@@ -725,6 +725,7 @@ class DomainMotif(object):
 
 
 class Regulation(object):
+    
     def __init__(self, ptm, source, target, effect, sources=None, refs=None):
         self.ptm = ptm if type(ptm) is list else [ptm]
         self.source = source
@@ -789,6 +790,7 @@ class Regulation(object):
 
 
 class Complex(object):
+    
     def __init__(self, proteins, name, long_name, sources):
         self.synonyms = set([])
         sources = sources if type(sources) is list else [sources]
