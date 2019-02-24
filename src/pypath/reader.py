@@ -218,7 +218,7 @@ class FieldProcessor(object):
         if isinstance(fields, common.simpleTypes):
             fields = (fields,)
         if self.single_value:
-            for field in self.process():
+            for field in fields:
                 yield field
         
         else:
