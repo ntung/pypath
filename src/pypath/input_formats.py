@@ -233,12 +233,12 @@ class ReadSettings:
         self.name = name
         self.separator = separator
         self.header = header
-        self.refs = references
+        self.references = references
         self.sign = sign
         self.taxonA = taxonA
         self.taxonB = taxonB
         self.ncbiTaxId = ncbiTaxId
-        self.intType = interactionType
+        self.interactionType = interactionType
         self.positiveFilters = positiveFilters or []
         self.negativeFilters = negativeFilters or []
         self.inputArgs = inputArgs or {}
