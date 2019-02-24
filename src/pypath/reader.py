@@ -44,13 +44,13 @@ FIELDS = {
     'taxonB',
     'ncbiTaxId',
     'interactionType',
-    'resource'
-    }
+    'resource',
+}
 
 
 UNIQUE_FIELDS = {
     'nameColA',
-    'nameColB'
+    'nameColB',
 }
 
 class ReaderBase(object):
@@ -182,7 +182,7 @@ class Reader(ReaderBase):
                 field_settings,
                 field in self.unique_fields,
             )
-            for field, field_settings in self.iter_fields
+            for field, field_settings in self.iter_fields()
         ]
     
     
@@ -197,6 +197,8 @@ class Reader(ReaderBase):
 
 
 class FieldProcessor(object):
+    
+    
     def __init__(self, field, is_unique = False):
         """
         :arg field:
@@ -221,7 +223,6 @@ class FieldProcessor(object):
         
         else:
             yield set(fields)
-
 
 
     def setup_method(self):
@@ -267,13 +268,12 @@ class FieldProcessor(object):
         return value
 
 
-    def dict_method(self):
+    def dict_method(self, row = None):
         self.i = self.field['col']
         value = self.index_method()
         mapping = self.field['dict']
 
         return mapping[value] if value in mapping else None
-
 
 
     def new_row(self, row):
