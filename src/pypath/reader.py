@@ -165,7 +165,7 @@ class Reader(ReaderBase):
     def iter_field_names(self):
         
         return itertools.chain(
-            self.fileds,
+            self.fields,
             self.fields_e_extra,
             self.fields_a_extra,
             self.fields_b_extra,
