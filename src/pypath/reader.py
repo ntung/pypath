@@ -21,13 +21,11 @@
 
 
 import os
-import imp
 import itertools
 import pandas as pd
 import pypath.common as common
 import pypath.dataio as dataio
 import pypath.curl as curl
-
 
 FIELDS = {
     'nameColA',
@@ -141,13 +139,13 @@ class Reader(ReaderBase):
 
     def setup_fields(self):
         self.fields = FIELDS
-        self.fields = self.fields | set(self.settings.extraEdgeAttrs.keys())
-        self.fields = self.fields | set(self.settings.extraNodeAttrsA.keys())
-        self.fields = self.fields | set(self.settings.extraNodeAttrsB.keys())
+        self.fields = self.fields & set(self.settings.extraEdgeAttrs.keys())
+        self.fields = self.fields & set(self.settings.extraNodeAttrsA.keys())
+        self.fields = self.fields & set(self.settings.extraNodeAttrsB.keys())
         self.fields = sorted(self.fields)
         self.unique_fields = UNIQUE_FIELDS
         self.unique_fields = (
-            self.unique_fields | set(self.settings.unique_fields)
+            self.unique_fields & set(self.settings.unique_fields)
         )
 
 
@@ -159,16 +157,6 @@ class Reader(ReaderBase):
 
             for field in self.fields
         ]
-
-
-    def reload(self):
-        """Reloads the object from the module level."""
-
-        modname = self.__class__.__module__
-        mod = __import__(modname, fromlist = [modname.split('.')[0]])
-        imp.reload(mod)
-        new = getattr(mod, self.__class__.__name__)
-        setattr(self, '__class__', new)
  
 
 class FieldProcessor(object):
@@ -201,7 +189,7 @@ class FieldProcessor(object):
 
     def setup_method(self):
 
-        if isinstance(self.field, common.basestring):
+        if isinstance(self._method, common.basestring):
             self._method = self.str_method
 
         elif callable(self.field):
