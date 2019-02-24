@@ -178,7 +178,7 @@ class Reader(ReaderBase):
             FieldProcessor(getattr(self.settings, field),
                            field in self.unique_fields)
 
-            for field in self.fields
+            for field in self.iter_fields()
         ]
 
 
