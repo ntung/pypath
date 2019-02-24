@@ -19,6 +19,7 @@
 #  Website: http://pypath.omnipathdb.org/
 #
 
+from future.utils import iteritems
 
 import os
 import imp
@@ -57,6 +58,7 @@ class ReaderBase(object):
 
     def __init__(self, settings):
         self.settings = settings
+        self.setup_resource()
 
 
     def __iter__(self):
@@ -111,6 +113,7 @@ class Reader(ReaderBase):
             ReadSettings instance
         """
         ReaderBase.__init__(self, settings)
+        self.setup_fields()
 
 
     def iter_rows(self):
@@ -181,9 +184,8 @@ class Reader(ReaderBase):
             )
             for field, field_settings in self.iter_fields
         ]
-
-
-
+    
+    
     def reload(self):
         """Reloads the object from the module level."""
 
@@ -192,7 +194,7 @@ class Reader(ReaderBase):
         imp.reload(mod)
         new = getattr(mod, self.__class__.__name__)
         setattr(self, '__class__', new)
- 
+
 
 class FieldProcessor(object):
     def __init__(self, field, is_unique = False):
