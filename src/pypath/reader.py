@@ -54,10 +54,13 @@ class ReaderBase(object):
 
 
     def __init__(self, settings):
+        
         self.settings = settings
+        self.setup_resource()
 
 
     def __iter__(self):
+        
         for i, row in enumerate(self.resource):
             if i < self.settings.header or not row:
                 continue
@@ -72,6 +75,7 @@ class ReaderBase(object):
 
 
     def setup_resource(self):
+        
         self.input = self.settings.inFile
 
         if callable(self.input):
@@ -109,6 +113,8 @@ class Reader(ReaderBase):
             ReadSettings instance
         """
         ReaderBase.__init__(self, settings)
+        
+        self.setup_fields()
 
 
     def iter_rows(self):
@@ -138,24 +144,45 @@ class Reader(ReaderBase):
     
 
     def setup_fields(self):
-        self.fields = FIELDS
-        self.fields = self.fields & set(self.settings.extraEdgeAttrs.keys())
-        self.fields = self.fields & set(self.settings.extraNodeAttrsA.keys())
-        self.fields = self.fields & set(self.settings.extraNodeAttrsB.keys())
-        self.fields = sorted(self.fields)
+        self.fields = sorted(FIELDS)
+        self.fields_e_extra = sorted(self.settings.extraEdgeAttrs.keys())
+        self.fields_a_extra = sorted(self.settings.extraNodeAttrsA.keys())
+        self.fields_b_extra = sorted(self.settings.extraNodeAttrsB.keys())
+        
         self.unique_fields = UNIQUE_FIELDS
         self.unique_fields = (
             self.unique_fields & set(self.settings.unique_fields)
         )
-
-
+    
+    
+    def iter_fields(self):
+        
+        return itertools.chain(
+            ((field, getattr(self.settings, field)) for field in self.fields),
+            sorted(iteritems(self.settings.extraEdgeAttrs)),
+            sorted(iteritems(self.settings.extraNodeAttrsA)),
+            sorted(iteritems(self.settings.extraNodeAttrsB)),
+        )
+    
+    
+    def iter_field_names(self):
+        
+        return itertools.chain(
+            self.fileds,
+            self.fields_e_extra,
+            self.fields_a_extra,
+            self.fields_b_extra,
+        )
+    
+    
     def setup_field_processors(self):
+        
         self.field_processors = [
-
-            FieldProcessor(getattr(self.settings, field),
-                           field in self.unique_fields)
-
-            for field in self.fields
+            FieldProcessor(
+                field_settings,
+                field in self.unique_fields,
+            )
+            for field, field_settings in self.iter_fields
         ]
  
 
