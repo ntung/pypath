@@ -170,16 +170,18 @@ class Reader(ReaderBase):
             self.fields_a_extra,
             self.fields_b_extra,
         )
-
-
+    
+    
     def setup_field_processors(self):
+        
         self.field_processors = [
-
-            FieldProcessor(getattr(self.settings, field),
-                           field in self.unique_fields)
-
-            for field in self.iter_fields()
+            FieldProcessor(
+                field_settings,
+                field in self.unique_fields,
+            )
+            for field, field_settings in self.iter_fields
         ]
+
 
 
     def reload(self):
