@@ -5,11 +5,6 @@ import pypath.common as common
 import pypath.dataio as dataio
 import pypath.curl as curl
 
-
-
-
-
-
 FIELDS = {
     'nameColA',
     'nameColB',
