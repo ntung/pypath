@@ -5,7 +5,7 @@
 #  This file is part of the `pypath` python module
 #
 #  Copyright
-#  2014-2018
+#  2014-2019
 #  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University
 #
 #  File author(s): Dénes Türei (turei.denes@gmail.com)
@@ -89,6 +89,47 @@ obsolate = {
         extraNodeAttrsA={},
         extraNodeAttrsB={})
 }
+
+
+new = {'signor': input_formats.ReadSettings(
+        name="Signor",
+        separator=None,
+        nameColA=2,
+        nameColB=6,
+        nameTypeA="uniprot",
+        nameTypeB="uniprot",
+        # only direct interactions
+        positiveFilters=[(22, 'YES')],
+        # exclude TF-target interactions
+        negativeFilters=[(9, 'transcriptional regulation')],
+        typeA="protein",
+        typeB="protein",
+        ncbiTaxId={'col': 12,
+                   'dict': {
+                       '9606;9606': 9606,
+                       '9606': 9606
+                   }},
+        isDirected=(8, [
+            'up-regulates', 'up-regulates activity',
+            'up-regulates quantity by stabilization', 'down-regulates',
+            'down-regulates activity',
+            'down-regulates quantity by destabilization'
+        ]),
+        sign=(8, [
+            'up-regulates', 'up-regulates activity',
+            'up-regulates quantity by stabilization'
+        ], [
+            'down-regulates', 'down-regulates activity',
+            'down-regulates quantity by destabilization'
+        ]),
+        inFile='signor_interactions',
+        references=(21, ";"),
+        header=True,
+        extraEdgeAttrs={"signor_mechanism": (9, ';')},
+        extraNodeAttrsA={},
+        extraNodeAttrsB={})
+}
+
 '''
 Reaction databases.
 These are not included in OmniPath, because only a minor
