@@ -182,7 +182,7 @@ class Reader(ReaderBase):
                 field_settings,
                 field in self.unique_fields,
             )
-            for field, field_settings in self.iter_fields
+            for field, field_settings in self.iter_fields()
         ]
     
     
@@ -216,7 +216,7 @@ class FieldProcessor(object):
         if isinstance(fields, common.simpleTypes):
             fields = (fields,)
         if self.single_value:
-            for field in self.process():
+            for field in fields:
                 yield field
         
         else:
@@ -267,7 +267,7 @@ class FieldProcessor(object):
         return value
 
 
-    def dict_method(self):
+    def dict_method(self, row = None):
         self.i = self.field['col']
         value = self.index_method()
         mapping = self.field['dict']
