@@ -150,6 +150,26 @@ class Reader(ReaderBase):
         self.unique_fields = (
             self.unique_fields | set(self.settings.unique_fields)
         )
+    
+    
+    def iter_fields(self):
+        
+        return itertools.chain(
+            ((field, getattr(self.settings, field)) for field in self.fields),
+            sorted(iteritems(self.settings.extraEdgeAttrs)),
+            sorted(iteritems(self.settings.extraNodeAttrsA)),
+            sorted(iteritems(self.settings.extraNodeAttrsB)),
+        )
+    
+    
+    def iter_field_names(self):
+        
+        return itertools.chain(
+            self.fileds,
+            self.fields_e_extra,
+            self.fields_a_extra,
+            self.fields_b_extra,
+        )
 
 
     def setup_field_processors(self):
