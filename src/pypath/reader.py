@@ -214,14 +214,20 @@ class FieldProcessor(object):
 
 
     def __iter__(self):
+        
         fields = self.process()
+        
         if isinstance(fields, common.simpleTypes):
             fields = (fields,)
+            
         if self.single_value:
+            
             for field in fields:
+                
                 yield field
         
         else:
+            
             yield set(fields)
 
 
