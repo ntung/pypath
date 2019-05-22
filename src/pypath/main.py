@@ -36,7 +36,7 @@ from functools import reduce
 try:
     import cairo
 
-except ImportError: # XXX: Catching any exception like this is bad practice
+except ImportError:
     _logger._log(
         'Module `cairo` not available. '
         'Some plotting functionalities won\'t work.'
@@ -12923,16 +12923,16 @@ class PyPath(session_mod.Logger):
         for interactions already supported by literature
         evidences from other sources.
         """
-        
+
         if use_string_effects:
             self.string_effects(graph = graph)
-        
+
         self.kegg_directions(graph=graph)
-        
+
         if use_laudanna_data:
             self.laudanna_effects(graph=graph)
             self.laudanna_directions(graph=graph)
-        
+
         self.wang_effects(graph=graph)
         self.acsn_effects(graph=graph)
         self.phosphosite_directions(graph=graph)
@@ -14445,18 +14445,18 @@ class PyPath(session_mod.Logger):
             tuple(_sort((names[e.source], names[e.target])))
             for e in graph.es
         ]
-        
+
     def __iter__(self):
-        
+
         return self.iter_interactions()
-    
+
     def iter_interactions(self):
         """
         Iterates over edges and yields interaction records.
         """
-        
+
         def get_references(sources, edge):
-            
+
             return set(
                 ref.pmid
                 for this_refs in
@@ -14467,34 +14467,34 @@ class PyPath(session_mod.Logger):
                 )
                 for ref in this_refs
             )
-        
-        
+
+
         for edge in self.graph.es:
-            
+
             directions = edge['dirs']
-            
+
             for direction in (directions.straight, directions.reverse):
-                
+
                 if not directions.dirs[direction]:
                     # this direction does not exist
                     continue
-                
+
                 dir_sources = directions.get_dir(direction, sources = True)
-                
+
                 id_a = direction[0]
                 id_b = direction[1]
                 type_a = self.uniprot(id_a)['type']
                 type_b = self.uniprot(id_b)['type']
-                
+
                 for effect, sign_sources in zip(
                     (1, -1),
                     directions.get_sign(direction, sources = True)
                 ):
-                    
+
                     if sign_sources:
-                        
+
                         references = get_references(sign_sources, edge)
-                        
+
                         yield network.Interaction(
                             id_a = id_a,
                             id_b = id_b,
@@ -14506,16 +14506,16 @@ class PyPath(session_mod.Logger):
                             sources = sign_sources,
                             references = references,
                         )
-                
+
                 sources_with_sign = set.union(
                     *directions.get_sign(direction, sources = True)
                 )
                 sources_without_sign = dir_sources - sources_with_sign
-                
+
                 if sources_without_sign:
-                    
+
                     references = get_references(sources_without_sign, edge)
-                    
+
                     yield network.Interaction(
                         id_a = id_a,
                         id_b = id_b,
@@ -14527,19 +14527,19 @@ class PyPath(session_mod.Logger):
                         sources = sources_without_sign,
                         references = references,
                     )
-            
+
             undirected_sources = (
                 directions.get_dir('undirected', sources = True)
             )
-            
+
             if undirected_sources:
-                
+
                 id_a = self.graph.vs[edge.source]['name']
                 id_b = self.graph.vs[edge.target]['name']
                 type_a = self.graph.vs[edge.source]['type']
                 type_b = self.graph.vs[edge.target]['type']
                 references = get_references(undirected_sources, edge)
-                
+
                 yield network.Interaction(
                     id_a = id_a,
                     id_b = id_b,
@@ -14551,7 +14551,7 @@ class PyPath(session_mod.Logger):
                     sources = undirected_sources,
                     references = references,
                 )
-    
+
     # shortcuts for the most often used igraph attributes:
 
     @property
