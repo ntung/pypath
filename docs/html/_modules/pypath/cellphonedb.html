@@ -1,0 +1,573 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>pypath.cellphonedb &#8212; pypath 0.8.10 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pypath.cellphonedb</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="c1">#</span>
+<span class="c1">#  This file is part of the `pypath` python module</span>
+<span class="c1">#</span>
+<span class="c1">#  Copyright</span>
+<span class="c1">#  2014-2019</span>
+<span class="c1">#  EMBL, EMBL-EBI, Uniklinik RWTH Aachen, Heidelberg University</span>
+<span class="c1">#</span>
+<span class="c1">#  File author(s): Dénes Türei (turei.denes@gmail.com)</span>
+<span class="c1">#                  Nicolàs Palacio</span>
+<span class="c1">#</span>
+<span class="c1">#  Distributed under the GPLv3 License.</span>
+<span class="c1">#  See accompanying file LICENSE.txt or copy at</span>
+<span class="c1">#      http://www.gnu.org/licenses/gpl-3.0.html</span>
+<span class="c1">#</span>
+<span class="c1">#  Website: http://pypath.omnipathdb.org/</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">iteritems</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">imp</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">pypath.mapping</span> <span class="k">as</span> <span class="nn">mapping</span>
+<span class="kn">import</span> <span class="nn">pypath.session_mod</span> <span class="k">as</span> <span class="nn">session_mod</span>
+<span class="kn">import</span> <span class="nn">pypath.main</span> <span class="k">as</span> <span class="nn">main_mod</span>
+<span class="kn">import</span> <span class="nn">pypath.network</span> <span class="k">as</span> <span class="nn">network_mod</span>
+<span class="kn">import</span> <span class="nn">pypath.data_formats</span> <span class="k">as</span> <span class="nn">data_formats</span>
+<span class="kn">import</span> <span class="nn">pypath.annot</span> <span class="k">as</span> <span class="nn">annot</span>
+<span class="kn">import</span> <span class="nn">pypath.intercell</span> <span class="k">as</span> <span class="nn">intercell</span>
+
+
+<span class="n">CellPhoneDBGene</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;CellPhoneDBGene&#39;</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="s1">&#39;gene_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;hgnc_symbol&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ensembl&#39;</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="n">CellPhoneDBProtein</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;CellPhoneDBProtein&#39;</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;adhesion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cytoplasm&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;entry_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;extracellular&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;integrin_interaction&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;other&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;other_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pdb_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pdb_structure&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;peripheral&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;receptor&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;receptor_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secreted_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secreted_highlight&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secretion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;stoichiometry&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tags_description&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transmembrane&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transporter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tags&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tags_reason&#39;</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="n">CellPhoneDBInteraction</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;CellPhoneDBInteraction&#39;</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="s1">&#39;comments_interaction&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;dlrp&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;family&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;iuphar&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;multidata_name_1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;multidata_name_2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;score_1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;score_2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;source&#39;</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="n">CellPhoneDBComplex</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+    <span class="s1">&#39;CellPhoneDBComplex&#39;</span><span class="p">,</span>
+    <span class="p">[</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uniprot_1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uniprot_2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uniprot_3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uniprot_4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;adhesion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cytoplasm&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;extracellular&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;integrin_interaction&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;other&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;other_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;peripheral&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;receptor&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;receptor_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secreted_desc&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secreted_highlight&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secretion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transmembrane&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transporter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pdb_structure&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pdb_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;stoichiometry&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;comments_complex&#39;</span><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+
+
+<span class="n">categories_transmitter</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ligand&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gap_junction&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tight_junction&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;extracellular_enzyme&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">categories_receiver</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;receptor&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;transporter&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gap_junction&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tight_junction&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;adhesion&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="n">categories</span> <span class="o">=</span> <span class="n">categories_transmitter</span> <span class="o">|</span> <span class="n">categories_receiver</span>
+
+
+<span class="k">class</span> <span class="nc">CellPhoneDB</span><span class="p">(</span><span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">output_dir</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">network</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">annotation</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">network_param</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">annot_param</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">omnipath</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">):</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_log_name&#39;</span><span class="p">):</span>
+            
+            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;cellphonedb&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_param</span> <span class="o">=</span> <span class="n">network_param</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot_param</span> <span class="o">=</span> <span class="n">annot_param</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omnipath</span> <span class="o">=</span> <span class="n">omnipath</span>
+    
+    
+    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="kn">import</span> <span class="nn">imp</span>
+        <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_paths</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_network</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup_annotation</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">setup_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="ow">or</span> <span class="s1">&#39;.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_path</span><span class="p">(</span><span class="s1">&#39;gene&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_path</span><span class="p">(</span><span class="s1">&#39;protein&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_path</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_path</span><span class="p">(</span><span class="s1">&#39;interaction&#39;</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_set_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_path&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.csv&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">),</span>
+        <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">setup_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">omnipath</span> <span class="ow">and</span> <span class="s1">&#39;lst&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_param</span><span class="p">:</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">network_param</span><span class="p">[</span><span class="s1">&#39;lst&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_formats</span><span class="o">.</span><span class="n">pathway</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">main_mod</span><span class="o">.</span><span class="n">PyPath</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">init_network</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">network_param</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">main_mod</span><span class="o">.</span><span class="n">PyPath</span><span class="p">):</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network_mod</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="n">records</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">network_mod</span><span class="o">.</span><span class="n">Network</span><span class="p">):</span>
+            
+            <span class="k">pass</span>
+    
+    
+    <span class="k">def</span> <span class="nf">setup_annotation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span> <span class="o">=</span> <span class="n">intercell</span><span class="o">.</span><span class="n">IntercellAnnotation</span><span class="p">(</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">annot_param</span>
+            <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_interaction</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_protein</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_complex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_gene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_dataframes</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">build_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">iuphar</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Guide2Pharma&#39;</span><span class="p">,</span> <span class="s1">&#39;Guide2Pharma_CP&#39;</span><span class="p">}</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        
+        <span class="k">for</span> <span class="n">iaction</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">records</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
+            
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="c1"># either the interaction is directed and the source is an</span>
+                <span class="c1"># intercellular communication transmitter while the target</span>
+                <span class="c1"># is a receiver</span>
+                <span class="n">iaction</span><span class="o">.</span><span class="n">directed</span> <span class="ow">and</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_a</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="n">categories_transmitter</span>
+                <span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_b</span><span class="p">)</span> <span class="o">&amp;</span>
+                    <span class="n">categories_transmitter</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="c1"># or it is indirected but both partners belong to the same</span>
+                <span class="c1"># intercellular communication role category</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_a</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_b</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="n">categories_transmitter</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_a</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_b</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="n">categories_receiver</span>
+            <span class="p">):</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="n">CellPhoneDBInteraction</span><span class="p">(</span>
+                        <span class="n">comments_interaction</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">dlrp</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="c1"># we don&#39;t have this info</span>
+                        <span class="n">family</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">iuphar</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">sources</span> <span class="o">&amp;</span> <span class="n">iuphar</span><span class="p">),</span>
+                        <span class="n">multidata_name_1</span> <span class="o">=</span> <span class="n">iaction</span><span class="o">.</span><span class="n">id_a</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                        <span class="n">multidata_name_2</span> <span class="o">=</span> <span class="n">iaction</span><span class="o">.</span><span class="n">id_b</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                        <span class="n">score_1</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">score_2</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">sources</span><span class="p">)),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_a</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">iaction</span><span class="o">.</span><span class="n">id_b</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">build_protein</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="n">integrins</span> <span class="o">=</span> <span class="n">annot</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="s1">&#39;Integrins&#39;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        
+        <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span><span class="p">:</span>
+            
+            <span class="c1"># we add the components of the complexes to the protein data</span>
+            <span class="c1"># frame; I don&#39;t know if it&#39;s necessary but does not harm I guess</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s1">&#39;components&#39;</span><span class="p">):</span>
+                
+                <span class="n">components</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">components</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="n">components</span> <span class="o">=</span> <span class="p">(</span><span class="n">entity</span><span class="p">,)</span>
+            
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                
+                <span class="n">classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">protein</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="n">CellPhoneDBProtein</span><span class="p">(</span>
+                        <span class="n">uniprot</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                        <span class="n">adhesion</span> <span class="o">=</span> <span class="s1">&#39;adhesion&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">cytoplasm</span> <span class="o">=</span> <span class="s1">&#39;intracellular&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">entry_name</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span>
+                            <span class="n">comp</span><span class="p">,</span>
+                            <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;uniprot-entry&#39;</span><span class="p">,</span>
+                        <span class="p">),</span>
+                        <span class="n">extracellular</span> <span class="o">=</span> <span class="s1">&#39;extracellular&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">integrin_interaction</span> <span class="o">=</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">integrins</span><span class="p">,</span>
+                        <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">other_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">pdb_id</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">pdb_structure</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">peripheral</span> <span class="o">=</span> <span class="s1">&#39;cell_surface&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">receptor</span> <span class="o">=</span> <span class="s1">&#39;receptor&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">receptor_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">secreted_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">secreted_highlight</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">secretion</span> <span class="o">=</span> <span class="s1">&#39;secreted&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">stoichiometry</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">tags_description</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">transmembrane</span> <span class="o">=</span> <span class="s1">&#39;transmembrane&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">transporter</span> <span class="o">=</span> <span class="s1">&#39;transporter&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                        <span class="n">tags</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                        <span class="n">tags_reason</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">build_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">def</span> <span class="nf">get_component</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+            
+            <span class="k">return</span> <span class="n">components</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">idx</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        
+        <span class="n">integrins</span> <span class="o">=</span> <span class="n">annot</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="s1">&#39;Integrins&#39;</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">complex</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        
+        <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s1">&#39;components&#39;</span><span class="p">):</span>
+                
+                <span class="k">continue</span>
+            
+            <span class="c1"># hey, what to do with complexes with more than 4 components???</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            
+            <span class="n">classes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotation</span><span class="o">.</span><span class="n">classes_by_entity</span><span class="p">(</span><span class="n">entity</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">complex</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">CellPhoneDBComplex</span><span class="p">(</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                    <span class="n">uniprot_1</span> <span class="o">=</span> <span class="n">get_component</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="n">uniprot_2</span> <span class="o">=</span> <span class="n">get_component</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">uniprot_3</span> <span class="o">=</span> <span class="n">get_component</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">uniprot_4</span> <span class="o">=</span> <span class="n">get_component</span><span class="p">(</span><span class="n">components</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                    <span class="n">adhesion</span> <span class="o">=</span> <span class="s1">&#39;adhesion&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">cytoplasm</span> <span class="o">=</span> <span class="s1">&#39;intracellular&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">extracellular</span> <span class="o">=</span> <span class="s1">&#39;extracellular&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">integrin_interaction</span> <span class="o">=</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">integrins</span><span class="p">,</span>
+                    <span class="n">other</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">other_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">peripheral</span> <span class="o">=</span> <span class="s1">&#39;cell_surface&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">receptor</span> <span class="o">=</span> <span class="s1">&#39;receptor&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">receptor_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">secreted_desc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">secreted_highlight</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">secretion</span> <span class="o">=</span> <span class="s1">&#39;secreted&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">transmembrane</span> <span class="o">=</span> <span class="s1">&#39;transmembrane&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">transporter</span> <span class="o">=</span> <span class="s1">&#39;transporter&#39;</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">,</span>
+                    <span class="n">pdb_structure</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">pdb_id</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">entity</span><span class="o">.</span><span class="n">ids</span><span class="p">[</span><span class="s1">&#39;PDB&#39;</span><span class="p">]))</span>
+                            <span class="k">if</span> <span class="s1">&#39;PDB&#39;</span> <span class="ow">in</span> <span class="n">entity</span><span class="o">.</span><span class="n">ids</span> <span class="k">else</span>
+                        <span class="s1">&#39;&#39;</span>
+                    <span class="p">),</span>
+                    <span class="n">stoichiometry</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">stoichiometry_str_genesymbols</span><span class="p">,</span>
+                    <span class="n">comments_complex</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">build_gene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">gene</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        
+        <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entities</span><span class="p">:</span>
+            
+            <span class="c1"># we add the components of the complexes to the protein data</span>
+            <span class="c1"># frame; I don&#39;t know if it&#39;s necessary but does not harm I guess</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">entity</span><span class="p">,</span> <span class="s1">&#39;components&#39;</span><span class="p">):</span>
+                
+                <span class="n">components</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">components</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="n">components</span> <span class="o">=</span> <span class="p">(</span><span class="n">entity</span><span class="p">,)</span>
+            
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                
+                <span class="n">name</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span> <span class="s1">&#39;genesymbol&#39;</span><span class="p">)</span>
+                <span class="n">ensembl_genes</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span> <span class="s1">&#39;ensembl&#39;</span><span class="p">)</span>
+                
+                <span class="k">for</span> <span class="n">ensembl</span> <span class="ow">in</span> <span class="n">ensembl_genes</span><span class="p">:</span>
+                    
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                        <span class="n">CellPhoneDBGene</span><span class="p">(</span>
+                            <span class="n">gene_name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
+                            <span class="n">uniprot</span> <span class="o">=</span> <span class="n">comp</span><span class="p">,</span>
+                            <span class="n">hgnc_symbol</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
+                            <span class="n">ensembl</span> <span class="o">=</span> <span class="n">ensembl</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">create_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;interaction&#39;</span><span class="p">,</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span> <span class="s1">&#39;gene&#39;</span><span class="p">):</span>
+            
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;CellPhoneDB</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()]</span><span class="o">.</span><span class="n">_fields</span>
+            
+            <span class="nb">setattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_dataframe&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">,</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">,</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_gene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_protein</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_complex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">export_interaction</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_path&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_dataframe&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">,</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="s1">&#39;Data frame `</span><span class="si">%s</span><span class="s1">` exported to `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+    
+    
+    <span class="k">def</span> <span class="nf">export_gene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export</span><span class="p">(</span><span class="s1">&#39;gene&#39;</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">export_protein</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export</span><span class="p">(</span><span class="s1">&#39;protein&#39;</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">export_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">export_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export</span><span class="p">(</span><span class="s1">&#39;interaction&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Dénes Türei.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>

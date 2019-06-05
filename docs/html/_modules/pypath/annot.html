@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>pypath.annot &#8212; pypath 0.8.7 documentation</title>
+    <title>pypath.annot &#8212; pypath 0.8.10 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -67,6 +66,11 @@
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
@@ -80,7 +84,7 @@
 <span class="kn">import</span> <span class="nn">pypath.annot_formats</span> <span class="k">as</span> <span class="nn">annot_formats</span>
 
 
-<span class="n">annotation_sources</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">protein_sources_default</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;Membranome&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Exocarta&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Vesiclepedia&#39;</span><span class="p">,</span>
@@ -93,6 +97,7 @@
     <span class="s1">&#39;GOIntercell&#39;</span><span class="p">,</span>
     <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Ramilowski2015&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Ramilowski2015Location&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Kirouac2010&#39;</span><span class="p">,</span>
     <span class="s1">&#39;GuideToPharmacology&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Adhesome&#39;</span><span class="p">,</span>
@@ -101,13 +106,16 @@
     <span class="s1">&#39;Topdb&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Hgnc&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Zhong2015&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;HumanProteinAtlas&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Comppi&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">complex_annotation_sources</span> <span class="o">=</span> <span class="p">{</span>
+<span class="n">complex_sources_default</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;CellPhoneDBComplex&#39;</span><span class="p">,</span>
     <span class="s1">&#39;CorumFuncat&#39;</span><span class="p">,</span>
     <span class="s1">&#39;CorumGO&#39;</span><span class="p">,</span>
     <span class="s1">&#39;HpmrComplex&#39;</span><span class="p">,</span>
+    <span class="c1">#&#39;PypathInferred&#39;,</span>
 <span class="p">}</span>
 
 <span class="n">default_fields</span> <span class="o">=</span> <span class="p">{</span>
@@ -115,7 +123,20 @@
     <span class="s1">&#39;Locate&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,),</span>
     <span class="s1">&#39;Vesiclepedia&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;vesicle&#39;</span><span class="p">,),</span>
     <span class="s1">&#39;Exocarta&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;vesicle&#39;</span><span class="p">,),</span>
+    <span class="s1">&#39;Ramilowski_location&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,),</span>
+    <span class="s1">&#39;HPA&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="s1">&#39;level&#39;</span><span class="p">),</span>
     <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;receptor&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;adhesion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;cytoplasm&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;peripheral&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secretion&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;secreted&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transporter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;transmembrane&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;extracellular&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;CellPhoneDB_Complex&#39;</span><span class="p">:</span> <span class="p">(</span>
         <span class="s1">&#39;receptor&#39;</span><span class="p">,</span>
         <span class="s1">&#39;adhesion&#39;</span><span class="p">,</span>
         <span class="s1">&#39;cytoplasm&#39;</span><span class="p">,</span>
@@ -135,11 +156,17 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">class_definitions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">):</span>
-
-        <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_log_name&#39;</span><span class="p">):</span>
+            
+            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="n">annotdb_pickle_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_class_definitions</span><span class="p">(</span><span class="n">class_definitions</span> <span class="ow">or</span> <span class="p">{})</span>
@@ -179,13 +206,35 @@
 <span class="sd">        Creates a classification of proteins according to their roles</span>
 <span class="sd">        in the intercellular communication.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
+            <span class="k">return</span>
+        
         <span class="k">for</span> <span class="n">classdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
 
             <span class="k">if</span> <span class="n">classdef</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="ow">or</span> <span class="n">update</span><span class="p">:</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">create_class</span><span class="p">(</span><span class="n">classdef</span><span class="p">)</span>
-
+    
+    
+    <span class="k">def</span> <span class="nf">load_from_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">save_to_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">fp</span><span class="p">,</span>
+            <span class="p">)</span>
+    
 
     <span class="k">def</span> <span class="nf">create_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classdef</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -198,7 +247,7 @@
 
     <span class="k">def</span> <span class="nf">process_annot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classdef</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Processes an annotation definition and returns a set if identifiers.</span>
+<span class="sd">        Processes an annotation definition and returns a set of identifiers.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
@@ -324,7 +373,7 @@
         <span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">classes_by_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">classes_by_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
             <span class="bp">cls</span>
@@ -342,6 +391,13 @@
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">entity_type</span> <span class="o">=</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+            <span class="n">swissprot_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">proteins</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">complexes</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">reference_set</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">infer_complexes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">dump</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -360,15 +416,31 @@
 <span class="sd">        :arg dict input_args:</span>
 <span class="sd">            Arguments for the ``input_method``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        
+        <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
+        
+        <span class="n">input_args</span> <span class="o">=</span> <span class="n">input_args</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">input_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        
         <span class="n">resource</span><span class="o">.</span><span class="n">AbstractResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="n">input_method</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="n">input_args</span><span class="p">,</span>
+            <span class="n">dump</span> <span class="o">=</span> <span class="n">dump</span><span class="p">,</span>
+            <span class="n">data_attr_name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">,</span>
         <span class="p">)</span>
-
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_type</span> <span class="o">=</span> <span class="n">entity_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">infer_complexes</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">infer_complexes</span> <span class="ow">and</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entity_type</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span> <span class="o">=</span> <span class="n">proteins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">complexes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">swissprot_only</span> <span class="o">=</span> <span class="n">swissprot_only</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
 
@@ -384,14 +456,218 @@
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="AnnotationBase.load_uniprots"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.load_uniprots">[docs]</a>    <span class="k">def</span> <span class="nf">load_uniprots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="s1">&#39;Loading annotations from `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_reference_set</span><span class="p">()</span>
+        <span class="n">resource</span><span class="o">.</span><span class="n">AbstractResource</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_complexes</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_complexes_by_inference</span><span class="p">()</span>
+    
+    
+<div class="viewcode-block" id="AnnotationBase.add_complexes_by_inference"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.add_complexes_by_inference">[docs]</a>    <span class="k">def</span> <span class="nf">add_complexes_by_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complexes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates complex annotations by in silico inference and adds them</span>
+<span class="sd">        to this annotation set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">complex_annotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">complex_inference</span><span class="p">(</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">complexes</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">complex_annotation</span><span class="p">)</span></div>
+    
+    
+<div class="viewcode-block" id="AnnotationBase.complex_inference"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.complex_inference">[docs]</a>    <span class="k">def</span> <span class="nf">complex_inference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">complexes</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Annotates all complexes in `complexes`, by default in the default</span>
+<span class="sd">        complex database (existing in the `complex` module or generated</span>
+<span class="sd">        on demand according to the module&#39;s current settings).</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dict with complexes as keys and sets of annotations as values.</span>
+<span class="sd">        Complexes with no valid information in this annotation resource</span>
+<span class="sd">        won&#39;t be in the dict.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        complexes : iterable</span>
+<span class="sd">            Iterable yielding complexes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="s1">&#39;Inferring complex annotations from `</span><span class="si">%s</span><span class="s1">`.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">complexes</span><span class="p">:</span>
+            
+            <span class="kn">import</span> <span class="nn">pypath.complex</span> <span class="k">as</span> <span class="nn">complex</span>
+            
+            <span class="n">complexdb</span> <span class="o">=</span> <span class="nb">complex</span><span class="o">.</span><span class="n">get_db</span><span class="p">()</span>
+            
+            <span class="n">complexes</span> <span class="o">=</span> <span class="n">complexdb</span><span class="o">.</span><span class="n">complexes</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        
+        <span class="n">complex_annotation</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">cplex</span> <span class="ow">in</span> <span class="n">complexes</span><span class="p">:</span>
+            
+            <span class="n">this_cplex_annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotate_complex</span><span class="p">(</span><span class="n">cplex</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">this_cplex_annot</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                
+                <span class="n">complex_annotation</span><span class="p">[</span><span class="n">cplex</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">this_cplex_annot</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">complex_annotation</span></div>
+    
+    
+<div class="viewcode-block" id="AnnotationBase.annotate_complex"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.annotate_complex">[docs]</a>    <span class="k">def</span> <span class="nf">annotate_complex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cplex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Infers annotations for a single complex.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="ow">or</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="c1"># this means no annotation for this complex</span>
+            <span class="k">return</span> <span class="kc">None</span>
+            
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span><span class="p">:</span>
+            <span class="c1"># here empty set means the complex belongs</span>
+            <span class="c1"># to the class of enitities covered by this</span>
+            <span class="c1"># annotation</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+            
+        <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span><span class="p">):</span>
+            
+            <span class="c1"># here a custom method combines the annotations</span>
+            <span class="c1"># we look at all possible combinations of the annotations</span>
+            <span class="c1"># of the components, but most likely each component have</span>
+            <span class="c1"># only one annotation in this case</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span><span class="p">(</span><span class="o">*</span><span class="n">annots</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">annots</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            
+            <span class="n">groups</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+            <span class="n">empty_args</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                
+                <span class="k">for</span> <span class="n">comp_annot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="p">[</span><span class="n">comp</span><span class="p">]:</span>
+                    
+                    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        
+                        <span class="bp">cls</span> <span class="o">=</span> <span class="n">comp_annot</span><span class="o">.</span><span class="vm">__class__</span>
+                        <span class="n">empty_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                            <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">comp_annot</span><span class="o">.</span><span class="n">_fields</span>
+                            <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span>
+                        <span class="p">)</span>
+                    
+                    <span class="n">groups</span><span class="p">[</span>
+                        <span class="nb">tuple</span><span class="p">(</span>
+                            <span class="nb">getattr</span><span class="p">(</span><span class="n">comp_annot</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span>
+                        <span class="p">)</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="c1"># the characteristic attributes of the group</span>
+                <span class="c1"># and the remaining left empty</span>
+                <span class="bp">cls</span><span class="p">(</span>
+                    <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eq_fields</span><span class="p">,</span> <span class="n">key</span><span class="p">)),</span>
+                    <span class="o">**</span><span class="n">empty_args</span>
+                <span class="p">)</span>
+                <span class="c1"># checking all groups</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+                <span class="c1"># and accepting the ones covering all members of the complex</span>
+                <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="n">components</span>
+            <span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AnnotationBase.load_proteins"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.load_proteins">[docs]</a>    <span class="k">def</span> <span class="nf">load_proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves a set of all UniProt IDs to have a base set of the entire</span>
 <span class="sd">        proteome.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataio</span><span class="o">.</span><span class="n">all_uniprots</span><span class="p">(</span><span class="n">organism</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">))</span></div>
-
+    
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_reference_set</span><span class="p">(</span>
+            <span class="n">proteins</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">complexes</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">use_complexes</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="n">swissprot_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">):</span>
+        
+        <span class="n">proteins</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">proteins</span> <span class="ow">or</span>
+            <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">dataio</span><span class="o">.</span><span class="n">all_uniprots</span><span class="p">(</span>
+                    <span class="n">organism</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
+                    <span class="n">swissprot</span> <span class="o">=</span> <span class="n">swissprot_only</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">use_complexes</span><span class="p">:</span>
+            
+            <span class="kn">import</span> <span class="nn">pypath.complex</span> <span class="k">as</span> <span class="nn">complex</span>
+            
+            <span class="n">complexes</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">complexes</span> <span class="ow">or</span>
+                <span class="nb">sorted</span><span class="p">(</span><span class="nb">complex</span><span class="o">.</span><span class="n">all_complexes</span><span class="p">())</span>
+            <span class="p">)</span>
+        
+        <span class="n">reference_set</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
+                <span class="n">proteins</span><span class="p">,</span>
+                <span class="n">complexes</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">proteins</span><span class="p">,</span> <span class="n">complexes</span><span class="p">,</span> <span class="n">reference_set</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_get_reference_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reference_set</span><span class="p">(</span>
+            <span class="n">proteins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">,</span>
+            <span class="n">complexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span>
+            <span class="n">use_complexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_complexes</span><span class="p">(),</span>
+            <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">,</span>
+            <span class="n">swissprot_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swissprot_only</span><span class="p">,</span>
+        <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">set_reference_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">:</span>
+            
+            <span class="n">proteins</span><span class="p">,</span> <span class="n">complexes</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reference_set</span><span class="p">()</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span> <span class="o">=</span> <span class="n">proteins</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">complexes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span>
+    
+    
+    <span class="k">def</span> <span class="nf">has_complexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_type</span> <span class="o">==</span> <span class="s1">&#39;complex&#39;</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_complexes</span>
+    
 
     <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -470,46 +746,76 @@
 
                     <span class="n">result</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uniprot</span><span class="p">)</span>
                     <span class="k">break</span>
-
+        
         <span class="k">return</span> <span class="n">result</span></div>
-
-
-    <span class="k">def</span> <span class="nf">get_subset_bool_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uniprots</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+    
+    
+    <span class="k">def</span> <span class="nf">get_subset_bool_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span>
+        
         <span class="n">subset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
+        
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">subset</span>
-            <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">uniprots</span>
+            <span class="n">entity</span> <span class="ow">in</span> <span class="n">subset</span>
+            <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">reference_set</span>
         <span class="p">])</span>
-
-
-    <span class="k">def</span> <span class="nf">to_bool_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uniprots</span><span class="p">):</span>
-
+    
+    
+    <span class="k">def</span> <span class="nf">to_bool_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span><span class="p">):</span>
+        
         <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_set</span><span class="p">()</span>
-
+        
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">total</span>
-            <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">uniprots</span>
+            <span class="n">entity</span> <span class="ow">in</span> <span class="n">total</span>
+            <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">reference_set</span>
         <span class="p">])</span>
-
-
+    
+    
     <span class="k">def</span> <span class="nf">to_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+        
         <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-
-
-<div class="viewcode-block" id="AnnotationBase.all_uniprots"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.all_uniprots">[docs]</a>    <span class="k">def</span> <span class="nf">all_uniprots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    
+    
+<div class="viewcode-block" id="AnnotationBase.all_proteins"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase.all_proteins">[docs]</a>    <span class="k">def</span> <span class="nf">all_proteins</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        All UniProt IDs annotated in this resource.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
-
-
-    <span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uniprots</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">use_fields</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-
-        <span class="n">uniprots</span> <span class="o">=</span> <span class="n">uniprots</span> <span class="k">if</span> <span class="n">uniprots</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_uniprots</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">((</span>
+            <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">basestring</span><span class="p">)</span>
+        <span class="p">))</span></div>
+    
+    
+    <span class="k">def</span> <span class="nf">all_complexes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="kn">import</span> <span class="nn">pypath.complexes</span> <span class="k">as</span> <span class="nn">complexes</span>
+        <span class="kn">import</span> <span class="nn">pypath.intera</span> <span class="k">as</span> <span class="nn">intera</span>
+        
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">((</span>
+            <span class="n">k</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annot</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">intera</span><span class="o">.</span><span class="n">complex</span><span class="p">)</span>
+        <span class="p">))</span>
+    
+    
+    <span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">use_fields</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="n">use_fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">use_fields</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">default_fields</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">default_fields</span> <span class="k">else</span>
+                <span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+            <span class="s1">&#39;Creating boolean array from `</span><span class="si">%s</span><span class="s1">` annotation data.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        
+        <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span>
+        
         <span class="n">all_fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="n">use_fields</span> <span class="ow">or</span> <span class="n">all_fields</span>
         <span class="n">ifields</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
@@ -518,12 +824,12 @@
         <span class="n">result</span> <span class="o">=</span> <span class="p">[</span>
             <span class="p">(</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">to_bool_array</span><span class="p">(</span><span class="n">uniprots</span> <span class="o">=</span> <span class="n">uniprots</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">to_bool_array</span><span class="p">(</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="p">]</span>
-
+        
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)):</span>
-
+            
             <span class="n">this_ifields</span> <span class="o">=</span> <span class="n">ifields</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">this_fields</span>  <span class="o">=</span>  <span class="n">fields</span><span class="p">[:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
             
@@ -555,7 +861,7 @@
                 <span class="n">this_values</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">this_fields</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
 
                 <span class="n">this_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_subset_bool_array</span><span class="p">(</span>
-                    <span class="n">uniprots</span> <span class="o">=</span> <span class="n">uniprots</span><span class="p">,</span>
+                    <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
                     <span class="o">**</span><span class="n">this_values</span>
                 <span class="p">)</span>
 
@@ -565,7 +871,12 @@
                         <span class="n">this_array</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
-
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+            <span class="s1">&#39;Boolean array has been created from &#39;</span>
+            <span class="s1">&#39;`</span><span class="si">%s</span><span class="s1">` annotation data.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="p">)</span>
+        
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">tuple</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">),</span>
             <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">result</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
@@ -720,7 +1031,9 @@
 
 
 <div class="viewcode-block" id="Membranome"><a class="viewcode-back" href="../../reference.html#pypath.annot.Membranome">[docs]</a><span class="k">class</span> <span class="nc">Membranome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;membrane&#39;</span><span class="p">,</span> <span class="s1">&#39;side&#39;</span><span class="p">)</span>
+    
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -749,6 +1062,8 @@
 
 
 <div class="viewcode-block" id="Exocarta"><a class="viewcode-back" href="../../reference.html#pypath.annot.Exocarta">[docs]</a><span class="k">class</span> <span class="nc">Exocarta</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="s1">&#39;vesicle&#39;</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -766,7 +1081,7 @@
             <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;_get_exocarta_vesiclepedia&#39;</span><span class="p">,</span>
-            <span class="n">input_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -815,6 +1130,8 @@
 
 <div class="viewcode-block" id="Vesiclepedia"><a class="viewcode-back" href="../../reference.html#pypath.annot.Vesiclepedia">[docs]</a><span class="k">class</span> <span class="nc">Vesiclepedia</span><span class="p">(</span><span class="n">Exocarta</span><span class="p">):</span>
 
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="s1">&#39;vesicle&#39;</span><span class="p">)</span>
+    
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -827,7 +1144,8 @@
 
 
 <div class="viewcode-block" id="Matrisome"><a class="viewcode-back" href="../../reference.html#pypath.annot.Matrisome">[docs]</a><span class="k">class</span> <span class="nc">Matrisome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,</span> <span class="s1">&#39;subclass&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -840,7 +1158,7 @@
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Matrisome&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_matrisome&#39;</span><span class="p">,</span>
-            <span class="n">input_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
 
@@ -861,7 +1179,9 @@
 
 
 <div class="viewcode-block" id="Surfaceome"><a class="viewcode-back" href="../../reference.html#pypath.annot.Surfaceome">[docs]</a><span class="k">class</span> <span class="nc">Surfaceome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
@@ -898,6 +1218,8 @@
 
 <div class="viewcode-block" id="Adhesome"><a class="viewcode-back" href="../../reference.html#pypath.annot.Adhesome">[docs]</a><span class="k">class</span> <span class="nc">Adhesome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
@@ -905,6 +1227,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Adhesome&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;adhesome_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -916,6 +1239,8 @@
 
 <div class="viewcode-block" id="Hgnc"><a class="viewcode-back" href="../../reference.html#pypath.annot.Hgnc">[docs]</a><span class="k">class</span> <span class="nc">Hgnc</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
@@ -923,6 +1248,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HGNC&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;hgnc_genegroups&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -935,6 +1261,8 @@
 
 <div class="viewcode-block" id="Zhong2015"><a class="viewcode-back" href="../../reference.html#pypath.annot.Zhong2015">[docs]</a><span class="k">class</span> <span class="nc">Zhong2015</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,)</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
@@ -942,6 +1270,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Zhong2015&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;zhong2015_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -953,16 +1282,20 @@
 
 <div class="viewcode-block" id="Opm"><a class="viewcode-back" href="../../reference.html#pypath.annot.Opm">[docs]</a><span class="k">class</span> <span class="nc">Opm</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;membrane&#39;</span><span class="p">,)</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="s1">&#39;organism&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;organism&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span>
         
         <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;OPM&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;opm_annotations&#39;</span><span class="p">,</span>
-            <span class="n">input_args</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;organism&#39;</span><span class="p">:</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
-            <span class="p">}</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -974,6 +1307,8 @@
 
 <div class="viewcode-block" id="Topdb"><a class="viewcode-back" href="../../reference.html#pypath.annot.Topdb">[docs]</a><span class="k">class</span> <span class="nc">Topdb</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;membrane&#39;</span><span class="p">,)</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
@@ -983,7 +1318,9 @@
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;topdb_annotations&#39;</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;ncbi_tax_id&#39;</span><span class="p">:</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
-            <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -995,6 +1332,8 @@
 
 <div class="viewcode-block" id="Integrins"><a class="viewcode-back" href="../../reference.html#pypath.annot.Integrins">[docs]</a><span class="k">class</span> <span class="nc">Integrins</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+    
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
@@ -1002,13 +1341,83 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Integrins&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_integrins&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="HumanProteinAtlas"><a class="viewcode-back" href="../../reference.html#pypath.annot.HumanProteinAtlas">[docs]</a><span class="k">class</span> <span class="nc">HumanProteinAtlas</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HPA&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;proteinatlas_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Comppi"><a class="viewcode-back" href="../../reference.html#pypath.annot.Comppi">[docs]</a><span class="k">class</span> <span class="nc">Comppi</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;ComPPI&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;comppi_locations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Ramilowski2015Location"><a class="viewcode-back" href="../../reference.html#pypath.annot.Ramilowski2015Location">[docs]</a><span class="k">class</span> <span class="nc">Ramilowski2015Location</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Ramilowski_location&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;ramilowski_locations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        
+        
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="CellSurfaceProteinAtlas"><a class="viewcode-back" href="../../reference.html#pypath.annot.CellSurfaceProteinAtlas">[docs]</a><span class="k">class</span> <span class="nc">CellSurfaceProteinAtlas</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The name of this resource abbreviated as `CSPA`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1022,13 +1431,15 @@
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CSPA&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_cspa&#39;</span><span class="p">,</span>
-            <span class="n">input_args</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="HumanPlasmaMembraneReceptome"><a class="viewcode-back" href="../../reference.html#pypath.annot.HumanPlasmaMembraneReceptome">[docs]</a><span class="k">class</span> <span class="nc">HumanPlasmaMembraneReceptome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;role&#39;</span><span class="p">,)</span>
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The name of this resource abbreviated as `HPMR`.</span>
@@ -1049,9 +1460,11 @@
 
 
 <div class="viewcode-block" id="Matrixdb"><a class="viewcode-back" href="../../reference.html#pypath.annot.Matrixdb">[docs]</a><span class="k">class</span> <span class="nc">Matrixdb</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">):</span>
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Protein annotations from MatrixDB.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1061,6 +1474,7 @@
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;MatrixDB&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;matrixdb_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
 
@@ -1073,14 +1487,17 @@
 
 
 <div class="viewcode-block" id="Locate"><a class="viewcode-back" href="../../reference.html#pypath.annot.Locate">[docs]</a><span class="k">class</span> <span class="nc">Locate</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;location&#39;</span><span class="p">,)</span>
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
             <span class="n">literature</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">external</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
             <span class="n">predictions</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
 
         <span class="n">input_args</span> <span class="o">=</span> <span class="p">{</span>
@@ -1096,6 +1513,7 @@
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_locate_localizations&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="n">input_args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
 
@@ -1115,6 +1533,7 @@
             <span class="n">categories</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">go_annot</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Same as :class:``pypath.go.GOCustomAnnotation``</span>
@@ -1133,13 +1552,16 @@
 
 
 <div class="viewcode-block" id="GOIntercell"><a class="viewcode-back" href="../../reference.html#pypath.annot.GOIntercell">[docs]</a><span class="k">class</span> <span class="nc">GOIntercell</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">categories</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">go_annot</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Annotation of proteins based on their roles in intercellular</span>
@@ -1153,6 +1575,7 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;GO_Intercell&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
 
@@ -1188,15 +1611,21 @@
 
 
 <div class="viewcode-block" id="CellPhoneDB"><a class="viewcode-back" href="../../reference.html#pypath.annot.CellPhoneDB">[docs]</a><span class="k">class</span> <span class="nc">CellPhoneDB</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
-
+    
+    
+    <span class="n">record</span> <span class="o">=</span> <span class="n">dataio</span><span class="o">.</span><span class="n">CellPhoneDBAnnotation</span>
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-
+        
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ncbi_tax_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
         <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;cellphonedb_protein_annotations&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
 
@@ -1206,7 +1635,12 @@
             <span class="p">(</span><span class="n">uniprot</span><span class="p">,</span> <span class="p">{</span><span class="n">annot</span><span class="p">,})</span>
             <span class="k">for</span> <span class="n">uniprot</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span>
             <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_eq_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)))</span></div>
 
 
 <div class="viewcode-block" id="CellPhoneDBComplex"><a class="viewcode-back" href="../../reference.html#pypath.annot.CellPhoneDBComplex">[docs]</a><span class="k">class</span> <span class="nc">CellPhoneDBComplex</span><span class="p">(</span><span class="n">CellPhoneDB</span><span class="p">):</span>
@@ -1214,11 +1648,15 @@
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ncbi_tax_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
         <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CellPhoneDB_complex&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;cellphonedb_complex_annotations&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="n">entity_type</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span></div>
 
 
@@ -1227,11 +1665,15 @@
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
+        <span class="n">_</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;ncbi_tax_id&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        
         <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HPMR&#39;</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HPMR_complex&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;hpmr_complexes&#39;</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
+            <span class="n">entity_type</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
@@ -1247,28 +1689,33 @@
 <div class="viewcode-block" id="Corum"><a class="viewcode-back" href="../../reference.html#pypath.annot.Corum">[docs]</a><span class="k">class</span> <span class="nc">Corum</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
     
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annot_attr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot_attr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">_annot_attr</span> <span class="o">=</span> <span class="n">annot_attr</span>
         
         <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CORUM&#39;</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;corum_complexes&#39;</span><span class="p">,</span>
+            <span class="n">entity_type</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
     
     
     <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
-        <span class="n">CorumAnnotation</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;CorumAnnotation&#39;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_annot_attr</span><span class="p">,))</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="n">CorumAnnotation</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+                <span class="s1">&#39;CorumAnnotation</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_annot_attr</span><span class="o">.</span><span class="n">capitalize</span><span class="p">(),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_annot_attr</span><span class="p">,),</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="n">cplex</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
                 <span class="nb">set</span><span class="p">(</span>
-                    <span class="n">CorumAnnotation</span><span class="p">(</span><span class="n">annot_val</span><span class="p">)</span>
+                    <span class="n">record</span><span class="p">(</span><span class="n">annot_val</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">annot_val</span> <span class="ow">in</span> <span class="n">cplex</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_annot_attr</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">annot_val</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span>
                 <span class="p">)</span>
@@ -1284,7 +1731,12 @@
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
-        <span class="n">Corum</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annot_attr</span> <span class="o">=</span> <span class="s1">&#39;funcat&#39;</span><span class="p">)</span></div>
+        <span class="n">Corum</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CORUM_Funcat&#39;</span><span class="p">,</span>
+            <span class="n">annot_attr</span> <span class="o">=</span> <span class="s1">&#39;funcat&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CorumGO"><a class="viewcode-back" href="../../reference.html#pypath.annot.CorumGO">[docs]</a><span class="k">class</span> <span class="nc">CorumGO</span><span class="p">(</span><span class="n">Corum</span><span class="p">):</span>
@@ -1292,11 +1744,18 @@
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         
-        <span class="n">Corum</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annot_attr</span> <span class="o">=</span> <span class="s1">&#39;go&#39;</span><span class="p">)</span></div>
+        <span class="n">Corum</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CORUM_GO&#39;</span><span class="p">,</span> 
+            <span class="n">annot_attr</span> <span class="o">=</span> <span class="s1">&#39;go&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LigandReceptor"><a class="viewcode-back" href="../../reference.html#pypath.annot.LigandReceptor">[docs]</a><span class="k">class</span> <span class="nc">LigandReceptor</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
-
+    
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;mainclass&#39;</span><span class="p">,)</span>
+    
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -1469,53 +1928,71 @@
         <span class="n">LigandReceptor</span><span class="o">.</span><span class="n">_default_record_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">annot</span><span class="p">)</span></div>
 
 
-
 <span class="k">class</span> <span class="nc">AnnotationTable</span><span class="p">(</span><span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
-
-
+    
+    
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
-            <span class="n">uniprots</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">use_sources</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">proteins</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">complexes</span> <span class="o">=</span> <span class="p">(),</span>
+            <span class="n">protein_sources</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">complex_sources</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">use_fields</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
             <span class="n">swissprot_only</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="n">complexes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-            <span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">use_complexes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">create_dataframe</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
             <span class="n">load</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sorry Nico I don&#39;t write docs because lab meeting tomorrow!</span>
+<span class="sd">        Manages a custom set of annotation resources. Loads data and</span>
+<span class="sd">        accepts queries, provides methods for converting the data to</span>
+<span class="sd">        data frame.</span>
+<span class="sd">        </span>
+<span class="sd">        :arg set proteins:</span>
+<span class="sd">            A reference set of proteins (UniProt IDs).</span>
+<span class="sd">        :arg set complexes:</span>
+<span class="sd">            A reference set of complexes.</span>
+<span class="sd">        :arg set protein_sources:</span>
+<span class="sd">            Class names providing the protein annotations. If not provided</span>
+<span class="sd">            the module&#39;s ``protein_sources_default`` attribute will be used.</span>
+<span class="sd">        :arg set complex_sources:</span>
+<span class="sd">            Class names providing the complex annotations. If not provided</span>
+<span class="sd">            the module&#39;s ``complex_sources_default`` attribute will be used.</span>
+<span class="sd">        :arg dict use_fields:</span>
+<span class="sd">            A dict with resource names as keys and tuple of field labels as</span>
+<span class="sd">            values. If provided for any resource only these fields will be</span>
+<span class="sd">            used for constructing the data frame. If `None`, the module&#39;s</span>
+<span class="sd">            ``default_fields`` settings will be used.</span>
+<span class="sd">        :arg bool use_complexes:</span>
+<span class="sd">            Whether to include complexes in the annotations.</span>
+<span class="sd">        :arg bool create_dataframe:</span>
+<span class="sd">            Whether to create a boolean data frame of annotations, apart</span>
+<span class="sd">            from having the annotator objects.</span>
+<span class="sd">        :arg bool load:</span>
+<span class="sd">            Load the data upon initialization. If `False`, you will have a</span>
+<span class="sd">            chance to call the ``load`` method later.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">complexes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_sources</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">use_sources</span> <span class="ow">or</span> <span class="p">(</span>
-                <span class="n">annotation_sources</span> <span class="o">|</span> <span class="n">complex_annotation_sources</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="k">else</span>
-                <span class="n">annotation_sources</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_sources</span> <span class="o">=</span> <span class="n">protein_sources</span> <span class="ow">or</span> <span class="n">protein_sources_default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complex_sources</span> <span class="o">=</span> <span class="n">complex_sources</span> <span class="ow">or</span> <span class="n">complex_sources_default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span> <span class="o">=</span> <span class="n">use_fields</span> <span class="ow">or</span> <span class="n">default_fields</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">uniprots</span> <span class="ow">or</span>
-            <span class="nb">sorted</span><span class="p">(</span>
-                <span class="n">dataio</span><span class="o">.</span><span class="n">all_uniprots</span><span class="p">(</span>
-                    <span class="n">organism</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
-                    <span class="n">swissprot</span> <span class="o">=</span> <span class="n">swissprot_only</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">reversed</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span><span class="p">)</span>
-        <span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_dataframe</span> <span class="o">=</span> <span class="n">create_dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span> <span class="o">=</span> <span class="n">proteins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">swissprot_only</span> <span class="o">=</span> <span class="n">swissprot_only</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_complexes</span> <span class="o">=</span> <span class="n">use_complexes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_reference_set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annots</span> <span class="o">=</span> <span class="p">{}</span>
+        
         <span class="k">if</span> <span class="n">load</span><span class="p">:</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -1534,62 +2011,249 @@
 
 
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="n">annots</span> <span class="o">=</span> <span class="p">{}</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_reference_set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_protein_resources</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_complex_resources</span><span class="p">()</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataframe</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">make_dataframe</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">load_from_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">,</span> <span class="n">annots</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+            <span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">annots</span> <span class="o">=</span> <span class="p">{}</span>
+            
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">cls_name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">record_cls</span><span class="p">)</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">annots</span><span class="p">):</span>
+                
+                <span class="k">if</span> <span class="n">record_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    
+                    <span class="nb">setattr</span><span class="p">(</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]],</span>
+                        <span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                        <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+                            <span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                            <span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">],</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                    
+                    <span class="n">record_cls_new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]],</span>
+                        <span class="n">record_cls</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    
+                    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="p">(</span>
+                            <span class="n">key</span><span class="p">,</span>
+                            <span class="nb">set</span><span class="p">(</span>
+                                <span class="n">record_cls_new</span><span class="p">(</span><span class="o">*</span><span class="n">this_annot</span><span class="p">)</span>
+                                <span class="k">for</span> <span class="n">this_annot</span> <span class="ow">in</span> <span class="n">these_annots</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">these_annots</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                    <span class="p">)</span>
+                
+                <span class="bp">cls</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">cls_name</span><span class="p">]</span>
+                
+                <span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">dump</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">save_to_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        
+        <span class="k">def</span> <span class="nf">get_record_class</span><span class="p">(</span><span class="n">annot</span><span class="p">):</span>
+            
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">annot</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+                    
+                    <span class="k">return</span> <span class="n">elem</span><span class="o">.</span><span class="vm">__class__</span>
+        
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="n">classes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">get_record_class</span><span class="p">(</span><span class="n">annot</span><span class="o">.</span><span class="n">annot</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">)</span>
+            <span class="p">)</span>
+            
+            <span class="n">annots</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="p">(</span>
+                        <span class="n">annot</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                        <span class="nb">dict</span><span class="p">(</span>
+                            <span class="p">(</span>
+                                <span class="n">key</span><span class="p">,</span>
+                                <span class="nb">set</span><span class="p">(</span>
+                                    <span class="nb">tuple</span><span class="p">(</span><span class="n">this_annot</span><span class="p">)</span>
+                                    <span class="k">for</span> <span class="n">this_annot</span> <span class="ow">in</span> <span class="n">these_annots</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">these_annots</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">annot</span><span class="o">.</span><span class="n">annot</span><span class="p">)</span>
+                        <span class="p">),</span>
+                        <span class="p">{</span>
+                            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">classes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                            <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="n">classes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                            <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="n">classes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">_fields</span><span class="p">,</span>
+                        <span class="p">}</span>
+                        <span class="k">if</span> <span class="n">classes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">annot</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">)</span>
+            <span class="p">)</span>
+            
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">,</span>
+                    <span class="n">annots</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">fp</span><span class="p">,</span>
+            <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">set_reference_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">AnnotationBase</span><span class="o">.</span><span class="n">get_reference_set</span><span class="p">(</span>
+                <span class="n">proteins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">,</span>
+                <span class="n">complexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span>
+                <span class="n">use_complexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_complexes</span><span class="p">,</span>
+                <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">,</span>
+                <span class="n">swissprot_only</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">swissprot_only</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="nb">reversed</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">)</span>
+        <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">load_protein_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_resources</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protein_sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proteins</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">load_complex_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_resources</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">complex_sources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_load_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definitions</span><span class="p">,</span> <span class="n">reference_set</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">:</span>
+            
+            <span class="bp">cls</span> <span class="o">=</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="k">else</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
+            
+            <span class="n">annot</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+                <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">,</span>
+                <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
+            <span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">annot</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
+    
+    
+    <span class="k">def</span> <span class="nf">make_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dataframe</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">(</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">ensure_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rebuild</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">rebuild</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">make_array</span><span class="p">(</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span>
+        
         <span class="n">names</span>  <span class="o">=</span> <span class="p">[]</span>
         <span class="n">arrays</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_sources</span><span class="p">:</span>
-
-            <span class="n">annot</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)(</span>
-                <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span>
-            <span class="p">)</span>
-
+        
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            
+            <span class="c1"># skipping HPA for now because too large number of</span>
+            <span class="c1"># annotations, it would take very long:</span>
+            <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;HPA&#39;</span><span class="p">:</span>
+                
+                <span class="k">continue</span>
+            
             <span class="n">use_fields</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span><span class="p">[</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span> <span class="k">else</span>
+                <span class="kc">None</span>
             <span class="p">)</span>
-
-            <span class="n">this_names</span><span class="p">,</span> <span class="n">this_array</span> <span class="o">=</span> <span class="n">annot</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span>
-                <span class="n">uniprots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span><span class="p">,</span>
-                <span class="n">use_fields</span> <span class="o">=</span> <span class="n">use_fields</span>
-            <span class="p">)</span>
-
+            
+            <span class="n">this_names</span><span class="p">,</span> <span class="n">this_array</span> <span class="o">=</span> <span class="n">resource</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span>
+                    <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
+                    <span class="n">use_fields</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span><span class="p">[</span><span class="n">resource</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">resource</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span> <span class="k">else</span>
+                        <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+            
             <span class="n">names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">this_names</span><span class="p">)</span>
             <span class="n">arrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_array</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_annotators</span><span class="p">:</span>
-
-                <span class="n">annots</span><span class="p">[</span><span class="n">annot</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">annots</span> <span class="o">=</span> <span class="n">annots</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
+        
+        <span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">names</span><span class="p">,</span> <span class="n">data</span>
+    
+    
+    <span class="k">def</span> <span class="nf">make_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_array</span><span class="p">(</span><span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_cols</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span><span class="p">)</span>
-
-
+    
+    
     <span class="k">def</span> <span class="nf">set_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">))</span>
-
-
+    
+    
     <span class="k">def</span> <span class="nf">keep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep</span><span class="p">):</span>
-
+        
         <span class="n">ikeep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
             <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">keep</span>
         <span class="p">])</span>
-
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">ikeep</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="n">ikeep</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_cols</span><span class="p">()</span>
-
-
+    
+    
     <span class="k">def</span> <span class="nf">make_sets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_array</span><span class="p">()</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">sets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span>
                 <span class="n">name</span><span class="p">,</span>
-                <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="n">i</span><span class="p">]])</span>
+                <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span><span class="n">i</span><span class="p">]])</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
         <span class="p">)</span>
@@ -1669,13 +2333,18 @@
             <span class="p">))</span>
 
 
-    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">to_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_array</span><span class="p">(</span>
+            <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
+            <span class="n">rebuild</span> <span class="o">=</span> <span class="n">reference_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
         
         <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;__&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">]</span>
         
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniprots</span><span class="p">,</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference_set</span><span class="p">,</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span><span class="p">,</span>
         <span class="p">)</span>
         
@@ -1733,16 +2402,31 @@
         <span class="p">)</span>
 
 
-<div class="viewcode-block" id="init_db"><a class="viewcode-back" href="../../reference.html#pypath.annot.init_db">[docs]</a><span class="k">def</span> <span class="nf">init_db</span><span class="p">(</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="init_db"><a class="viewcode-back" href="../../reference.html#pypath.annot.init_db">[docs]</a><span class="k">def</span> <span class="nf">init_db</span><span class="p">(</span>
+        <span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">create_dataframe</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_complexes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes or reloads the annotation database.</span>
 <span class="sd">    The database will be assigned to the ``db`` attribute of this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">AnnotationTable</span><span class="p">(</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span><span class="p">)</span></div>
+    <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">AnnotationTable</span><span class="p">(</span>
+        <span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span><span class="p">,</span>
+        <span class="n">create_dataframe</span> <span class="o">=</span> <span class="n">create_dataframe</span><span class="p">,</span>
+        <span class="n">use_complexes</span> <span class="o">=</span> <span class="n">use_complexes</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_db"><a class="viewcode-back" href="../../reference.html#pypath.annot.get_db">[docs]</a><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="get_db"><a class="viewcode-back" href="../../reference.html#pypath.annot.get_db">[docs]</a><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span>
+        <span class="n">keep_annotators</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">create_dataframe</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">use_complexes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the current database instance and initializes it if does</span>
 <span class="sd">    not exist yet.</span>
@@ -1750,7 +2434,12 @@
 
     <span class="k">if</span> <span class="s1">&#39;db&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
 
-        <span class="n">init_db</span><span class="p">(</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span><span class="p">)</span>
+        <span class="n">init_db</span><span class="p">(</span>
+            <span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span><span class="p">,</span>
+            <span class="n">create_dataframe</span> <span class="o">=</span> <span class="n">create_dataframe</span><span class="p">,</span>
+            <span class="n">use_complexes</span> <span class="o">=</span> <span class="n">use_complexes</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span></div>
 </pre></div>
@@ -1783,7 +2472,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

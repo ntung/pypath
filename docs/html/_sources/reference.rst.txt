@@ -1,45 +1,87 @@
-*********
-Reference
-*********
+****************
+Module reference
+****************
 
-annot module
-============
+annot
+=====
 
 .. automodule:: pypath.annot
    :members:
 
-bel module
-==========
+bel
+===
 
 .. automodule:: pypath.bel
    :members:
 
-complex module
-==============
+cellphonedb
+===========
+
+.. automodule:: pypath.cellphonedb
+   :members:
+
+complex
+=======
 
 .. automodule:: pypath.complex
    :members:
 
-intera module
-=============
+go
+==
+
+.. automodule:: pypath.go
+   :members:
+
+homology
+========
+
+.. automodule:: pypath.homology
+   :members:
+
+intera
+======
 
 .. automodule:: pypath.intera
    :members:
 
-intercell module
-================
+intercell
+=========
 
 .. automodule:: pypath.intercell
    :members:
 
-main module
-===========
+network
+=======
 
-.. automodule:: pypath.main
+.. automodule:: pypath.network
    :members:
 
-ptm module
-==========
+pdb
+===
+
+.. automodule:: pypath.pdb
+   :members:
+
+ptm
+===
 
 .. automodule:: pypath.ptm
+   :members:
+
+pyreact
+=======
+
+.. automodule:: pypath.pyreact
+   :members:
+
+seq
+===
+
+.. automodule:: pypath.seq
+   :members:
+
+unichem
+=======
+
+.. automodule:: pypath.unichem
    :members:

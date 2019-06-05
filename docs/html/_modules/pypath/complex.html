@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>pypath.complex &#8212; pypath 0.8.7 documentation</title>
+    <title>pypath.complex &#8212; pypath 0.8.10 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -27,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -60,7 +59,13 @@
 
 <span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">iteritems</span>
 
+<span class="kn">import</span> <span class="nn">imp</span>
 <span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -69,6 +74,7 @@
 <span class="kn">import</span> <span class="nn">pypath.intera</span> <span class="k">as</span> <span class="nn">intera</span>
 <span class="kn">import</span> <span class="nn">pypath.resource</span> <span class="k">as</span> <span class="nn">resource</span>
 <span class="kn">import</span> <span class="nn">pypath.settings</span> <span class="k">as</span> <span class="nn">settings</span>
+<span class="kn">import</span> <span class="nn">pypath.session_mod</span> <span class="k">as</span> <span class="nn">session_mod</span>
 
 
 <span class="n">complex_resources</span> <span class="o">=</span> <span class="p">(</span>
@@ -97,6 +103,7 @@
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">dump</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -108,7 +115,9 @@
 <span class="sd">            Method processing the data and yielding ``intera.Complex``</span>
 <span class="sd">            instances.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
+        
+        <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span><span class="p">)</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">resource</span><span class="o">.</span><span class="n">AbstractResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -117,6 +126,8 @@
             <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="n">input_method</span><span class="p">,</span>
             <span class="n">input_args</span> <span class="o">=</span> <span class="n">input_args</span><span class="p">,</span>
+            <span class="n">dump</span> <span class="o">=</span> <span class="n">dump</span><span class="p">,</span>
+            <span class="n">data_attr_name</span> <span class="o">=</span> <span class="s1">&#39;complexes&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
@@ -235,7 +246,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">records</span><span class="p">,</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">_from_dump_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_from_dump&#39;</span><span class="p">):</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_dump</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_from_dump&#39;</span><span class="p">)</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;dump&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CellPhoneDB"><a class="viewcode-back" href="../../reference.html#pypath.complex.CellPhoneDB">[docs]</a><span class="k">class</span> <span class="nc">CellPhoneDB</span><span class="p">(</span><span class="n">AbstractComplexResource</span><span class="p">):</span>
@@ -388,6 +408,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">resources</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Combines complexes from multiple resources.</span>
@@ -397,16 +418,34 @@
 <span class="sd">            module or custom</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="n">resources</span> <span class="ow">or</span> <span class="n">complex_resources</span>
 
         <span class="n">AbstractComplexResource</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;OmniPath&#39;</span><span class="p">,</span>
         <span class="p">)</span>
+    
+    
+<div class="viewcode-block" id="ComplexAggregator.reload"><a class="viewcode-back" href="../../reference.html#pypath.complex.ComplexAggregator.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reloads the object from the module level.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-
+        <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
+    
+    
     <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
+            <span class="k">return</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">:</span>
@@ -436,19 +475,36 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cplex</span>
 
         <span class="n">resource</span><span class="o">.</span><span class="n">AbstractResource</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_index</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_index</span><span class="p">()</span>
+    
+    
+    <span class="k">def</span> <span class="nf">load_from_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+    
+    
+    <span class="k">def</span> <span class="nf">save_to_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="p">,</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">fp</span><span class="p">,</span>
+            <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="init_db"><a class="viewcode-back" href="../../reference.html#pypath.complex.init_db">[docs]</a><span class="k">def</span> <span class="nf">init_db</span><span class="p">():</span>
+<div class="viewcode-block" id="init_db"><a class="viewcode-back" href="../../reference.html#pypath.complex.init_db">[docs]</a><span class="k">def</span> <span class="nf">init_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes or reloads the complex database.</span>
 <span class="sd">    The database will be assigned to the ``db`` attribute of this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComplexAggregator</span><span class="p">()</span></div>
+    <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComplexAggregator</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_db"><a class="viewcode-back" href="../../reference.html#pypath.complex.get_db">[docs]</a><span class="k">def</span> <span class="nf">get_db</span><span class="p">():</span>
+<div class="viewcode-block" id="get_db"><a class="viewcode-back" href="../../reference.html#pypath.complex.get_db">[docs]</a><span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieves the current database instance and initializes it if does</span>
 <span class="sd">    not exist yet.</span>
@@ -456,9 +512,21 @@
 
     <span class="k">if</span> <span class="s1">&#39;db&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
 
-        <span class="n">init_db</span><span class="p">()</span>
+        <span class="n">init_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="all_complexes"><a class="viewcode-back" href="../../reference.html#pypath.complex.all_complexes">[docs]</a><span class="k">def</span> <span class="nf">all_complexes</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a set of all complexes in the database which serves as a</span>
+<span class="sd">    reference set for many methods, just like ``uniprot_input.all_uniprots``</span>
+<span class="sd">    represents the proteome.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">db</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">complexes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
 </pre></div>
 
           </div>
@@ -489,7 +557,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
