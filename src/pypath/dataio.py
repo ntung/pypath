@@ -128,6 +128,23 @@ ERASE_LINE = '\x1b[2K'
 #
 
 
+CellPhoneDBAnnotation = collections.namedtuple(
+    'CellPhoneDBAnnotation',
+    (
+        'receptor',
+        'adhesion',
+        'cytoplasm',
+        'peripheral',
+        'secretion',
+        'secreted',
+        'transporter',
+        'transmembrane',
+        'extracellular',
+        'integrin',
+    )
+)
+
+
 def read_xls(xls_file, sheet = '', csv_file = None, return_table = True):
 
     try:
@@ -2236,6 +2253,102 @@ def comppi_locations(organism = 9606, score_threshold = .7):
                     continue
                 
                 result[getattr(iloc, 'id_%s' % label)].add(loc)
+    
+    return result
+
+
+def ramilowski_locations():
+    
+    reloc = re.compile(
+        r'([^\(]+[^\s^\(])'
+        r'\s?\('
+        r'?(?:(.*[^\)])?)'
+        r'\)?'
+    )
+    resep = re.compile(r'[\.;,]')
+    renote = re.compile(r'Note=([- \w\(\),\s\+\./%\'":;]*)')
+    
+    sources = (
+        (4, 'UniProt'),
+        (5, 'HPRD'),
+        (7, 'LocTree3'),
+        (10, 'Consensus'),
+        (11, 'Consensus6'),
+    )
+    
+    RamilowskiLocation = collections.namedtuple(
+        'RamilowskiLocation',
+        [
+            'location',
+            'source',
+            'tmh',
+            'note',
+            'long_note',
+        ],
+    )
+    
+    url = urls.urls['rami']['loc']
+    c = curl.Curl(url, silent = False, large = True)
+    
+    _ = next(c.result)
+    
+    result = collections.defaultdict(set)
+    
+    for l in c.result:
+        
+        l = l.strip('\n\r').split('\t')
+        
+        for idx, source in sources:
+            
+            locs = l[idx]
+            
+            long_note = None
+            mnote = renote.search(locs)
+            
+            if mnote:
+                
+                long_note = mnote.groups()[0]
+                locs = renote.sub('', locs)
+            
+            for loc in resep.split(locs):
+                
+                if ':' in loc and 'GO:' not in loc:
+                    
+                    loc = loc.split(':')[-1]
+                
+                loc = loc.strip().replace('- ', '-').lower()
+                
+                if (
+                    not loc or
+                    len(loc.split()) > 3 or
+                    re.search(r'\d', loc) or
+                    loc == 'n/a' or
+                    any(
+                        w in loc for w in
+                        ('tumor',)
+                    )
+                ):
+                    
+                    continue
+                
+                m = reloc.match(loc)
+                
+                if not m:
+                    
+                    continue
+                
+                location, note = m.groups()
+                tmh = l[9].strip()
+                
+                result[l[3]].add(
+                    RamilowskiLocation(
+                        location = location.lower(),
+                        source = source,
+                        tmh = int(tmh) if tmh.isdigit() else None,
+                        note = note,
+                        long_note = long_note,
+                    )
+                )
     
     return result
 
@@ -5845,21 +5958,7 @@ def _cellphonedb_annotations(url, name_method):
             attr.capitalize()
         )
 
-    record = collections.namedtuple(
-        'CellPhoneDBAnnotation',
-        (
-            'receptor',
-            'adhesion',
-            'cytoplasm',
-            'peripheral',
-            'secretion',
-            'secreted',
-            'transporter',
-            'transmembrane',
-            'extracellular',
-            'integrin',
-        )
-    )
+    record = CellPhoneDBAnnotation
 
     annot = {}
 
@@ -10075,12 +10174,15 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
             'n_low',
             'n_medium',
             'n_high',
-            'effect',
+            'prognostic',
+            'favourable',
             'score',
             'pathology',
         ],
     )
-    ProteinatlasAnnotation.__new__.__defaults__ = (None,) * 6 + (False,)
+    ProteinatlasAnnotation.__new__.__defaults__ = (
+        (None,) * 4 + (False, False, None, False)
+    )
     
     
     def n_or_none(ex, key):
@@ -10120,8 +10222,12 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
                     effect, score = next(
                         i for i in iteritems(ex) if i[0] not in LEVELS
                     )
+                    prognostic = not effect.startswith('unprognostic')
+                    favourable = not effect.endswith('unfavourable')
+                    
                 except StopIteration:
-                    effect, score = None, None
+                    
+                    prognostic, favourable, score = None, None, None
                 
                 result[uniprot].add(
                     ProteinatlasAnnotation(
@@ -10136,7 +10242,8 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
                         n_low = n_or_none(ex, 'Low'),
                         n_medium = n_or_none(ex, 'Medium'),
                         n_high = n_or_none(ex, 'High'),
-                        effect = effect,
+                        prognostic = prognostic,
+                        favourable = favourable,
                         score = score,
                         pathology = True,
                     )

@@ -60,6 +60,12 @@ go_combined_classes = {
         extracellular region OR
         extracellular region part
         """,
+    'intracellular':
+        """
+        intracellular organelle OR
+        intracellular organelle lumen OR
+        intracellular
+        """,
     'cell_surface':
         """
         cell surface OR
@@ -836,11 +842,13 @@ annot_combined_classes = (
     ),
     # intracellular
     af.AnnotDef(
-        name = 'extracellular',
+        name = 'intracellular',
         source = af.AnnotOp(
             annots = (
                 'intracellular_locate',
                 'intracellular_cellphonedb',
+                'intracellular_comppi',
+                'intracellular_go',
             ),
             op = set.union,
         ),
@@ -912,6 +920,24 @@ annot_combined_classes = (
             'cytoplasm': bool,
         },
     ),
+    af.AnnotDef(
+        name = 'intracellular_comppi',
+        source = 'ComPPI',
+        args = {
+            'location': {
+                'cytosol',
+                'nucleus',
+                'mitochondrion',
+            },
+        },
+    ),
+    af.AnnotDef(
+        name = 'intracellular_go',
+        source = 'GO_Intercell',
+        args = {
+            'mainclass': 'intracellular',
+        },
+    ),
     # extracellular
     af.AnnotDef(
         name = 'extracellular',
@@ -924,6 +950,7 @@ annot_combined_classes = (
                 'extracellular_cspa',
                 'extracellular_hpmr',
                 'extracellular_cellphonedb',
+                'extracellular_comppi',
             ),
             op = set.union,
         ),
@@ -952,6 +979,13 @@ annot_combined_classes = (
             ),
             op = set.union,
         ),
+    ),
+    af.AnnotDef(
+        name = 'extracellular_comppi',
+        source = 'ComPPI',
+        args = {
+            'location': 'extracellular',
+        },
     ),
     af.AnnotDef(
         name = 'extracellular_surfaceome',
@@ -1385,6 +1419,7 @@ class_types = {
         'extracellular',
         'secreted',
         'transmembrane',
+        'intracellular',
     },
     'main': {
         'adhesion',
@@ -1401,5 +1436,14 @@ class_types = {
         'growth_factor_binder',
         'growth_factor_regulator',
         'tight_junction',
-    }
+    },
+    'misc': {
+        'extracellular_peptidase',
+        'interleukin_receptors_hgnc',
+        'interleukins_hgnc',
+        'chemokine_ligands_hgnc',
+        'endogenous_ligands_hgnc',
+    },
 }
+
+

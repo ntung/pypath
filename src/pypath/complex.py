@@ -20,7 +20,13 @@
 
 from future.utils import iteritems
 
+import imp
 import collections
+
+try:
+    import cPickle as pickle
+except:
+    import pickle
 
 import numpy as np
 import pandas as pd
@@ -29,6 +35,7 @@ import pypath.dataio as dataio
 import pypath.intera as intera
 import pypath.resource as resource
 import pypath.settings as settings
+import pypath.session_mod as session_mod
 
 
 complex_resources = (
@@ -57,6 +64,7 @@ class AbstractComplexResource(resource.AbstractResource):
             ncbi_tax_id = 9606,
             input_method = None,
             input_args = None,
+            dump = None,
             **kwargs
         ):
         """
@@ -68,7 +76,9 @@ class AbstractComplexResource(resource.AbstractResource):
             Method processing the data and yielding ``intera.Complex``
             instances.
         """
-
+        
+        session_mod.Logger.__init__(self, name = 'complex')
+        
         self.complexes = {}
 
         resource.AbstractResource.__init__(
@@ -77,6 +87,8 @@ class AbstractComplexResource(resource.AbstractResource):
             ncbi_tax_id = ncbi_tax_id,
             input_method = input_method,
             input_args = input_args,
+            dump = dump,
+            data_attr_name = 'complexes',
         )
 
         self.load()
@@ -196,6 +208,15 @@ class AbstractComplexResource(resource.AbstractResource):
             records,
             columns = colnames,
         )
+    
+    
+    def _from_dump_callback(self):
+        
+        if hasattr(self, '_from_dump'):
+            
+            self.complexes = self._from_dump
+            delattr(self, '_from_dump')
+            delattr(self, 'dump')
 
 
 class CellPhoneDB(AbstractComplexResource):
@@ -348,6 +369,7 @@ class ComplexAggregator(AbstractComplexResource):
     def __init__(
             self,
             resources = None,
+            pickle_file = None,
         ):
         """
         Combines complexes from multiple resources.
@@ -357,16 +379,34 @@ class ComplexAggregator(AbstractComplexResource):
             module or custom
         """
 
+        self.pickle_file = pickle_file
         self.resources = resources or complex_resources
 
         AbstractComplexResource.__init__(
             self,
             name = 'OmniPath',
         )
+    
+    
+    def reload(self):
+        """
+        Reloads the object from the module level.
+        """
 
-
+        modname = self.__class__.__module__
+        mod = __import__(modname, fromlist = [modname.split('.')[0]])
+        imp.reload(mod)
+        new = getattr(mod, self.__class__.__name__)
+        setattr(self, '__class__', new)
+    
+    
     def load(self):
-
+        
+        if self.pickle_file:
+            
+            self.load_from_pickle(self.pickle_file)
+            return
+        
         self.data = {}
 
         for res in self.resources:
@@ -397,18 +437,35 @@ class ComplexAggregator(AbstractComplexResource):
 
         resource.AbstractResource.load(self)
         self.update_index()
+    
+    
+    def load_from_pickle(self, pickle_file):
+        
+        with open(pickle_file, 'rb') as fp:
+            
+            self.complexes = pickle.load(fp)
+    
+    
+    def save_to_pickle(self, pickle_file):
+        
+        with open(pickle_file, 'wb') as fp:
+            
+            pickle.dump(
+                obj = self.complexes,
+                file = fp,
+            )
 
 
-def init_db():
+def init_db(**kwargs):
     """
     Initializes or reloads the complex database.
     The database will be assigned to the ``db`` attribute of this module.
     """
 
-    globals()['db'] = ComplexAggregator()
+    globals()['db'] = ComplexAggregator(**kwargs)
 
 
-def get_db():
+def get_db(**kwargs):
     """
     Retrieves the current database instance and initializes it if does
     not exist yet.
@@ -416,6 +473,18 @@ def get_db():
 
     if 'db' not in globals():
 
-        init_db()
+        init_db(**kwargs)
 
     return globals()['db']
+
+
+def all_complexes():
+    """
+    Returns a set of all complexes in the database which serves as a
+    reference set for many methods, just like ``uniprot_input.all_uniprots``
+    represents the proteome.
+    """
+    
+    db = get_db()
+    
+    return set(db.complexes.values())
