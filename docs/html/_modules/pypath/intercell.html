@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>pypath.intercell &#8212; pypath 0.8.10 documentation</title>
+    <title>pypath.intercell &#8212; pypath 0.8.12 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -96,7 +96,7 @@
 
 
 
-<span class="k">class</span> <span class="nc">IntercellAnnotation</span><span class="p">(</span><span class="n">annot</span><span class="o">.</span><span class="n">CustomAnnotation</span><span class="p">):</span>
+<div class="viewcode-block" id="IntercellAnnotation"><a class="viewcode-back" href="../../reference.html#pypath.intercell.IntercellAnnotation">[docs]</a><span class="k">class</span> <span class="nc">IntercellAnnotation</span><span class="p">(</span><span class="n">annot</span><span class="o">.</span><span class="n">CustomAnnotation</span><span class="p">):</span>
 
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_definitions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -105,6 +105,7 @@
             <span class="n">class_definitions</span> <span class="ow">or</span> <span class="n">intercell_annot</span><span class="o">.</span><span class="n">annot_combined_classes</span>
         <span class="p">)</span>
 
+        <span class="c1"># XXX: Shoudln&#39;t we use `super(self.__class__, self).__init__()`?</span>
         <span class="n">annot</span><span class="o">.</span><span class="n">CustomAnnotation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">class_definitions</span> <span class="o">=</span> <span class="n">class_definitions</span><span class="p">,</span>
@@ -117,7 +118,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">collect_classes</span><span class="p">()</span>
 
 
-    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IntercellAnnotation.reload"><a class="viewcode-back" href="../../reference.html#pypath.intercell.IntercellAnnotation.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reloads the object from the module level.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -126,7 +127,7 @@
         <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
         <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">set_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -176,61 +177,61 @@
                 <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">category</span>
             <span class="p">]))</span><span class="o">.</span><span class="n">values</span>
         <span class="p">)</span>
-    
-    
+
+
     <span class="k">def</span> <span class="nf">collect_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span>
                 <span class="o">*</span><span class="n">intercell_annot</span><span class="o">.</span><span class="n">class_types</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">class_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typ</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">typ</span><span class="p">,</span> <span class="n">ccls</span> <span class="ow">in</span> <span class="n">intercell_annot</span><span class="o">.</span><span class="n">class_types</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">ccls</span>
         <span class="p">)</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">{}</span>
-        
+
         <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            
+
             <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">intercell_annot</span><span class="o">.</span><span class="n">class_types</span><span class="p">[</span><span class="s1">&#39;misc&#39;</span><span class="p">]:</span>
-                
+
                 <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">continue</span>
-            
+
             <span class="n">cls_split</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
             <span class="n">mainclass</span> <span class="o">=</span> <span class="kc">None</span>
-            
+
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cls_split</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-                
+
                 <span class="n">this_part</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cls_split</span><span class="p">[:</span><span class="n">j</span><span class="p">])</span>
-                
+
                 <span class="k">if</span> <span class="n">this_part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span><span class="p">:</span>
-                    
+
                     <span class="n">mainclass</span> <span class="o">=</span> <span class="n">this_part</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">mainclass</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">mainclass</span>
-            
+
             <span class="n">resource</span> <span class="o">=</span> <span class="n">cls_split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            
+
             <span class="k">if</span> <span class="n">mainclass</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">resource</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mainclass</span><span class="p">:</span>
-                
+
                 <span class="n">resource</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">resource_labels</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span>
                         <span class="k">if</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resource_labels</span> <span class="k">else</span>
                     <span class="n">resource</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
                 <span class="p">)</span>
-                
-                <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource</span></div>
 
 
-<span class="k">class</span> <span class="nc">Intercell</span><span class="p">(</span><span class="n">IntercellAnnotation</span><span class="p">):</span>
+<div class="viewcode-block" id="Intercell"><a class="viewcode-back" href="../../reference.html#pypath.intercell.Intercell">[docs]</a><span class="k">class</span> <span class="nc">Intercell</span><span class="p">(</span><span class="n">IntercellAnnotation</span><span class="p">):</span>
 
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
@@ -253,14 +254,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">omnipath</span> <span class="o">=</span> <span class="n">omnipath</span>
 
 
-    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Intercell.reload"><a class="viewcode-back" href="../../reference.html#pypath.intercell.Intercell.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
         <span class="kn">import</span> <span class="nn">imp</span>
         <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -287,12 +288,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">init_network</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">network_param</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">main_mod</span><span class="o">.</span><span class="n">PyPath</span><span class="p">):</span>
-            
+
             <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network_mod</span><span class="o">.</span><span class="n">Network</span><span class="o">.</span><span class="n">from_igraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">network_mod</span><span class="o">.</span><span class="n">Network</span><span class="p">):</span>
 
-            <span class="k">pass</span>
+            <span class="k">pass</span></div>
 </pre></div>
 
           </div>
@@ -323,7 +324,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.10 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

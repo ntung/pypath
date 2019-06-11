@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Module reference &#8212; pypath 0.8.10 documentation</title>
+    <title>Module reference &#8212; pypath 0.8.12 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.10 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.12 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -47,6 +47,8 @@
 <h1>Module reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-pypath.annot">
 <span id="annot"></span><h2>annot<a class="headerlink" href="#module-pypath.annot" title="Permalink to this headline">¶</a></h2>
+<p>Annotation module. Contains classes and methods to load different
+annotation data from different sources.</p>
 <dl class="class">
 <dt id="pypath.annot.Adhesome">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Adhesome</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Adhesome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Adhesome" title="Permalink to this definition">¶</a></dt>
@@ -156,6 +158,63 @@ proteome.</p>
 <dd></dd></dl>
 
 <dl class="class">
+<dt id="pypath.annot.CustomAnnotation">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CustomAnnotation</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>pickle_file=None</em>, <em>annotdb_pickle_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom annotation base class. Inherits from
+<code class="xref py py-class docutils literal notranslate"><span class="pre">pypath.session_mod.Logger</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_definitions</strong> (<em>dict</em>) – </p></li>
+<li><p><strong>pickle_file</strong> (<em>str</em>) – </p></li>
+<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Var</dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.counts">
+<code class="descname">counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dict with number of elements in each class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.create_class">
+<code class="descname">create_class</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.create_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.create_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a category of entities with specific role in intercellular
+communication.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.get_class">
+<code class="descname">get_class</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.get_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.get_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a class by its name and loads it if hasn’t been loaded yet
+but the name present in the class definitions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.populate_classes">
+<code class="descname">populate_classes</code><span class="sig-paren">(</span><em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.populate_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.populate_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a classification of proteins according to their roles
+in the intercellular communication.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.process_annot">
+<code class="descname">process_annot</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.process_annot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.process_annot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes an annotation definition and returns a set of identifiers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reloads the object from the module level.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="pypath.annot.Exocarta">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Exocarta</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Exocarta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Exocarta" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -260,6 +319,18 @@ proteome.</p>
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Zhong2015</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Zhong2015"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Zhong2015" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="data">
+<dt id="pypath.annot.complex_sources_default">
+<code class="descclassname">pypath.annot.</code><code class="descname">complex_sources_default</code><em class="property"> = {'CellPhoneDBComplex', 'CorumFuncat', 'CorumGO', 'HpmrComplex'}</em><a class="headerlink" href="#pypath.annot.complex_sources_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default protein complex annotation sources</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="pypath.annot.default_fields">
+<code class="descclassname">pypath.annot.</code><code class="descname">default_fields</code><em class="property"> = {'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski_location': ('location',), 'Vesiclepedia': ('vesicle',)}</em><a class="headerlink" href="#pypath.annot.default_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default annotation classes by source</p>
+</dd></dl>
+
 <dl class="function">
 <dt id="pypath.annot.get_db">
 <code class="descclassname">pypath.annot.</code><code class="descname">get_db</code><span class="sig-paren">(</span><em>keep_annotators=True</em>, <em>create_dataframe=False</em>, <em>use_complexes=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#get_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.get_db" title="Permalink to this definition">¶</a></dt>
@@ -272,6 +343,12 @@ not exist yet.</p>
 <code class="descclassname">pypath.annot.</code><code class="descname">init_db</code><span class="sig-paren">(</span><em>keep_annotators=True</em>, <em>create_dataframe=False</em>, <em>use_complexes=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#init_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.init_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes or reloads the annotation database.
 The database will be assigned to the <code class="docutils literal notranslate"><span class="pre">db</span></code> attribute of this module.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="pypath.annot.protein_sources_default">
+<code class="descclassname">pypath.annot.</code><code class="descname">protein_sources_default</code><em class="property"> = {'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'}</em><a class="headerlink" href="#pypath.annot.protein_sources_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default protein annotation sources</p>
 </dd></dl>
 
 </div>
@@ -796,6 +873,28 @@ domain-motif interactions, binding interfaces.</p>
 <div class="section" id="module-pypath.intercell">
 <span id="intercell"></span><h2>intercell<a class="headerlink" href="#module-pypath.intercell" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="pypath.intercell.Intercell">
+<em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">Intercell</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>network=None</em>, <em>network_param=None</em>, <em>omnipath=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#Intercell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.Intercell" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pypath.intercell.Intercell.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#Intercell.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.Intercell.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reloads the object from the module level.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pypath.intercell.IntercellAnnotation">
+<em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">IntercellAnnotation</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#IntercellAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.IntercellAnnotation" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="pypath.intercell.IntercellAnnotation.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#IntercellAnnotation.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.IntercellAnnotation.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reloads the object from the module level.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="pypath.intercell.IntercellRole">
 <em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">IntercellRole</code><span class="sig-paren">(</span><em>source</em>, <em>role</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.intercell.IntercellRole" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
@@ -1101,7 +1200,7 @@ for all isoforms, by default only first isoform.</p>
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.10 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.12 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

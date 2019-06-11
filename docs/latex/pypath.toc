@@ -15,17 +15,17 @@
 \contentsline {section}{\numberline {2.1}annot}{7}{section.2.1}% 
 \contentsline {section}{\numberline {2.2}bel}{9}{section.2.2}% 
 \contentsline {section}{\numberline {2.3}cellphonedb}{9}{section.2.3}% 
-\contentsline {section}{\numberline {2.4}complex}{12}{section.2.4}% 
+\contentsline {section}{\numberline {2.4}complex}{13}{section.2.4}% 
 \contentsline {section}{\numberline {2.5}go}{13}{section.2.5}% 
-\contentsline {section}{\numberline {2.6}homology}{13}{section.2.6}% 
-\contentsline {section}{\numberline {2.7}intera}{13}{section.2.7}% 
-\contentsline {section}{\numberline {2.8}intercell}{13}{section.2.8}% 
-\contentsline {section}{\numberline {2.9}network}{13}{section.2.9}% 
-\contentsline {section}{\numberline {2.10}pdb}{14}{section.2.10}% 
-\contentsline {section}{\numberline {2.11}ptm}{14}{section.2.11}% 
-\contentsline {section}{\numberline {2.12}pyreact}{14}{section.2.12}% 
-\contentsline {section}{\numberline {2.13}seq}{15}{section.2.13}% 
-\contentsline {section}{\numberline {2.14}unichem}{15}{section.2.14}% 
+\contentsline {section}{\numberline {2.6}homology}{14}{section.2.6}% 
+\contentsline {section}{\numberline {2.7}intera}{14}{section.2.7}% 
+\contentsline {section}{\numberline {2.8}intercell}{14}{section.2.8}% 
+\contentsline {section}{\numberline {2.9}network}{14}{section.2.9}% 
+\contentsline {section}{\numberline {2.10}pdb}{15}{section.2.10}% 
+\contentsline {section}{\numberline {2.11}ptm}{15}{section.2.11}% 
+\contentsline {section}{\numberline {2.12}pyreact}{15}{section.2.12}% 
+\contentsline {section}{\numberline {2.13}seq}{16}{section.2.13}% 
+\contentsline {section}{\numberline {2.14}unichem}{16}{section.2.14}% 
 \contentsline {chapter}{\numberline {3}Webservice}{17}{chapter.3}% 
 \contentsline {section}{\numberline {3.1}Mouse and rat}{17}{section.3.1}% 
 \contentsline {section}{\numberline {3.2}Examples}{17}{section.3.2}% 
@@ -47,5 +47,5 @@
 \contentsline {section}{\numberline {5.7}Drug compounds}{22}{section.5.7}% 
 \contentsline {section}{\numberline {5.8}Technical}{22}{section.5.8}% 
 \contentsline {chapter}{\numberline {6}OmniPath in R}{23}{chapter.6}% 
-\contentsline {chapter}{Python Module Index}{25}{section*.153}% 
-\contentsline {chapter}{Index}{27}{section*.154}% 
+\contentsline {chapter}{Python Module Index}{25}{section*.167}% 
+\contentsline {chapter}{Index}{27}{section*.168}% 

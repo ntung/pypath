@@ -18,6 +18,11 @@
 #  Website: http://pypath.omnipathdb.org/
 #
 
+"""
+Annotation module. Contains classes and methods to load different
+annotation data from different sources.
+"""
+
 from future.utils import iteritems
 from past.builtins import xrange, range, reduce
 
@@ -45,6 +50,7 @@ import pypath.session_mod as session_mod
 import pypath.annot_formats as annot_formats
 
 
+#: Default protein annotation sources
 protein_sources_default = {
     'Membranome',
     'Exocarta',
@@ -71,6 +77,7 @@ protein_sources_default = {
     'Comppi',
 }
 
+#: Default protein complex annotation sources
 complex_sources_default = {
     'CellPhoneDBComplex',
     'CorumFuncat',
@@ -79,6 +86,7 @@ complex_sources_default = {
     #'PypathInferred',
 }
 
+#: Default annotation classes by source
 default_fields = {
     'Matrisome': ('mainclass', 'subclass'),
     'Locate': ('location',),
@@ -112,29 +120,35 @@ default_fields = {
 
 
 class CustomAnnotation(session_mod.Logger):
+    """
+    Custom annotation base class. Inherits from
+    :py:class:`pypath.session_mod.Logger`.
 
+    :arg dict class_definitions:
+    :arg str pickle_file:
+    :arg str annotdb_pickle_file:
 
-    def __init__(
-            self,
-            class_definitions = None,
-            pickle_file = None,
-            annotdb_pickle_file = None,
-        ):
-        
+    :var str pickle_file:
+    :var str annotdb_pickle_file:
+    :var pypath.annot.AnnotationTable annotdb:
+    :var dict classes:
+    """
+
+    def __init__(self, class_definitions=None, pickle_file=None,
+                 annotdb_pickle_file=None):
+
         if not hasattr(self, '_log_name'):
-            
-            session_mod.Logger.__init__(self, name = 'annot')
-        
+            session_mod.Logger.__init__(self, name='annot')
+
         self.pickle_file = pickle_file
         self.annotdb_pickle_file = annotdb_pickle_file
-        self.annotdb = get_db(pickle_file = self.annotdb_pickle_file)
+        self.annotdb = get_db(pickle_file=self.annotdb_pickle_file)
 
         self._class_definitions = {}
         self.add_class_definitions(class_definitions or {})
 
         self.classes = {}
         self.populate_classes()
-
 
     def reload(self):
         """
@@ -146,7 +160,6 @@ class CustomAnnotation(session_mod.Logger):
         imp.reload(mod)
         new = getattr(mod, self.__class__.__name__)
         setattr(self, '__class__', new)
-
 
     def add_class_definitions(self, class_definitions):
 
@@ -161,41 +174,37 @@ class CustomAnnotation(session_mod.Logger):
 
         self._class_definitions.update(class_definitions)
 
-
     def populate_classes(self, update = False):
         """
         Creates a classification of proteins according to their roles
         in the intercellular communication.
         """
-        
+
         if self.pickle_file:
-            
+
             self.load_from_pickle(fname = self.pickle_file)
             return
-        
+
         for classdef in self._class_definitions.values():
 
             if classdef.name not in self.classes or update:
 
                 self.create_class(classdef)
-    
-    
+
     def load_from_pickle(self, pickle_file):
-        
+
         with open(pickle_file, 'rb') as fp:
-            
+
             self.classes = pickle.load(fp)
-    
-    
+
     def save_to_pickle(self, pickle_file):
-        
+
         with open(pickle_file, 'wb') as fp:
-            
+
             pickle.dump(
                 obj = self.classes,
                 file = fp,
             )
-    
 
     def create_class(self, classdef):
         """
@@ -204,7 +213,6 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         self.classes[classdef.name] = self.process_annot(classdef)
-
 
     def process_annot(self, classdef):
         """
@@ -239,7 +247,6 @@ class CustomAnnotation(session_mod.Logger):
 
         return set()
 
-
     def _execute_operation(self, annotop):
         """
         Executes a set operation on anntation sets.
@@ -260,7 +267,6 @@ class CustomAnnotation(session_mod.Logger):
 
         return annotop.op(*annots)
 
-
     def get_class(self, name):
         """
         Retrieves a class by its name and loads it if hasn't been loaded yet
@@ -277,11 +283,9 @@ class CustomAnnotation(session_mod.Logger):
 
         self._log('No such annotation class: `%s`' % name)
 
-
     def __len__(self):
 
         return len(self.classes)
-
 
     def __contains__(self, other):
 
@@ -290,57 +294,38 @@ class CustomAnnotation(session_mod.Logger):
             any(other in v for v in self.classes.values)
         )
 
+    def make_df(self, all_annotations=False):
+        """
+        """
 
-    def make_df(self, all_annotations = False):
-
-        self.df = pd.DataFrame(
-            data = [
-                [
-                    cls,
-                    uniprot,
-                    mapping.map_name0(uniprot, 'uniprot', 'genesymbol'),
-                    '; '.join(
-                        mapping.map_name(uniprot, 'uniprot', 'protein-name')
-                    ),
-                ] + (
-                    [self.annotdb.all_annotations_str(uniprot)]
-                        if all_annotations else
-                    []
-                )
-                for cls, members in iteritems(self.classes)
-                for uniprot in members
-            ],
-            columns = ['category', 'uniprot', 'genesymbol', 'full_name'] + (
-                ['all_annotations'] if all_annotations else []
-            )
-        )
-
+        map_gs = mapping.map_name0(uniprot, 'uniprot',
+                          'genesymbol')
+        self.df = pd.DataFrame(data = [[cls, uniprot, map_gs,
+                                        '; '.join(mapping.map_name(uniprot,
+                                                                   'uniprot',
+                                                                   'protein-name')), ] + ([self.annotdb.all_annotations_str(uniprot)] if all_annotations else []) for cls, members in iteritems(self.classes) for uniprot in members], columns = ['category', 'uniprot', 'genesymbol', 'full_name'] + (['all_annotations'] if all_annotations else []))
 
     def export(self, fname, **kwargs):
+        """
+        """
 
         self.make_df()
-
         self.df.to_csv(fname, **kwargs)
-
 
     def counts(self):
         """
         Returns a dict with number of elements in each class.
         """
 
-        return dict(
-            (name, len(members))
-            for name, members in iteritems(self.classes)
-        )
-
+        return dict((name, len(members)) for name, members in
+                    iteritems(self.classes))
 
     def classes_by_entity(self, element):
+        """
+        """
 
-        return set(
-            cls
-            for cls, elements in iteritems(self.classes)
-            if element in elements
-        )
+        return set(cls for cls, elements in iteritems(self.classes) if element
+                   in elements)
 
 
 class AnnotationBase(resource.AbstractResource):
@@ -377,12 +362,12 @@ class AnnotationBase(resource.AbstractResource):
         :arg dict input_args:
             Arguments for the ``input_method``.
         """
-        
+
         session_mod.Logger.__init__(self, name = 'annot')
-        
+
         input_args = input_args or {}
         input_args.update(kwargs)
-        
+
         resource.AbstractResource.__init__(
             self,
             name = name,
@@ -392,7 +377,7 @@ class AnnotationBase(resource.AbstractResource):
             dump = dump,
             data_attr_name = 'annot',
         )
-        
+
         self.entity_type = entity_type
         self.infer_complexes = (
             infer_complexes and
@@ -418,89 +403,89 @@ class AnnotationBase(resource.AbstractResource):
 
 
     def load(self):
-        
+
         self._log('Loading annotations from `%s`.' % self.name)
-        
+
         self.set_reference_set()
         resource.AbstractResource.load(self)
-        
+
         if self.infer_complexes:
-            
+
             self.add_complexes_by_inference()
-    
-    
+
+
     def add_complexes_by_inference(self, complexes = None):
         """
         Creates complex annotations by in silico inference and adds them
         to this annotation set.
         """
-        
+
         complex_annotation = self.complex_inference(complexes = complexes)
-        
+
         self.annot.update(complex_annotation)
-    
-    
+
+
     def complex_inference(self, complexes = None):
         """
         Annotates all complexes in `complexes`, by default in the default
         complex database (existing in the `complex` module or generated
         on demand according to the module's current settings).
-        
+
         Returns
         -------
         Dict with complexes as keys and sets of annotations as values.
         Complexes with no valid information in this annotation resource
         won't be in the dict.
-        
+
         Parameters
         ----------
         complexes : iterable
             Iterable yielding complexes.
         """
-        
+
         self._log('Inferring complex annotations from `%s`.' % self.name)
-        
+
         if not complexes:
-            
+
             import pypath.complex as complex
-            
+
             complexdb = complex.get_db()
-            
+
             complexes = complexdb.complexes.values()
-        
+
         complex_annotation = collections.defaultdict(set)
-        
+
         for cplex in complexes:
-            
+
             this_cplex_annot = self.annotate_complex(cplex)
-            
+
             if this_cplex_annot is not None:
-                
+
                 complex_annotation[cplex].update(this_cplex_annot)
-        
+
         return complex_annotation
-    
-    
+
+
     def annotate_complex(self, cplex):
         """
         Infers annotations for a single complex.
         """
-        
+
         if (
             not all(comp in self for comp in cplex.components.keys()) or
             self._eq_fields is None
         ):
             # this means no annotation for this complex
             return None
-            
+
         elif not self._eq_fields:
             # here empty set means the complex belongs
             # to the class of enitities covered by this
             # annotation
             return set()
-            
+
         elif callable(self._eq_fields):
-            
+
             # here a custom method combines the annotations
             # we look at all possible combinations of the annotations
             # of the components, but most likely each component have
@@ -514,34 +499,34 @@ class AnnotationBase(resource.AbstractResource):
                     )
                 )
             )
-            
+
         else:
-            
+
             groups = collections.defaultdict(set)
             empty_args = {}
             cls = None
             components = set(cplex.components.keys())
-            
+
             for comp in cplex.components.keys():
-                
+
                 for comp_annot in self.annot[comp]:
-                    
+
                     if cls is None:
-                        
+
                         cls = comp_annot.__class__
                         empty_args = dict(
                             (f, None)
                             for f in comp_annot._fields
                             if f not in self._eq_fields
                         )
-                    
+
                     groups[
                         tuple(
                             getattr(comp_annot, f)
                             for f in self._eq_fields
                         )
                     ].add(comp)
-            
+
             return set(
                 # the characteristic attributes of the group
                 # and the remaining left empty
@@ -563,8 +548,8 @@ class AnnotationBase(resource.AbstractResource):
         """
 
         self.uniprots = set(dataio.all_uniprots(organism = self.ncbi_tax_id))
-    
-    
+
+
     @staticmethod
     def get_reference_set(
             proteins = (),
@@ -573,7 +558,7 @@ class AnnotationBase(resource.AbstractResource):
             ncbi_tax_id = 9606,
             swissprot_only = True,
         ):
-        
+
         proteins = (
             proteins or
             sorted(
@@ -583,28 +568,28 @@ class AnnotationBase(resource.AbstractResource):
                 )
             )
         )
-        
+
         if use_complexes:
-            
+
             import pypath.complex as complex
-            
+
             complexes = (
                 complexes or
                 sorted(complex.all_complexes())
             )
-        
+
         reference_set = sorted(
             itertools.chain(
                 proteins,
                 complexes,
             )
         )
-        
+
         return proteins, complexes, reference_set
-    
-    
+
+
     def _get_reference_set(self):
-        
+
         return self.get_reference_set(
             proteins = self.proteins,
             complexes = self.complexes,
@@ -612,23 +597,23 @@ class AnnotationBase(resource.AbstractResource):
             ncbi_tax_id = self.ncbi_tax_id,
             swissprot_only = self.swissprot_only,
         )
-    
-    
+
+
     def set_reference_set(self):
-        
+
         if not self.reference_set:
-            
+
             proteins, complexes, reference_set = self._get_reference_set()
-            
+
             self.proteins = proteins
             self.complexes = complexes
             self.reference_set = reference_set
-    
-    
+
+
     def has_complexes(self):
-        
+
         return self.entity_type == 'complex' or self.infer_complexes
-    
+
 
     def _process_method(self, *args, **kwargs):
         """
@@ -707,62 +692,62 @@ class AnnotationBase(resource.AbstractResource):
 
                     result.add(uniprot)
                     break
-        
+
         return result
-    
-    
+
+
     def get_subset_bool_array(self, reference_set = None, **kwargs):
-        
+
         reference_set = reference_set or self.reference_set
-        
+
         subset = self.get_subset(**kwargs)
-        
+
         return np.array([
             entity in subset
             for entity in reference_set
         ])
-    
-    
+
+
     def to_bool_array(self, reference_set):
-        
+
         total = self.to_set()
-        
+
         return np.array([
             entity in total
             for entity in reference_set
         ])
-    
-    
+
+
     def to_set(self):
-        
+
         return set(self.annot.keys())
-    
-    
+
+
     def all_proteins(self):
         """
         All UniProt IDs annotated in this resource.
         """
-        
+
         return sorted((
             k for k in self.annot.keys()
             if isinstance(k, common.basestring)
         ))
-    
-    
+
+
     def all_complexes(self):
-        
+
         import pypath.complexes as complexes
         import pypath.intera as intera
-        
+
         return sorted((
             k
             for k in self.annot.keys()
             if isinstance(k, intera.complex)
         ))
-    
-    
+
+
     def to_array(self, reference_set = None, use_fields = None):
-        
+
         use_fields = (
             use_fields or (
                 default_fields[self.name]
@@ -770,13 +755,13 @@ class AnnotationBase(resource.AbstractResource):
                 None
             )
         )
-        
+
         self._log(
             'Creating boolean array from `%s` annotation data.' % self.name
         )
-        
+
         reference_set = reference_set or self.reference_set
-        
+
         all_fields = self.get_names()
         fields = use_fields or all_fields
         ifields = tuple(
@@ -788,12 +773,12 @@ class AnnotationBase(resource.AbstractResource):
                 self.to_bool_array(reference_set = reference_set)
             )
         ]
-        
+
         for i in xrange(len(fields)):
-            
+
             this_ifields = ifields[:i+1]
             this_fields  =  fields[:i+1]
-            
+
             value_combinations = set(
                 tuple(annot[j] for j in this_ifields)
                 for annots in self.annot.values()
@@ -807,9 +792,9 @@ class AnnotationBase(resource.AbstractResource):
                     for v in values
                 )
             )
-            
+
             for values in value_combinations:
-                
+
                 labels = tuple(
                     'not-%s' % this_fields[ival]
                         if isinstance(val, bool) and not val else
@@ -818,7 +803,7 @@ class AnnotationBase(resource.AbstractResource):
                     val
                     for ival, val in enumerate(values)
                 )
-                
+
                 this_values = dict(zip(this_fields, values))
 
                 this_array = self.get_subset_bool_array(
@@ -832,12 +817,12 @@ class AnnotationBase(resource.AbstractResource):
                         this_array,
                     )
                 )
-        
+
         self._log(
             'Boolean array has been created from '
             '`%s` annotation data.' % self.name
         )
-        
+
         return (
             tuple(r[0] for r in result),
             np.vstack([r[1] for r in result]).T
@@ -992,9 +977,9 @@ class AnnotationBase(resource.AbstractResource):
 
 
 class Membranome(AnnotationBase):
-    
+
     _eq_fields = ('membrane', 'side')
-    
+
 
     def __init__(self, **kwargs):
 
@@ -1023,7 +1008,7 @@ class Membranome(AnnotationBase):
 
 
 class Exocarta(AnnotationBase):
-    
+
     _eq_fields = ('tissue', 'vesicle')
 
 
@@ -1052,34 +1037,34 @@ class Exocarta(AnnotationBase):
             '%sAnnotation' % self.name,
             ['pmid', 'tissue', 'vesicle'],
         )
-        
+
         _annot = collections.defaultdict(set)
-        
+
         missing_name = False
-        
+
         for a in self.data:
-            
+
             if not a[1]:
-                
+
                 missing_name = True
                 continue
 
             uniprots = mapping.map_name(a[1], 'genesymbol', 'uniprot')
 
             for u in uniprots:
-                
+
                 for vesicle in (
                     a[3][3]
                         if self.name == 'Vesiclepedia' else
                     ('Exosomes',)
                 ):
-                    
+
                     _annot[u].add(record(a[3][0], a[3][2], vesicle))
 
         self.annot = dict(_annot)
-        
+
         if missing_name:
-            
+
             self._log(
                 'One or more names were missing while processing '
                 'annotations from %s. Best if you check your cache '
@@ -1092,7 +1077,7 @@ class Exocarta(AnnotationBase):
 class Vesiclepedia(Exocarta):
 
     _eq_fields = ('tissue', 'vesicle')
-    
+
 
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
 
@@ -1105,7 +1090,7 @@ class Vesiclepedia(Exocarta):
 
 
 class Matrisome(AnnotationBase):
-    
+
     _eq_fields = ('mainclass', 'subclass')
 
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
@@ -1140,9 +1125,9 @@ class Matrisome(AnnotationBase):
 
 
 class Surfaceome(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
+
 
     def __init__(self, **kwargs):
 
@@ -1178,101 +1163,101 @@ class Surfaceome(AnnotationBase):
 
 
 class Adhesome(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'Adhesome',
             input_method = 'adhesome_annotations',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Hgnc(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'HGNC',
             input_method = 'hgnc_genegroups',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 
 class Zhong2015(AnnotationBase):
-    
+
     _eq_fields = ('type',)
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'Zhong2015',
             input_method = 'zhong2015_annotations',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Opm(AnnotationBase):
-    
+
     _eq_fields = ('membrane',)
-    
-    
+
+
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
-        
+
         if 'organism' not in kwargs:
-            
+
             kwargs['organism'] = ncbi_tax_id
-        
+
         AnnotationBase.__init__(
             self,
             name = 'OPM',
             input_method = 'opm_annotations',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Topdb(AnnotationBase):
-    
+
     _eq_fields = ('membrane',)
-    
-    
+
+
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'TopDB',
@@ -1283,21 +1268,21 @@ class Topdb(AnnotationBase):
             ncbi_tax_id = ncbi_tax_id,
             **kwargs
         )
-    
-    
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Integrins(AnnotationBase):
-    
+
     _eq_fields = ()
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'Integrins',
@@ -1307,73 +1292,73 @@ class Integrins(AnnotationBase):
 
 
 class HumanProteinAtlas(AnnotationBase):
-    
+
     _eq_fields = None
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'HPA',
             input_method = 'proteinatlas_annotations',
             **kwargs
         )
-        
-        
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Comppi(AnnotationBase):
-    
+
     _eq_fields = ('location',)
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'ComPPI',
             input_method = 'comppi_locations',
             **kwargs
         )
-        
-        
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class Ramilowski2015Location(AnnotationBase):
-    
+
     _eq_fields = ('location',)
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         AnnotationBase.__init__(
             self,
             name = 'Ramilowski_location',
             input_method = 'ramilowski_locations',
             **kwargs
         )
-        
-        
+
+
     def _process_method(self):
-        
+
         self.annot = self.data
         delattr(self, 'data')
 
 
 class CellSurfaceProteinAtlas(AnnotationBase):
-    
+
     _eq_fields = ()
-    
-    
+
+
     def __init__(
             self,
             ncbi_tax_id = 9606,
@@ -1397,10 +1382,10 @@ class CellSurfaceProteinAtlas(AnnotationBase):
 
 
 class HumanPlasmaMembraneReceptome(AnnotationBase):
-    
+
     _eq_fields = ('role',)
-    
-    
+
+
     def __init__(self, **kwargs):
         """
         The name of this resource abbreviated as `HPMR`.
@@ -1421,10 +1406,10 @@ class HumanPlasmaMembraneReceptome(AnnotationBase):
 
 
 class Matrixdb(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
-    
+
+
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
         """
         Protein annotations from MatrixDB.
@@ -1448,10 +1433,10 @@ class Matrixdb(AnnotationBase):
 
 
 class Locate(AnnotationBase):
-    
+
     _eq_fields = ('location',)
-    
-    
+
+
     def __init__(
             self,
             ncbi_tax_id = 9606,
@@ -1513,10 +1498,10 @@ class GOCustomIntercell(go.GOCustomAnnotation):
 
 
 class GOIntercell(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
-    
+
+
     def __init__(
             self,
             categories = None,
@@ -1572,15 +1557,15 @@ class GOIntercell(AnnotationBase):
 
 
 class CellPhoneDB(AnnotationBase):
-    
-    
+
+
     record = dataio.CellPhoneDBAnnotation
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         _ = kwargs.pop('ncbi_tax_id', None)
-        
+
         AnnotationBase.__init__(
             self,
             name = 'CellPhoneDB',
@@ -1597,20 +1582,20 @@ class CellPhoneDB(AnnotationBase):
             for uniprot, annot in
             iteritems(self.data)
         )
-    
-    
+
+
     def _eq_fields(self, *args):
-        
+
         return self.record(*tuple(all(a) for a in zip(*args)))
 
 
 class CellPhoneDBComplex(CellPhoneDB):
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         _ = kwargs.pop('ncbi_tax_id', None)
-        
+
         AnnotationBase.__init__(
             self,
             name = 'CellPhoneDB_complex',
@@ -1622,12 +1607,12 @@ class CellPhoneDBComplex(CellPhoneDB):
 
 
 class HpmrComplex(AnnotationBase):
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         _ = kwargs.pop('ncbi_tax_id', None)
-        
+
         AnnotationBase.__init__(
             self,
             name = 'HPMR_complex',
@@ -1636,10 +1621,10 @@ class HpmrComplex(AnnotationBase):
             entity_type = 'complex',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self, *args, **kwargs):
-        
+
         self.annot = dict(
             (cplex.__str__(), set())
             for cplex in self.data
@@ -1648,12 +1633,12 @@ class HpmrComplex(AnnotationBase):
 
 
 class Corum(AnnotationBase):
-    
-    
+
+
     def __init__(self, name, annot_attr, **kwargs):
-        
+
         self._annot_attr = annot_attr
-        
+
         AnnotationBase.__init__(
             self,
             name = name,
@@ -1661,17 +1646,17 @@ class Corum(AnnotationBase):
             entity_type = 'complex',
             **kwargs
         )
-    
-    
+
+
     def _process_method(self, *args, **kwargs):
-        
+
         record = CorumAnnotation = (
             collections.namedtuple(
                 'CorumAnnotation%s' % self._annot_attr.capitalize(),
                 (self._annot_attr,),
             )
         )
-        
+
         self.annot = dict(
             (
                 cplex.__str__(),
@@ -1683,15 +1668,15 @@ class Corum(AnnotationBase):
             )
             for cplex in self.data.values()
         )
-        
+
         del self.data
 
 
 class CorumFuncat(Corum):
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         Corum.__init__(
             self,
             name = 'CORUM_Funcat',
@@ -1701,22 +1686,22 @@ class CorumFuncat(Corum):
 
 
 class CorumGO(Corum):
-    
-    
+
+
     def __init__(self, **kwargs):
-        
+
         Corum.__init__(
             self,
-            name = 'CORUM_GO', 
+            name = 'CORUM_GO',
             annot_attr = 'go',
             **kwargs
         )
 
 
 class LigandReceptor(AnnotationBase):
-    
+
     _eq_fields = ('mainclass',)
-    
+
 
     def __init__(
             self,
@@ -1890,8 +1875,8 @@ class GuideToPharmacology(LigandReceptor):
 
 
 class AnnotationTable(session_mod.Logger):
-    
-    
+
+
     def __init__(
             self,
             proteins = (),
@@ -1911,7 +1896,7 @@ class AnnotationTable(session_mod.Logger):
         Manages a custom set of annotation resources. Loads data and
         accepts queries, provides methods for converting the data to
         data frame.
-        
+
         :arg set proteins:
             A reference set of proteins (UniProt IDs).
         :arg set complexes:
@@ -1953,7 +1938,7 @@ class AnnotationTable(session_mod.Logger):
         self.use_complexes = use_complexes
         self.set_reference_set()
         self.annots = {}
-        
+
         if load:
 
             self.load()
@@ -1972,35 +1957,35 @@ class AnnotationTable(session_mod.Logger):
 
 
     def load(self):
-        
+
         if self.pickle_file:
-            
+
             self.load_from_pickle(pickle_file = self.pickle_file)
             return
-        
+
         self.set_reference_set()
         self.load_protein_resources()
         self.load_complex_resources()
-        
+
         if self.create_dataframe:
-            
+
             self.make_dataframe()
-    
-    
+
+
     def load_from_pickle(self, pickle_file):
-        
+
         with open(pickle_file, 'rb') as fp:
-            
+
             self.proteins, self.complexes, self.reference_set, annots = (
                 pickle.load(fp)
             )
-            
+
             self.annots = {}
-            
+
             for name, (cls_name, data, record_cls) in iteritems(annots):
-                
+
                 if record_cls is not None:
-                    
+
                     setattr(
                         sys.modules[record_cls['module']],
                         record_cls['name'],
@@ -2009,12 +1994,12 @@ class AnnotationTable(session_mod.Logger):
                             record_cls['fields'],
                         ),
                     )
-                    
+
                     record_cls_new = getattr(
                         sys.modules[record_cls['module']],
                         record_cls['name'],
                     )
-                    
+
                     data = dict(
                         (
                             key,
@@ -2025,26 +2010,26 @@ class AnnotationTable(session_mod.Logger):
                         )
                         for key, these_annots in iteritems(data)
                     )
-                
+
                 cls = globals()[cls_name]
-                
+
                 self.annots[name] = cls(dump = data)
-    
-    
+
+
     def save_to_pickle(self, pickle_file):
-        
-        
+
+
         def get_record_class(annot):
-            
+
             for val in annot.values():
-                
+
                 for elem in val:
-                    
+
                     return elem.__class__
-        
-        
+
+
         with open(pickle_file, 'wb') as fp:
-            
+
             classes = dict(
                 (
                     name,
@@ -2052,7 +2037,7 @@ class AnnotationTable(session_mod.Logger):
                 )
                 for name, annot in iteritems(self.annots)
             )
-            
+
             annots = dict(
                 (
                     name,
@@ -2078,7 +2063,7 @@ class AnnotationTable(session_mod.Logger):
                 )
                 for name, annot in iteritems(self.annots)
             )
-            
+
             pickle.dump(
                 obj = (
                     self.proteins,
@@ -2088,10 +2073,10 @@ class AnnotationTable(session_mod.Logger):
                 ),
                 file = fp,
             )
-    
-    
+
+
     def set_reference_set(self):
-        
+
         self.proteins, self.complexes, self.reference_set = (
             AnnotationBase.get_reference_set(
                 proteins = self.proteins,
@@ -2101,72 +2086,72 @@ class AnnotationTable(session_mod.Logger):
                 swissprot_only = self.swissprot_only,
             )
         )
-        
+
         self.rows = dict(
             reversed(i)
             for i in enumerate(self.reference_set)
         )
-    
-    
+
+
     def load_protein_resources(self):
-        
+
         self._load_resources(self.protein_sources, self.proteins)
-    
-    
+
+
     def load_complex_resources(self):
-        
+
         self._load_resources(self.complex_sources, self.complexes)
-    
-    
+
+
     def _load_resources(self, definitions, reference_set):
-        
+
         for cls in definitions:
-            
+
             cls = cls if callable(cls) else getattr(self._module, cls)
-            
+
             annot = cls(
                 ncbi_tax_id = self.ncbi_tax_id,
                 reference_set = reference_set,
             )
-            
+
             self.annots[annot.name] = annot
-    
-    
+
+
     def make_dataframe(self, reference_set = None):
-        
+
         if self.create_dataframe:
-            
+
             self.df = self.to_dataframe(reference_set = reference_set)
-    
-    
+
+
     def ensure_array(self, reference_set = None, rebuild = False):
-        
+
         if not hasattr(self, 'data') or rebuild:
-            
+
             self.make_array(reference_set = reference_set)
-    
-    
+
+
     def to_array(self, reference_set = None):
-        
+
         reference_set = reference_set or self.reference_set
-        
+
         names  = []
         arrays = []
-        
+
         for resource in self.annots.values():
-            
+
             # skipping HPA for now because too large number of
             # annotations, it would take very long:
             if resource.name == 'HPA':
-                
+
                 continue
-            
+
             use_fields = (
                 self.use_fields[resource.name]
                     if resource.name in self.use_fields else
                 None
             )
-            
+
             this_names, this_array = resource.to_array(
                     reference_set = reference_set,
                     use_fields = (
@@ -2175,42 +2160,42 @@ class AnnotationTable(session_mod.Logger):
                         None
                     ),
                 )
-            
+
             names.extend(this_names)
             arrays.append(this_array)
-        
+
         names = np.array(list(itertools.chain(names)))
         data = np.hstack(arrays)
-        
+
         return names, data
-    
-    
+
+
     def make_array(self, reference_set = None):
-        
+
         self.names, self.data = self.to_array(reference_set = reference_set)
         self.set_cols()
-    
-    
+
+
     def set_cols(self):
-        
+
         self.cols = dict((name, i) for i, name in enumerate(self.names))
-    
-    
+
+
     def keep(self, keep):
-        
+
         ikeep = np.array([
             i for i, name in enumerate(self.names) if name in keep
         ])
-        
+
         self.names = self.names[ikeep]
         self.data  = self.data[:,ikeep]
         self.set_cols()
-    
-    
+
+
     def make_sets(self):
-        
+
         self.ensure_array()
-        
+
         self.sets = dict(
             (
                 name,
@@ -2295,20 +2280,20 @@ class AnnotationTable(session_mod.Logger):
 
 
     def to_dataframe(self, reference_set = None):
-        
+
         self.ensure_array(
             reference_set = reference_set,
             rebuild = reference_set is not None,
         )
-        
+
         colnames = ['__'.join(name) for name in self.names]
-        
+
         df = pd.DataFrame(
             data = self.data,
             index = self.reference_set,
             columns = colnames,
         )
-        
+
         return df
 
 

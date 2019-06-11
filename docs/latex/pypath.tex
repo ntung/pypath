@@ -72,8 +72,8 @@
 
 
 \title{pypath Documentation}
-\date{Jun 05, 2019}
-\release{0.8.10}
+\date{Jun 06, 2019}
+\release{0.8.12}
 \author{Dénes Türei}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -278,7 +278,10 @@ as soon as possible.
 \label{\detokenize{reference:module-reference}}\label{\detokenize{reference::doc}}
 
 \section{annot}
-\label{\detokenize{reference:module-pypath.annot}}\label{\detokenize{reference:annot}}\index{pypath.annot (module)@\spxentry{pypath.annot}\spxextra{module}}\index{Adhesome (class in pypath.annot)@\spxentry{Adhesome}\spxextra{class in pypath.annot}}
+\label{\detokenize{reference:module-pypath.annot}}\label{\detokenize{reference:annot}}\index{pypath.annot (module)@\spxentry{pypath.annot}\spxextra{module}}
+Annotation module. Contains classes and methods to load different
+annotation data from different sources.
+\index{Adhesome (class in pypath.annot)@\spxentry{Adhesome}\spxextra{class in pypath.annot}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.Adhesome}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Adhesome}}}{\emph{**kwargs}}{}
@@ -413,6 +416,81 @@ alias of \sphinxcode{\sphinxupquote{pypath.dataio.CellPhoneDBAnnotation}}
 \phantomsection\label{\detokenize{reference:pypath.annot.CorumGO}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{CorumGO}}}{\emph{**kwargs}}{}
 \end{fulllineitems}
 
+\index{CustomAnnotation (class in pypath.annot)@\spxentry{CustomAnnotation}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{CustomAnnotation}}}{\emph{class\_definitions=None}, \emph{pickle\_file=None}, \emph{annotdb\_pickle\_file=None}}{}
+Custom annotation base class. Inherits from
+\sphinxcode{\sphinxupquote{pypath.session\_mod.Logger}}.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{class\_definitions}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} 
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} 
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} 
+
+\end{itemize}
+
+\item[{Var}] \leavevmode
+\end{description}\end{quote}
+\index{counts() (pypath.annot.CustomAnnotation method)@\spxentry{counts()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.counts}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{counts}}}{}{}
+Returns a dict with number of elements in each class.
+
+\end{fulllineitems}
+
+\index{create\_class() (pypath.annot.CustomAnnotation method)@\spxentry{create\_class()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.create_class}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{create\_class}}}{\emph{classdef}}{}
+Creates a category of entities with specific role in intercellular
+communication.
+
+\end{fulllineitems}
+
+\index{get\_class() (pypath.annot.CustomAnnotation method)@\spxentry{get\_class()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.get_class}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_class}}}{\emph{name}}{}
+Retrieves a class by its name and loads it if hasn’t been loaded yet
+but the name present in the class definitions.
+
+\end{fulllineitems}
+
+\index{populate\_classes() (pypath.annot.CustomAnnotation method)@\spxentry{populate\_classes()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.populate_classes}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{populate\_classes}}}{\emph{update=False}}{}
+Creates a classification of proteins according to their roles
+in the intercellular communication.
+
+\end{fulllineitems}
+
+\index{process\_annot() (pypath.annot.CustomAnnotation method)@\spxentry{process\_annot()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.process_annot}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{process\_annot}}}{\emph{classdef}}{}
+Processes an annotation definition and returns a set of identifiers.
+
+\end{fulllineitems}
+
+\index{reload() (pypath.annot.CustomAnnotation method)@\spxentry{reload()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.reload}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reload}}}{}{}
+Reloads the object from the module level.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
 \index{Exocarta (class in pypath.annot)@\spxentry{Exocarta}\spxextra{class in pypath.annot}}
 
 \begin{fulllineitems}
@@ -539,6 +617,22 @@ alias of \sphinxcode{\sphinxupquote{pypath.dataio.CellPhoneDBAnnotation}}
 \phantomsection\label{\detokenize{reference:pypath.annot.Zhong2015}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Zhong2015}}}{\emph{**kwargs}}{}
 \end{fulllineitems}
 
+\index{complex\_sources\_default (in module pypath.annot)@\spxentry{complex\_sources\_default}\spxextra{in module pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.complex_sources_default}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{complex\_sources\_default}}\sphinxbfcode{\sphinxupquote{ = \{'CellPhoneDBComplex', 'CorumFuncat', 'CorumGO', 'HpmrComplex'\}}}}
+Default protein complex annotation sources
+
+\end{fulllineitems}
+
+\index{default\_fields (in module pypath.annot)@\spxentry{default\_fields}\spxextra{in module pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.default_fields}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{default\_fields}}\sphinxbfcode{\sphinxupquote{ = \{'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB\_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski\_location': ('location',), 'Vesiclepedia': ('vesicle',)\}}}}
+Default annotation classes by source
+
+\end{fulllineitems}
+
 \index{get\_db() (in module pypath.annot)@\spxentry{get\_db()}\spxextra{in module pypath.annot}}
 
 \begin{fulllineitems}
@@ -554,6 +648,14 @@ not exist yet.
 \phantomsection\label{\detokenize{reference:pypath.annot.init_db}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{init\_db}}}{\emph{keep\_annotators=True}, \emph{create\_dataframe=False}, \emph{use\_complexes=True}, \emph{**kwargs}}{}
 Initializes or reloads the annotation database.
 The database will be assigned to the \sphinxcode{\sphinxupquote{db}} attribute of this module.
+
+\end{fulllineitems}
+
+\index{protein\_sources\_default (in module pypath.annot)@\spxentry{protein\_sources\_default}\spxextra{in module pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.protein_sources_default}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{protein\_sources\_default}}\sphinxbfcode{\sphinxupquote{ = \{'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'\}}}}
+Default protein annotation sources
 
 \end{fulllineitems}
 
@@ -1228,7 +1330,35 @@ domain-motif interactions, binding interfaces.
 
 
 \section{intercell}
-\label{\detokenize{reference:module-pypath.intercell}}\label{\detokenize{reference:intercell}}\index{pypath.intercell (module)@\spxentry{pypath.intercell}\spxextra{module}}\index{IntercellRole (class in pypath.intercell)@\spxentry{IntercellRole}\spxextra{class in pypath.intercell}}
+\label{\detokenize{reference:module-pypath.intercell}}\label{\detokenize{reference:intercell}}\index{pypath.intercell (module)@\spxentry{pypath.intercell}\spxextra{module}}\index{Intercell (class in pypath.intercell)@\spxentry{Intercell}\spxextra{class in pypath.intercell}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.intercell.Intercell}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.intercell.}}\sphinxbfcode{\sphinxupquote{Intercell}}}{\emph{class\_definitions=None}, \emph{network=None}, \emph{network\_param=None}, \emph{omnipath=False}}{}~\index{reload() (pypath.intercell.Intercell method)@\spxentry{reload()}\spxextra{pypath.intercell.Intercell method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.intercell.Intercell.reload}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reload}}}{}{}
+Reloads the object from the module level.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{IntercellAnnotation (class in pypath.intercell)@\spxentry{IntercellAnnotation}\spxextra{class in pypath.intercell}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.intercell.IntercellAnnotation}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.intercell.}}\sphinxbfcode{\sphinxupquote{IntercellAnnotation}}}{\emph{class\_definitions=None}, \emph{**kwargs}}{}~\index{reload() (pypath.intercell.IntercellAnnotation method)@\spxentry{reload()}\spxextra{pypath.intercell.IntercellAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.intercell.IntercellAnnotation.reload}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reload}}}{}{}
+Reloads the object from the module level.
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{IntercellRole (class in pypath.intercell)@\spxentry{IntercellRole}\spxextra{class in pypath.intercell}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.intercell.IntercellRole}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.intercell.}}\sphinxbfcode{\sphinxupquote{IntercellRole}}}{\emph{source}, \emph{role}}{}~\index{role (pypath.intercell.IntercellRole attribute)@\spxentry{role}\spxextra{pypath.intercell.IntercellRole attribute}}
