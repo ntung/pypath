@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Module reference &#8212; pypath 0.8.12 documentation</title>
+    <title>Module reference &#8212; pypath 0.8.18 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -34,7 +34,7 @@
         <li class="right" >
           <a href="installation.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.18 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -158,6 +158,11 @@ proteome.</p>
 <dd></dd></dl>
 
 <dl class="class">
+<dt id="pypath.annot.Cpad">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Cpad</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Cpad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Cpad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
 <dt id="pypath.annot.CustomAnnotation">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CustomAnnotation</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>pickle_file=None</em>, <em>annotdb_pickle_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom annotation base class. Inherits from
@@ -165,14 +170,44 @@ proteome.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>class_definitions</strong> (<em>dict</em>) – </p></li>
-<li><p><strong>pickle_file</strong> (<em>str</em>) – </p></li>
-<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – </p></li>
+<li><p><strong>class_definitions</strong> (<em>dict</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Contains the annotation classes’
+definitions. This is, <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an
+<code class="docutils literal notranslate"><span class="pre">'args'</span></code> parameter.</p></li>
+<li><p><strong>pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. The path to an annotation classes
+pickle file.</p></li>
+<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Path to the annotation database
+pickle file.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Var</dt>
-<dd class="field-even"><p></p></dd>
+<dt class="field-even">Variables</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>pickle_file</strong> (<em>str</em>) – The path to an annotation classes pickle file.</p></li>
+<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Path to the annotation database
+pickle file.</p></li>
+<li><p><strong>annotdb</strong> (<em>pypath.annot.AnnotationTable</em>) – An instance of the annotation table class. Loads, contains and
+manages the annotation data.</p></li>
+<li><p><strong>classes</strong> (<em>dict</em>) – Contains the entities by their class definition according to
+their role.</p></li>
+</ul>
+</dd>
 </dl>
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.add_class_definitions">
+<code class="descname">add_class_definitions</code><span class="sig-paren">(</span><em>class_definitions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.add_class_definitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.add_class_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a class definition to the current instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class_definitions</strong> (<em>dict</em>) – Contains the annotation classes’ definitions to add. This
+is, <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code> parameter.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.classes_by_entity">
+<code class="descname">classes_by_entity</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.classes_by_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.classes_by_entity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.counts">
 <code class="descname">counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.counts" title="Permalink to this definition">¶</a></dt>
@@ -182,34 +217,93 @@ proteome.</p>
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.create_class">
 <code class="descname">create_class</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.create_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.create_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a category of entities with specific role in intercellular
-communication.</p>
+<dd><p>Creates a category of entities with specific role in
+intercellular communication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>classdef</strong> (<em>object</em>) – The new class definition for the new category. Should
+contain <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code>
+parameters.</p>
+</dd>
+</dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.export">
+<code class="descname">export</code><span class="sig-paren">(</span><em>fname</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.export" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.get_class">
 <code class="descname">get_class</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.get_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.get_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves a class by its name and loads it if hasn’t been loaded yet
 but the name present in the class definitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.load_from_pickle">
+<code class="descname">load_from_pickle</code><span class="sig-paren">(</span><em>pickle_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.load_from_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.load_from_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the annotation classes from pickle file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pickle_file</strong> (<em>str</em>) – The path to an annotation classes pickle file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.make_df">
+<code class="descname">make_df</code><span class="sig-paren">(</span><em>all_annotations=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.make_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.make_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.populate_classes">
 <code class="descname">populate_classes</code><span class="sig-paren">(</span><em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.populate_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.populate_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a classification of proteins according to their roles
-in the intercellular communication.</p>
+in the intercellular communication. Loads from pickle
+<code class="docutils literal notranslate"><span class="pre">pickle_file``(if</span> <span class="pre">available)</span> <span class="pre">or</span> <span class="pre">from</span> <span class="pre">``class_definitions</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>update</strong> (<em>bool</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. Whether to reload all
+classes or just the ones not already loaded.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.process_annot">
 <code class="descname">process_annot</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.process_annot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.process_annot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processes an annotation definition and returns a set of identifiers.</p>
+<dd><p>Processes an annotation definition and returns a set of
+identifiers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>classdef</strong> (<em>object</em>) – The class definition to process for the new category. Should
+contain <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code>
+parameters.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="pypath.annot.CustomAnnotation.reload">
 <code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.reload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reloads the object from the module level.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pypath.annot.CustomAnnotation.save_to_pickle">
+<code class="descname">save_to_pickle</code><span class="sig-paren">(</span><em>pickle_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.save_to_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.save_to_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the annotation classes on a pickle file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pickle_file</strong> (<em>str</em>) – The path to save the annotation pickle file.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -255,6 +349,11 @@ in the intercellular communication.</p>
 <dd></dd></dl>
 
 <dl class="class">
+<dt id="pypath.annot.KeggPathways">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">KeggPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#KeggPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.KeggPathways" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
 <dt id="pypath.annot.Kirouac2010">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Kirouac2010</code><span class="sig-paren">(</span><em>load_sources=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Kirouac2010"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Kirouac2010" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -285,6 +384,11 @@ in the intercellular communication.</p>
 <dd></dd></dl>
 
 <dl class="class">
+<dt id="pypath.annot.NetpathPathways">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">NetpathPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#NetpathPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.NetpathPathways" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
 <dt id="pypath.annot.Opm">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Opm</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Opm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Opm" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -297,6 +401,16 @@ in the intercellular communication.</p>
 <dl class="class">
 <dt id="pypath.annot.Ramilowski2015Location">
 <em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Ramilowski2015Location</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Ramilowski2015Location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Ramilowski2015Location" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="pypath.annot.SignalinkPathways">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">SignalinkPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#SignalinkPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.SignalinkPathways" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="pypath.annot.SignorPathways">
+<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">SignorPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#SignorPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.SignorPathways" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="class">
@@ -327,7 +441,7 @@ in the intercellular communication.</p>
 
 <dl class="data">
 <dt id="pypath.annot.default_fields">
-<code class="descclassname">pypath.annot.</code><code class="descname">default_fields</code><em class="property"> = {'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski_location': ('location',), 'Vesiclepedia': ('vesicle',)}</em><a class="headerlink" href="#pypath.annot.default_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pypath.annot.</code><code class="descname">default_fields</code><em class="property"> = {'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Cpad': ('cancer', 'effect_on_cancer'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski_location': ('location',), 'Vesiclepedia': ('vesicle',)}</em><a class="headerlink" href="#pypath.annot.default_fields" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default annotation classes by source</p>
 </dd></dl>
 
@@ -347,7 +461,7 @@ The database will be assigned to the <code class="docutils literal notranslate">
 
 <dl class="data">
 <dt id="pypath.annot.protein_sources_default">
-<code class="descclassname">pypath.annot.</code><code class="descname">protein_sources_default</code><em class="property"> = {'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'}</em><a class="headerlink" href="#pypath.annot.protein_sources_default" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pypath.annot.</code><code class="descname">protein_sources_default</code><em class="property"> = {'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Cpad', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'KeggPathways', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'NetpathPathways', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'SignalinkPathways', 'SignorPathways', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'}</em><a class="headerlink" href="#pypath.annot.protein_sources_default" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default protein annotation sources</p>
 </dd></dl>
 
@@ -1200,7 +1314,7 @@ for all isoforms, by default only first isoform.</p>
         <li class="right" >
           <a href="installation.html" title="Installation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.18 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

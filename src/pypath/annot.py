@@ -130,19 +130,34 @@ default_fields = {
 }
 
 
+# XXX: Not sure, double-check
 class CustomAnnotation(session_mod.Logger):
     """
     Custom annotation base class. Inherits from
     :py:class:`pypath.session_mod.Logger`.
 
     :arg dict class_definitions:
+        Optional, ``None`` by default. Contains the annotation classes'
+        definitions. This is, ``'name'``, a ``'source'`` and an
+        ``'args'`` parameter.
     :arg str pickle_file:
+        Optional, ``None`` by default. The path to an annotation classes
+        pickle file.
     :arg str annotdb_pickle_file:
+        Optional, ``None`` by default. Path to the annotation database
+        pickle file.
 
     :var str pickle_file:
+        The path to an annotation classes pickle file.
     :var str annotdb_pickle_file:
+        Optional, ``None`` by default. Path to the annotation database
+        pickle file.
     :var pypath.annot.AnnotationTable annotdb:
+        An instance of the annotation table class. Loads, contains and
+        manages the annotation data.
     :var dict classes:
+        Contains the entities by their class definition according to
+        their role.
     """
 
     def __init__(self, class_definitions=None, pickle_file=None,
@@ -167,67 +182,91 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         modname = self.__class__.__module__
-        mod = __import__(modname, fromlist = [modname.split('.')[0]])
+        mod = __import__(modname, fromlist=[modname.split('.')[0]])
         imp.reload(mod)
         new = getattr(mod, self.__class__.__name__)
         setattr(self, '__class__', new)
 
     def add_class_definitions(self, class_definitions):
+        """
+        Adds a class definition to the current instance.
+
+        :arg dict class_definitions:
+            Contains the annotation classes' definitions to add. This
+            is, ``'name'``, a ``'source'`` and an ``'args'`` parameter.
+        """
 
         if not isinstance(class_definitions, dict):
-
-            class_definitions = dict(
-                (
-                    classdef.name,
-                    classdef
-                ) for classdef in class_definitions
-            )
+            class_definitions = dict((classdef.name, classdef) for classdef
+                                      in class_definitions)
 
         self._class_definitions.update(class_definitions)
 
-    def populate_classes(self, update = False):
+    def populate_classes(self, update=False):
         """
         Creates a classification of proteins according to their roles
-        in the intercellular communication.
+        in the intercellular communication. Loads from pickle
+        ``pickle_file``(if available) or from ``class_definitions``.
+
+        :arg bool update:
+            Optional, ``False`` by default. Whether to reload all
+            classes or just the ones not already loaded.
         """
 
         if self.pickle_file:
+            self.load_from_pickle(fname=self.pickle_file)
 
-            self.load_from_pickle(fname = self.pickle_file)
             return
 
         for classdef in self._class_definitions.values():
-
             if classdef.name not in self.classes or update:
-
                 self.create_class(classdef)
 
     def load_from_pickle(self, pickle_file):
+        """
+        Loads the annotation classes from pickle file.
+
+        :arg str pickle_file:
+            The path to an annotation classes pickle file.
+        """
 
         with open(pickle_file, 'rb') as fp:
-
             self.classes = pickle.load(fp)
 
     def save_to_pickle(self, pickle_file):
+        """
+        Saves the annotation classes on a pickle file.
+
+        :arg str pickle_file:
+            The path to save the annotation pickle file.
+        """
 
         with open(pickle_file, 'wb') as fp:
+            pickle.dump(obj=self.classes, file=fp)
 
-            pickle.dump(
-                obj = self.classes,
-                file = fp,
-            )
-
+# XXX: Double-check!
     def create_class(self, classdef):
         """
-        Creates a category of entities with specific role in intercellular
-        communication.
+        Creates a category of entities with specific role in
+        intercellular communication.
+
+        :arg object classdef:
+            The new class definition for the new category. Should
+            contain ``'name'``, a ``'source'`` and an ``'args'``
+            parameters.
         """
 
         self.classes[classdef.name] = self.process_annot(classdef)
 
     def process_annot(self, classdef):
         """
-        Processes an annotation definition and returns a set of identifiers.
+        Processes an annotation definition and returns a set of
+        identifiers.
+
+        :arg object classdef:
+            The class definition to process for the new category. Should
+            contain ``'name'``, a ``'source'`` and an ``'args'``
+            parameters.
         """
 
         if isinstance(classdef.source, set):
@@ -235,18 +274,14 @@ class CustomAnnotation(session_mod.Logger):
             return classdef.source
 
         elif isinstance(classdef.source, common.basestring):
-
             if classdef.source in self.annotdb.annots:
-
                 if not classdef.args:
 
                     return self.annotdb.annots[classdef.source].to_set()
 
                 else:
-
-                    return self.annotdb.annots[classdef.source].get_subset(
-                        **classdef.args
-                    )
+                    annots = self.annotdb.annots[classdef.source]
+                    return annots.get_subset(**classdef.args)
 
         elif callable(classdef.source):
 
@@ -261,20 +296,19 @@ class CustomAnnotation(session_mod.Logger):
     def _execute_operation(self, annotop):
         """
         Executes a set operation on anntation sets.
+
+        :arg annotop:
+
         """
 
-        annots = tuple(
-            (
-                self._execute_operation(_annot)
-                    if isinstance(_annot, annot_formats.AnnotOp) else
-                self.process_annot(_annot)
-                    if isinstance(_annot, annot_formats.AnnotDef) else
-                _annot
-                    if isinstance(_annot, set) else
-                self.get_class(_annot)
-            )
-            for _annot in annotop.annots
-        )
+        annots = tuple((self._execute_operation(_annot)
+                        if isinstance(_annot, annot_formats.AnnotOp)
+                        else self.process_annot(_annot)
+                        if isinstance(_annot, annot_formats.AnnotDef)
+                        else _annot
+                        if isinstance(_annot, set)
+                        else self.get_class(_annot))
+                        for _annot in annotop.annots)
 
         return annotop.op(*annots)
 
@@ -282,6 +316,9 @@ class CustomAnnotation(session_mod.Logger):
         """
         Retrieves a class by its name and loads it if hasn't been loaded yet
         but the name present in the class definitions.
+
+        :arg str name:
+            
         """
 
         if name not in self.classes and name in self._class_definitions:

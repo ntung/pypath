@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>pypath.dataio &#8212; pypath 0.8.12 documentation</title>
+    <title>pypath.dataio &#8212; pypath 0.8.18 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -814,6 +814,7 @@
     <span class="n">complexes</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">tab</span><span class="p">:</span>
+        
 
         <span class="n">is_predicted</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;predicted&#39;</span><span class="p">]</span> <span class="ow">and</span>
@@ -829,7 +830,7 @@
             <span class="k">continue</span>
 
         <span class="n">uniprots</span> <span class="o">=</span> <span class="p">[]</span>
-
+        
         <span class="k">for</span> <span class="n">entrez</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;members&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
 
             <span class="n">uniprot</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span><span class="n">entrez</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s1">&#39;entrez&#39;</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">)</span>
@@ -4956,6 +4957,7 @@
 
 
 <span class="k">def</span> <span class="nf">netpath_names</span><span class="p">():</span>
+    
     <span class="n">repwnum</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;_([0-9]+)$&#39;</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;netpath_names&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
@@ -4966,7 +4968,72 @@
         <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;pathways&#39;</span><span class="p">):</span>
             <span class="n">num</span> <span class="o">=</span> <span class="n">repwnum</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;href&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">text</span>
-            <span class="n">result</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">netpath_pathway_annotations</span><span class="p">():</span>
+    
+    <span class="n">NetpathPathway</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;NetpathPathway&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pathway&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="n">url_template</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;netpath_pw&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+    
+    <span class="n">url_main</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;netpath_pw&#39;</span><span class="p">][</span><span class="s1">&#39;mainpage&#39;</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span><span class="n">url_main</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">cookie</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">resp_headers</span>
+        <span class="k">if</span> <span class="n">h</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;Set-Cookie&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">cookie_hdr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Cookie: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cookie</span><span class="p">)]</span>
+    
+    <span class="n">pathway_ids</span> <span class="o">=</span> <span class="n">netpath_names</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">_id</span><span class="p">,</span> <span class="n">pathway</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">pathway_ids</span><span class="p">):</span>
+        
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url_template</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">_id</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">req_headers</span> <span class="o">=</span> <span class="n">cookie_hdr</span><span class="p">,</span>
+            <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;iso-8859-1&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">bs4</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">tbl</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">):</span>
+            
+            <span class="n">hdr</span> <span class="o">=</span> <span class="n">tbl</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;td&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;barhead&#39;</span><span class="p">})</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">hdr</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">hdr</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Molecules Invol&#39;</span><span class="p">):</span>
+                
+                <span class="k">continue</span>
+            
+            <span class="k">for</span> <span class="n">td</span> <span class="ow">in</span> <span class="n">tbl</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;td&#39;</span><span class="p">):</span>
+                
+                <span class="n">genesymbol</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">genesymbol</span><span class="p">:</span>
+                    
+                    <span class="k">continue</span>
+                
+                <span class="n">uniprot</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span>
+                    <span class="n">genesymbol</span><span class="p">,</span>
+                    <span class="s1">&#39;genesymbol&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+                
+                <span class="n">result</span><span class="p">[</span><span class="n">uniprot</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                    <span class="n">NetpathPathway</span><span class="p">(</span>
+                        <span class="n">pathway</span> <span class="o">=</span> <span class="n">pathway</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+    
     <span class="k">return</span> <span class="n">result</span>
 
 
@@ -5640,6 +5707,144 @@
         <span class="p">)</span>
     
     <span class="k">return</span> <span class="n">result</span>
+
+
+
+
+<span class="k">def</span> <span class="nf">get_cpad</span><span class="p">():</span>
+    
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;cpad&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+    
+    <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">large</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;iso-8859-1&#39;</span><span class="p">)</span>
+    
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">reader</span>
+
+
+<span class="k">def</span> <span class="nf">cpad_annotations</span><span class="p">(</span><span class="n">include_unknown_type</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    
+    <span class="n">CpadAnnotation</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;CpadAnnotation&#39;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;regulator_type&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;effect_on_pathway&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;pathway&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;effect_on_cancer&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;effect_on_cancer_outcome&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cancer&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;pathway_category&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    
+    <span class="n">cpad</span> <span class="o">=</span> <span class="n">get_cpad</span><span class="p">()</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">cpad</span><span class="p">:</span>
+        
+        <span class="k">if</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Regulator&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NULL&#39;</span><span class="p">:</span>
+            
+            <span class="k">continue</span>
+        
+        <span class="k">for</span> <span class="n">regulator</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Regulator&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; and &#39;</span><span class="p">):</span>
+            
+            <span class="n">uniprot</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span><span class="n">regulator</span><span class="p">,</span> <span class="s1">&#39;genesymbol&#39;</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">uniprot</span><span class="p">:</span>
+                
+                <span class="n">regulator_name</span> <span class="o">=</span> <span class="n">uniprot</span>
+                <span class="n">regulator_type</span> <span class="o">=</span> <span class="s1">&#39;protein&#39;</span>
+                
+            <span class="k">else</span><span class="p">:</span>
+                
+                <span class="n">mirbase</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name</span><span class="p">(</span>
+                    <span class="s1">&#39;hsa-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">regulator</span><span class="p">,</span>
+                    <span class="s1">&#39;mir-mat-name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;mirbase&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mirbase</span><span class="p">:</span>
+                    
+                    <span class="n">mirbase</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name</span><span class="p">(</span>
+                        <span class="s1">&#39;hsa-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">regulator</span><span class="p">,</span>
+                        <span class="s1">&#39;mir-name&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;mirbase&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">mirbase</span><span class="p">:</span>
+                    
+                    <span class="n">regulator_name</span> <span class="o">=</span> <span class="n">mirbase</span>
+                    <span class="n">regulator_type</span> <span class="o">=</span> <span class="s1">&#39;mirna&#39;</span>
+                    
+                <span class="k">else</span><span class="p">:</span>
+                    
+                    <span class="k">if</span> <span class="n">include_unknown_type</span><span class="p">:</span>
+                        
+                        <span class="n">regulator_name</span> <span class="o">=</span> <span class="n">regulator</span>
+                        <span class="n">regulator_type</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+                        
+                    <span class="k">else</span><span class="p">:</span>
+                        
+                        <span class="k">continue</span>
+            
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regulator_name</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">basestring</span><span class="p">):</span>
+                
+                <span class="n">regulator_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">regulator_name</span><span class="p">,)</span>
+            
+            <span class="k">for</span> <span class="n">regulator_name_0</span> <span class="ow">in</span> <span class="n">regulator_name</span><span class="p">:</span>
+                
+                <span class="n">record</span> <span class="o">=</span> <span class="n">CpadAnnotation</span><span class="p">(</span>
+                    <span class="n">regulator_type</span> <span class="o">=</span> <span class="n">regulator_type</span><span class="p">,</span>
+                    <span class="n">effect_on_pathway</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Regulator_Type&#39;</span><span class="p">],</span>
+                    <span class="n">effect_on_cancer</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Regulation_Type&#39;</span><span class="p">],</span>
+                    <span class="n">effect_on_cancer_outcome</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Outcome_Description&#39;</span><span class="p">],</span>
+                    <span class="n">pathway</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Pathway&#39;</span><span class="p">],</span>
+                    <span class="n">pathway_category</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Pathway_Category&#39;</span><span class="p">],</span>
+                    <span class="n">cancer</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Cancer&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
+                
+                <span class="n">result</span><span class="p">[</span><span class="n">regulator_name_0</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">cpad_pathway_cancer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collects only the pathway-cancer relationships. Returns sets of records</span>
+<span class="sd">    grouped in dicts by cancer and by pathway.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">CpadPathwayCancer</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;CpadPathwayCancer&#39;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;pathway&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cancer&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;pathway_category&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;effect_on_cancer&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;effect_on_cancer_outcome&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    
+    <span class="n">cpad</span> <span class="o">=</span> <span class="n">get_cpad</span><span class="p">()</span>
+    
+    <span class="n">by_cancer</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">by_pathway</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">cpad</span><span class="p">:</span>
+        
+        <span class="n">record</span> <span class="o">=</span> <span class="n">CpadPathwayCancer</span><span class="p">(</span>
+            <span class="n">pathway</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Pathway&#39;</span><span class="p">],</span>
+            <span class="n">cancer</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Cancer&#39;</span><span class="p">],</span>
+            <span class="n">pathway_category</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Pathway_Category&#39;</span><span class="p">],</span>
+            <span class="n">effect_on_cancer</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Regulation_Type&#39;</span><span class="p">],</span>
+            <span class="n">effect_on_cancer_outcome</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Outcome_Description&#39;</span><span class="p">],</span>
+        <span class="p">)</span>
+        
+        <span class="n">by_cancer</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Cancer&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="n">by_pathway</span><span class="p">[</span><span class="n">rec</span><span class="p">[</span><span class="s1">&#39;Pathway&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">by_cancer</span><span class="p">,</span> <span class="n">by_pathway</span>
 
 
 <span class="k">def</span> <span class="nf">get_integrins</span><span class="p">():</span>
@@ -6901,14 +7106,17 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_kegg</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">kegg_interactions</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Downloads and processes KEGG Pathways.</span>
 <span class="sd">    Returns list of interactions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="n">rehsa</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*(hsa[0-9]+).*&#39;</span><span class="p">)</span>
-    <span class="n">req_hdrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Referer: http://www.genome.jp/kegg-bin/show_pathway&#39;</span>
-        <span class="s1">&#39;?map=hsa04710&amp;show_description=show&#39;</span><span class="p">]</span>
+    <span class="n">req_hdrs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;Referer: http://www.genome.jp/kegg-bin/show_pathway&#39;</span>
+        <span class="s1">&#39;?map=hsa04710&amp;show_description=show&#39;</span>
+    <span class="p">]</span>
     <span class="n">hsa_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">interactions</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -6927,7 +7135,7 @@
     <span class="k">for</span> <span class="n">hsa</span><span class="p">,</span> <span class="n">pw</span> <span class="ow">in</span> <span class="n">hsa_list</span><span class="p">:</span>
 
         <span class="n">prg</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span><span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;kegg_pws&#39;</span><span class="p">][</span><span class="s1">&#39;kgml_url&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">hsa</span><span class="p">,</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span><span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;kegg_pws&#39;</span><span class="p">][</span><span class="s1">&#39;kgml_url_2&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="n">hsa</span><span class="p">,</span>
                       <span class="n">silent</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                       <span class="n">req_headers</span> <span class="o">=</span> <span class="n">req_hdrs</span><span class="p">)</span>
         <span class="n">kgml</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">result</span>
@@ -6950,18 +7158,26 @@
 
         <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">kgmlsoup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">&#39;relation&#39;</span><span class="p">):</span>
             <span class="n">st</span> <span class="o">=</span> <span class="n">rel</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry1&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">uentries</span> <span class="ow">and</span> <span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry2&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">uentries</span> <span class="ow">and</span> \
-                    <span class="n">st</span> <span class="ow">and</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">attrs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry1&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">uentries</span> <span class="ow">and</span>
+                <span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry2&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">uentries</span> <span class="ow">and</span>
+                <span class="n">st</span> <span class="ow">and</span>
+                <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">attrs</span>
+            <span class="p">):</span>
+                
                 <span class="k">for</span> <span class="n">u1</span> <span class="ow">in</span> <span class="n">uentries</span><span class="p">[</span><span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry1&#39;</span><span class="p">]]:</span>
+                    
                     <span class="k">for</span> <span class="n">u2</span> <span class="ow">in</span> <span class="n">uentries</span><span class="p">[</span><span class="n">rel</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;entry2&#39;</span><span class="p">]]:</span>
+                        
                         <span class="n">interactions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">st</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pw</span><span class="p">))</span>
+    
     <span class="n">prg</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">uniqList</span><span class="p">(</span><span class="n">interactions</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">kegg_pathways</span><span class="p">():</span>
 
-    <span class="n">data</span> <span class="o">=</span> <span class="n">get_kegg</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">kegg_interactions</span><span class="p">()</span>
     <span class="n">pws</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">uniqList</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">data</span><span class="p">))</span>
     <span class="n">proteins_pws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pw</span><span class="p">:</span> <span class="p">(</span><span class="n">pw</span><span class="p">,</span> <span class="nb">set</span><span class="p">([])),</span> <span class="n">pws</span><span class="p">))</span>
     <span class="n">interactions_pws</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pw</span><span class="p">:</span> <span class="p">(</span><span class="n">pw</span><span class="p">,</span> <span class="nb">set</span><span class="p">([])),</span> <span class="n">pws</span><span class="p">))</span>
@@ -6970,6 +7186,28 @@
         <span class="n">proteins_pws</span><span class="p">[</span><span class="n">pw</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">u2</span><span class="p">)</span>
         <span class="n">interactions_pws</span><span class="p">[</span><span class="n">pw</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">u1</span><span class="p">,</span> <span class="n">u2</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">proteins_pws</span><span class="p">,</span> <span class="n">interactions_pws</span>
+
+
+<span class="k">def</span> <span class="nf">kegg_pathway_annotations</span><span class="p">():</span>
+    
+    <span class="n">KeggPathway</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;KeggPathway&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pathway&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="n">proteins</span><span class="p">,</span> <span class="n">interactions</span> <span class="o">=</span> <span class="n">kegg_pathways</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">pathway</span><span class="p">,</span> <span class="n">uniprots</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">proteins</span><span class="p">):</span>
+        
+        <span class="n">record</span> <span class="o">=</span> <span class="n">KeggPathway</span><span class="p">(</span><span class="n">pathway</span> <span class="o">=</span> <span class="n">pathway</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">uniprots</span><span class="p">:</span>
+            
+            <span class="n">result</span><span class="p">[</span><span class="n">uniprot</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">signor_pathways</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -6987,22 +7225,24 @@
 
     <span class="n">soup</span> <span class="o">=</span> <span class="n">bs4</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">result</span><span class="p">,</span> <span class="s1">&#39;html.parser&#39;</span><span class="p">)</span>
 
-    <span class="n">prg</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">Progress</span><span class="p">(</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;pathway_list&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;option&#39;</span><span class="p">)),</span>
-        <span class="s1">&#39;Downloading data from Signor&#39;</span><span class="p">,</span>
-        <span class="mi">1</span><span class="p">,</span>
-        <span class="n">percent</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">short</span><span class="p">,</span> <span class="n">full</span> <span class="ow">in</span> <span class="p">[</span>
+    <span class="n">pathway_names</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span>
             <span class="s1">&#39;select&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;pathway_list&#39;</span><span class="p">}</span>
         <span class="p">)</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s1">&#39;option&#39;</span><span class="p">)</span>
-    <span class="p">]:</span>
+    <span class="p">]</span>
+    
+    <span class="n">prg</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">Progress</span><span class="p">(</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">pathway_names</span><span class="p">),</span>
+        <span class="s1">&#39;Downloading data from Signor&#39;</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">,</span>
+        <span class="n">percent</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">short</span><span class="p">,</span> <span class="n">full</span> <span class="ow">in</span> <span class="n">pathway_names</span><span class="p">:</span>
 
         <span class="n">prg</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
+        
         <span class="k">if</span> <span class="ow">not</span> <span class="n">short</span><span class="p">:</span>
 
             <span class="k">continue</span>
@@ -7018,7 +7258,9 @@
             <span class="n">binary_data</span> <span class="o">=</span> <span class="n">binary_data</span><span class="p">,</span>
             <span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">,</span>
         <span class="p">)</span>
-
+        
+        <span class="c1">#csv.DictReader(c_pw.result)</span>
+        
         <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;@#@#@&#39;</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">csv_sep_change</span><span class="p">(</span>
             <span class="n">c_pw</span><span class="o">.</span><span class="n">result</span><span class="p">,</span>
@@ -7037,17 +7279,17 @@
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span>
-
+        
         <span class="n">proteins_pathways</span><span class="p">[</span><span class="n">full</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
         <span class="n">proteins_pathways</span><span class="p">[</span><span class="n">full</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">proteins_pathways</span><span class="p">[</span><span class="n">full</span><span class="p">]</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                        <span class="n">l</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+                        <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span>
                     <span class="nb">filter</span><span class="p">(</span>
                         <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                            <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+                            <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
                         <span class="n">data</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -7058,10 +7300,10 @@
             <span class="n">proteins_pathways</span><span class="p">[</span><span class="n">full</span><span class="p">]</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span>
                 <span class="nb">map</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                        <span class="n">l</span><span class="p">[</span><span class="mi">10</span><span class="p">],</span>
+                        <span class="n">l</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span>
                     <span class="nb">filter</span><span class="p">(</span>
                         <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                            <span class="n">l</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+                            <span class="n">l</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
                         <span class="n">data</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
@@ -7071,11 +7313,11 @@
         <span class="n">interactions_pathways</span><span class="p">[</span><span class="n">full</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
             <span class="nb">map</span><span class="p">(</span>
                 <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                    <span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">10</span><span class="p">]),</span>
+                    <span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">8</span><span class="p">]),</span>
                 <span class="nb">filter</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span>
-                        <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span> <span class="ow">and</span>
-                        <span class="n">l</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
+                        <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span> <span class="ow">and</span>
+                        <span class="n">l</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;protein&#39;</span><span class="p">,</span>
                     <span class="n">data</span>
                 <span class="p">)</span>
             <span class="p">)</span>
@@ -7084,6 +7326,28 @@
     <span class="n">prg</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">proteins_pathways</span><span class="p">,</span> <span class="n">interactions_pathways</span>
+
+
+<span class="k">def</span> <span class="nf">signor_pathway_annotations</span><span class="p">():</span>
+    
+    <span class="n">SignorPathway</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;SignorPathway&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pathway&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+    
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="n">proteins</span><span class="p">,</span> <span class="n">interactions</span> <span class="o">=</span> <span class="n">signor_pathways</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">pathway</span><span class="p">,</span> <span class="n">uniprots</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">proteins</span><span class="p">):</span>
+        
+        <span class="n">record</span> <span class="o">=</span> <span class="n">SignorPathway</span><span class="p">(</span><span class="n">pathway</span> <span class="o">=</span> <span class="n">pathway</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">uniprots</span><span class="p">:</span>
+            
+            <span class="n">result</span><span class="p">[</span><span class="n">uniprot</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">csv_sep_change</span><span class="p">(</span><span class="n">csv</span><span class="p">,</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
@@ -7314,7 +7578,7 @@
                 <span class="k">else</span><span class="p">:</span>
 
                     <span class="n">cplex</span> <span class="o">=</span> <span class="n">intera</span><span class="o">.</span><span class="n">Complex</span><span class="p">(</span>
-                        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
                         <span class="n">components</span> <span class="o">=</span> <span class="n">this_components</span><span class="p">,</span>
                         <span class="n">sources</span> <span class="o">=</span> <span class="s1">&#39;Signor&#39;</span><span class="p">,</span>
                         <span class="n">ids</span> <span class="o">=</span> <span class="n">id_</span><span class="p">,</span>
@@ -7361,7 +7625,7 @@
             <span class="k">else</span><span class="p">:</span>
 
                 <span class="n">cplex</span> <span class="o">=</span> <span class="n">intera</span><span class="o">.</span><span class="n">Complex</span><span class="p">(</span>
-                    <span class="n">name</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
                     <span class="n">components</span> <span class="o">=</span> <span class="n">this_components</span><span class="p">,</span>
                     <span class="n">sources</span> <span class="o">=</span> <span class="s1">&#39;Signor&#39;</span><span class="p">,</span>
                     <span class="n">ids</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -8351,7 +8615,9 @@
 <span class="sd">    Reads and processes SignaLink3 interactions from local file.</span>
 <span class="sd">    Returns list of interactions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="n">repar</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.*\(([a-z\s]+)\)&#39;</span><span class="p">)</span>
+    <span class="n">repref</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?:.*:)?((?:[\w]+[^\s])?)\s?&#39;</span><span class="p">)</span>
     <span class="n">notNeeded</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;acsn&#39;</span><span class="p">,</span> <span class="s1">&#39;reactome&#39;</span><span class="p">])</span>
     <span class="n">edgesFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">ROOT</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span>
                              <span class="n">urls</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="s1">&#39;signalink&#39;</span><span class="p">][</span><span class="s1">&#39;edges&#39;</span><span class="p">])</span>
@@ -8371,27 +8637,39 @@
             <span class="k">return</span> <span class="n">attr</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nodesFile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                
                 <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">uniprot</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;uniprot:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">uniprot</span> <span class="o">=</span> <span class="n">repref</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">pathways</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">pw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pw</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+                    <span class="n">pw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">pw</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">pw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">notNeeded</span>
                 <span class="p">]</span>
                 <span class="n">nodes</span><span class="p">[</span><span class="n">_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">uniprot</span><span class="p">,</span> <span class="n">pathways</span><span class="p">]</span>
+    
     <span class="n">prg</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">Progress</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">edgesFile</span><span class="p">),</span> <span class="s1">&#39;Reading file&#39;</span><span class="p">,</span> <span class="mi">33</span><span class="p">)</span>
+    
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">edgesFile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        
         <span class="n">lPrev</span> <span class="o">=</span> <span class="kc">None</span>
+        
         <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            
             <span class="n">prg</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
             <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+            
             <span class="k">if</span> <span class="n">lPrev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">l</span> <span class="o">=</span> <span class="n">lPrev</span> <span class="o">+</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
                 <span class="n">lPrev</span> <span class="o">=</span> <span class="kc">None</span>
+                
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">13</span><span class="p">:</span>
+                
                 <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                    
                     <span class="n">dbs</span> <span class="o">=</span> <span class="p">[</span>
                         <span class="n">_process_attr</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                         <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
@@ -8401,8 +8679,14 @@
                         <span class="k">continue</span>
                     <span class="n">idSrc</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                     <span class="n">idTgt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-                    <span class="n">uniprotSrc</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;uniprot:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-                    <span class="n">uniprotTgt</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;uniprot:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    
+                    <span class="n">uniprotSrc</span> <span class="o">=</span> <span class="n">repref</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">uniprotTgt</span> <span class="o">=</span> <span class="n">repref</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">1&#39;</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+                    
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">uniprotSrc</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">uniprotTgt</span><span class="p">:</span>
+                        
+                        <span class="k">continue</span>
+                    
                     <span class="n">refs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ref</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">ref</span> <span class="ow">in</span> <span class="n">l</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)]</span>
                     <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                         <span class="nb">tuple</span><span class="p">(</span><span class="n">attr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -8419,6 +8703,34 @@
                 <span class="n">lPrev</span> <span class="o">=</span> <span class="n">l</span>
     <span class="n">prg</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">interactions</span>
+
+
+<span class="k">def</span> <span class="nf">signalink_pathway_annotations</span><span class="p">():</span>
+    
+    <span class="n">SignalinkPathway</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span>
+        <span class="s1">&#39;SignalinkPathway&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pathway&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+    
+    <span class="n">interactions</span> <span class="o">=</span> <span class="n">signalink_interactions</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">interactions</span><span class="p">:</span>
+        
+        <span class="k">for</span> <span class="n">pathway</span> <span class="ow">in</span> <span class="n">i</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">):</span>
+            
+            <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">SignalinkPathway</span><span class="p">(</span><span class="n">pathway</span> <span class="o">=</span> <span class="n">pathway</span><span class="p">)</span>
+            <span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">pathway</span> <span class="ow">in</span> <span class="n">i</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">):</span>
+            
+            <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">SignalinkPathway</span><span class="p">(</span><span class="n">pathway</span> <span class="o">=</span> <span class="n">pathway</span><span class="p">)</span>
+            <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">get_laudanna_directions</span><span class="p">():</span>
@@ -8485,11 +8797,12 @@
     <span class="k">return</span> <span class="n">effects</span>
 
 
-<span class="k">def</span> <span class="nf">get_wang_effects</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">wang_interactions</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Downloads and processes Wang Lab HumanSignalingNetwork.</span>
-<span class="sd">    Returns list of effects.</span>
+<span class="sd">    Returns list of interactions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    
     <span class="n">url</span> <span class="o">=</span> <span class="n">urls</span><span class="o">.</span><span class="n">urls</span><span class="p">[</span><span class="s1">&#39;wang&#39;</span><span class="p">][</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
     <span class="n">c</span> <span class="o">=</span> <span class="n">curl</span><span class="o">.</span><span class="n">Curl</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">silent</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">result</span>
@@ -8498,7 +8811,9 @@
     <span class="n">nodes</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">reading_nodes</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">reading_edges</span> <span class="o">=</span> <span class="kc">False</span>
+    
     <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">reading_nodes</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">reading_edges</span> <span class="o">=</span> <span class="kc">False</span>
@@ -8512,6 +8827,7 @@
         <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;From&#39;</span><span class="p">):</span>
             <span class="n">reading_nodes</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">reading_edges</span> <span class="o">=</span> <span class="kc">True</span>
+    
     <span class="k">return</span> <span class="n">effects</span>
 
 
@@ -11342,7 +11658,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

@@ -72,8 +72,8 @@
 
 
 \title{pypath Documentation}
-\date{Jun 06, 2019}
-\release{0.8.12}
+\date{Jun 11, 2019}
+\release{0.8.18}
 \author{Dénes Türei}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -416,6 +416,12 @@ alias of \sphinxcode{\sphinxupquote{pypath.dataio.CellPhoneDBAnnotation}}
 \phantomsection\label{\detokenize{reference:pypath.annot.CorumGO}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{CorumGO}}}{\emph{**kwargs}}{}
 \end{fulllineitems}
 
+\index{Cpad (class in pypath.annot)@\spxentry{Cpad}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.Cpad}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Cpad}}}{\emph{ncbi\_tax\_id=9606}, \emph{**kwargs}}{}
+\end{fulllineitems}
+
 \index{CustomAnnotation (class in pypath.annot)@\spxentry{CustomAnnotation}\spxextra{class in pypath.annot}}
 
 \begin{fulllineitems}
@@ -425,18 +431,59 @@ Custom annotation base class. Inherits from
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
-\sphinxstyleliteralstrong{\sphinxupquote{class\_definitions}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} 
+\sphinxstyleliteralstrong{\sphinxupquote{class\_definitions}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{None}} by default. Contains the annotation classes’
+definitions. This is, \sphinxcode{\sphinxupquote{'name'}}, a \sphinxcode{\sphinxupquote{'source'}} and an
+\sphinxcode{\sphinxupquote{'args'}} parameter.
 
 \item {} 
-\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} 
+\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{None}} by default. The path to an annotation classes
+pickle file.
 
 \item {} 
-\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} 
+\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{None}} by default. Path to the annotation database
+pickle file.
 
 \end{itemize}
 
-\item[{Var}] \leavevmode
+\item[{Variables}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The path to an annotation classes pickle file.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{None}} by default. Path to the annotation database
+pickle file.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{annotdb}} (\sphinxstyleliteralemphasis{\sphinxupquote{pypath.annot.AnnotationTable}}) \textendash{} An instance of the annotation table class. Loads, contains and
+manages the annotation data.
+
+\item {} 
+\sphinxstyleliteralstrong{\sphinxupquote{classes}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} Contains the entities by their class definition according to
+their role.
+
+\end{itemize}
+
 \end{description}\end{quote}
+\index{add\_class\_definitions() (pypath.annot.CustomAnnotation method)@\spxentry{add\_class\_definitions()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.add_class_definitions}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{add\_class\_definitions}}}{\emph{class\_definitions}}{}
+Adds a class definition to the current instance.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{class\_definitions}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} Contains the annotation classes’ definitions to add. This
+is, \sphinxcode{\sphinxupquote{'name'}}, a \sphinxcode{\sphinxupquote{'source'}} and an \sphinxcode{\sphinxupquote{'args'}} parameter.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{classes\_by\_entity() (pypath.annot.CustomAnnotation method)@\spxentry{classes\_by\_entity()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.classes_by_entity}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{classes\_by\_entity}}}{\emph{element}}{}
+\end{fulllineitems}
+
 \index{counts() (pypath.annot.CustomAnnotation method)@\spxentry{counts()}\spxextra{pypath.annot.CustomAnnotation method}}
 
 \begin{fulllineitems}
@@ -449,9 +496,22 @@ Returns a dict with number of elements in each class.
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.create_class}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{create\_class}}}{\emph{classdef}}{}
-Creates a category of entities with specific role in intercellular
-communication.
+Creates a category of entities with specific role in
+intercellular communication.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{classdef}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}) \textendash{} The new class definition for the new category. Should
+contain \sphinxcode{\sphinxupquote{'name'}}, a \sphinxcode{\sphinxupquote{'source'}} and an \sphinxcode{\sphinxupquote{'args'}}
+parameters.
 
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{export() (pypath.annot.CustomAnnotation method)@\spxentry{export()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.export}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{export}}}{\emph{fname}, \emph{**kwargs}}{}
 \end{fulllineitems}
 
 \index{get\_class() (pypath.annot.CustomAnnotation method)@\spxentry{get\_class()}\spxextra{pypath.annot.CustomAnnotation method}}
@@ -460,7 +520,31 @@ communication.
 \phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.get_class}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{get\_class}}}{\emph{name}}{}
 Retrieves a class by its name and loads it if hasn’t been loaded yet
 but the name present in the class definitions.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{name}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} 
 
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{load\_from\_pickle() (pypath.annot.CustomAnnotation method)@\spxentry{load\_from\_pickle()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.load_from_pickle}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{load\_from\_pickle}}}{\emph{pickle\_file}}{}
+Loads the annotation classes from pickle file.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The path to an annotation classes pickle file.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{make\_df() (pypath.annot.CustomAnnotation method)@\spxentry{make\_df()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.make_df}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{make\_df}}}{\emph{all\_annotations=False}}{}
 \end{fulllineitems}
 
 \index{populate\_classes() (pypath.annot.CustomAnnotation method)@\spxentry{populate\_classes()}\spxextra{pypath.annot.CustomAnnotation method}}
@@ -468,7 +552,14 @@ but the name present in the class definitions.
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.populate_classes}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{populate\_classes}}}{\emph{update=False}}{}
 Creates a classification of proteins according to their roles
-in the intercellular communication.
+in the intercellular communication. Loads from pickle
+\sphinxcode{\sphinxupquote{pickle\_file{}`{}`(if available) or from {}`{}`class\_definitions}}.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{update}} (\sphinxstyleliteralemphasis{\sphinxupquote{bool}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{False}} by default. Whether to reload all
+classes or just the ones not already loaded.
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -476,7 +567,15 @@ in the intercellular communication.
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.process_annot}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{process\_annot}}}{\emph{classdef}}{}
-Processes an annotation definition and returns a set of identifiers.
+Processes an annotation definition and returns a set of
+identifiers.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{classdef}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}) \textendash{} The class definition to process for the new category. Should
+contain \sphinxcode{\sphinxupquote{'name'}}, a \sphinxcode{\sphinxupquote{'source'}} and an \sphinxcode{\sphinxupquote{'args'}}
+parameters.
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -485,6 +584,19 @@ Processes an annotation definition and returns a set of identifiers.
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.reload}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{reload}}}{}{}
 Reloads the object from the module level.
+
+\end{fulllineitems}
+
+\index{save\_to\_pickle() (pypath.annot.CustomAnnotation method)@\spxentry{save\_to\_pickle()}\spxextra{pypath.annot.CustomAnnotation method}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.CustomAnnotation.save_to_pickle}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{save\_to\_pickle}}}{\emph{pickle\_file}}{}
+Saves the annotation classes on a pickle file.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The path to save the annotation pickle file.
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -539,6 +651,12 @@ Reloads the object from the module level.
 \phantomsection\label{\detokenize{reference:pypath.annot.Integrins}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Integrins}}}{\emph{**kwargs}}{}
 \end{fulllineitems}
 
+\index{KeggPathways (class in pypath.annot)@\spxentry{KeggPathways}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.KeggPathways}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{KeggPathways}}}{\emph{ncbi\_tax\_id=9606}, \emph{**kwargs}}{}
+\end{fulllineitems}
+
 \index{Kirouac2010 (class in pypath.annot)@\spxentry{Kirouac2010}\spxextra{class in pypath.annot}}
 
 \begin{fulllineitems}
@@ -575,6 +693,12 @@ Reloads the object from the module level.
 \phantomsection\label{\detokenize{reference:pypath.annot.Membranome}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Membranome}}}{\emph{**kwargs}}{}
 \end{fulllineitems}
 
+\index{NetpathPathways (class in pypath.annot)@\spxentry{NetpathPathways}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.NetpathPathways}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{NetpathPathways}}}{\emph{ncbi\_tax\_id=9606}, \emph{**kwargs}}{}
+\end{fulllineitems}
+
 \index{Opm (class in pypath.annot)@\spxentry{Opm}\spxextra{class in pypath.annot}}
 
 \begin{fulllineitems}
@@ -591,6 +715,18 @@ Reloads the object from the module level.
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{reference:pypath.annot.Ramilowski2015Location}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{Ramilowski2015Location}}}{\emph{**kwargs}}{}
+\end{fulllineitems}
+
+\index{SignalinkPathways (class in pypath.annot)@\spxentry{SignalinkPathways}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.SignalinkPathways}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{SignalinkPathways}}}{\emph{ncbi\_tax\_id=9606}, \emph{**kwargs}}{}
+\end{fulllineitems}
+
+\index{SignorPathways (class in pypath.annot)@\spxentry{SignorPathways}\spxextra{class in pypath.annot}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot.SignorPathways}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{SignorPathways}}}{\emph{ncbi\_tax\_id=9606}, \emph{**kwargs}}{}
 \end{fulllineitems}
 
 \index{Surfaceome (class in pypath.annot)@\spxentry{Surfaceome}\spxextra{class in pypath.annot}}
@@ -628,7 +764,7 @@ Default protein complex annotation sources
 \index{default\_fields (in module pypath.annot)@\spxentry{default\_fields}\spxextra{in module pypath.annot}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{reference:pypath.annot.default_fields}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{default\_fields}}\sphinxbfcode{\sphinxupquote{ = \{'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB\_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski\_location': ('location',), 'Vesiclepedia': ('vesicle',)\}}}}
+\phantomsection\label{\detokenize{reference:pypath.annot.default_fields}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{default\_fields}}\sphinxbfcode{\sphinxupquote{ = \{'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB\_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Cpad': ('cancer', 'effect\_on\_cancer'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski\_location': ('location',), 'Vesiclepedia': ('vesicle',)\}}}}
 Default annotation classes by source
 
 \end{fulllineitems}
@@ -654,7 +790,7 @@ The database will be assigned to the \sphinxcode{\sphinxupquote{db}} attribute o
 \index{protein\_sources\_default (in module pypath.annot)@\spxentry{protein\_sources\_default}\spxextra{in module pypath.annot}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{reference:pypath.annot.protein_sources_default}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{protein\_sources\_default}}\sphinxbfcode{\sphinxupquote{ = \{'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'\}}}}
+\phantomsection\label{\detokenize{reference:pypath.annot.protein_sources_default}}\pysigline{\sphinxcode{\sphinxupquote{pypath.annot.}}\sphinxbfcode{\sphinxupquote{protein\_sources\_default}}\sphinxbfcode{\sphinxupquote{ = \{'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Cpad', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'KeggPathways', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'NetpathPathways', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'SignalinkPathways', 'SignorPathways', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'\}}}}
 Default protein annotation sources
 
 \end{fulllineitems}

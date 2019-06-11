@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>pypath.complex &#8212; pypath 0.8.12 documentation</title>
+    <title>pypath.complex &#8212; pypath 0.8.18 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
@@ -26,7 +26,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>  
@@ -204,36 +204,26 @@
 
 
     <span class="k">def</span> <span class="nf">make_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="n">have_stoichiometry</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;PDB&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Compleat&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;ComplexPortal&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">,</span>
-        <span class="p">}</span>
-
+        
         <span class="n">colnames</span> <span class="o">=</span> <span class="p">[</span>
             <span class="s1">&#39;name&#39;</span><span class="p">,</span>
             <span class="s1">&#39;components&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;components_genesymbols&#39;</span><span class="p">,</span>
             <span class="s1">&#39;stoichiometry&#39;</span><span class="p">,</span>
             <span class="s1">&#39;sources&#39;</span><span class="p">,</span>
             <span class="s1">&#39;references&#39;</span><span class="p">,</span>
             <span class="s1">&#39;identifiers&#39;</span><span class="p">,</span>
         <span class="p">]</span>
-
+        
         <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
-
+        
         <span class="k">for</span> <span class="n">cplex</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-
-            <span class="n">has_stoi</span> <span class="o">=</span> <span class="n">have_stoichiometry</span> <span class="o">&amp;</span> <span class="n">cplex</span><span class="o">.</span><span class="n">sources</span>
-
+            
             <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">([</span>
                 <span class="n">cplex</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">cplex</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">cplex</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
-                <span class="s1">&#39;:&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="s1">&#39;</span><span class="si">%u</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="k">if</span> <span class="n">has_stoi</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-                <span class="p">),</span>
+                <span class="n">cplex</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()[</span><span class="mi">8</span><span class="p">:],</span>
+                <span class="n">cplex</span><span class="o">.</span><span class="n">genesymbol_str</span><span class="p">,</span>
+                <span class="n">cplex</span><span class="o">.</span><span class="n">stoichiometry</span><span class="p">,</span>
                 <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">sources</span><span class="p">),</span>
                 <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cplex</span><span class="o">.</span><span class="n">references</span><span class="p">),</span>
                 <span class="s1">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
@@ -242,7 +232,7 @@
                     <span class="k">for</span> <span class="n">_id</span> <span class="ow">in</span> <span class="n">ids</span>
                 <span class="p">),</span>
             <span class="p">])</span>
-
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">records</span><span class="p">,</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="n">colnames</span><span class="p">,</span>
@@ -557,7 +547,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.12 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">pypath 0.8.18 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>
