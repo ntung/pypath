@@ -796,33 +796,14 @@ class Regulation(object):
             self.add_refs(other.refs)
 
 
-class ComplexOld(object):
-    
-    def __init__(self, proteins, name, long_name, sources = None):
-        
-        self.synonyms = set()
-        sources = sources if type(sources) is list else [sources]
-        sources = set(sources) if sources else set()
-        proteins = proteins if type(proteins) is list else list(proteins)
-        for key, val in iteritems(locals()):
-            setattr(self, key, val)
-        self.members = sorted(uniqList(self.proteins))
-        self.constitution = Counter(proteins)
-
-    def __hash__(self):
-        
-        return hash(tuple(sorted(self.proteins)))
-
-    def __contains__(self, item):
-        
-        return item in self.proteins
-
-    def __eq__(self, other):
-        
-        return self.proteins == other.proteins
-
-
 class Complex(object):
+    
+    have_stoichiometry = {
+        'PDB',
+        'Compleat',
+        'ComplexPortal',
+        'CellPhoneDB',
+    }
     
     
     def __init__(
@@ -1041,7 +1022,11 @@ class Complex(object):
     def stoichiometry(self):
         
         return ':'.join(
-            '%u' % cnt
+            '%u' % (
+                cnt
+                    if self.sources & self.have_stoichiometry else
+                0
+            )
             for _id, cnt in
             sorted(
                 iteritems(self.components),
@@ -1070,14 +1055,42 @@ class Complex(object):
         
         return ';'.join(
             itertools.chain(*(
-                (mapping.map_name0(comp, 'uniprot', 'genesymbol'),) * cnt
-                for comp, cnt in
+                (
+                    (
+                        mapping.map_name0(
+                            uniprot,
+                            'uniprot',
+                            'genesymbol',
+                        ) or
+                        uniprot
+                    ),
+                ) * cnt
+                for uniprot, cnt in
                 sorted(
                     iteritems(self.components),
                     key = lambda comp_cnt: comp_cnt[0],
                 )
             ))
         )
+    
+    
+    @property
+    def genesymbols(self):
+        
+        return sorted(
+            (
+                mapping.map_name0(uniprot, 'uniprot', 'genesymbol') or
+                uniprot
+            )
+            for uniprot in self.components.keys()
+        )
+    
+    
+    @property
+    def genesymbol_str(self):
+        
+        return '-'.join(self.genesymbols)
+
 
 class Interface(object):
     

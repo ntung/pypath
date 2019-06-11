@@ -48,6 +48,8 @@ import pypath.go as go
 import pypath.intercell_annot as intercell_annot
 import pypath.session_mod as session_mod
 import pypath.annot_formats as annot_formats
+import pypath.complex as complex
+import pypath.intera as intera
 
 
 #: Default protein annotation sources
@@ -75,6 +77,11 @@ protein_sources_default = {
     'Zhong2015',
     'HumanProteinAtlas',
     'Comppi',
+    'SignorPathways',
+    'SignalinkPathways',
+    'KeggPathways',
+    'NetpathPathways',
+    'Cpad',
 }
 
 #: Default protein complex annotation sources
@@ -115,6 +122,10 @@ default_fields = {
         'transporter',
         'transmembrane',
         'extracellular',
+    ),
+    'Cpad': (
+        'cancer',
+        'effect_on_cancer',
     ),
 }
 
@@ -736,13 +747,10 @@ class AnnotationBase(resource.AbstractResource):
 
     def all_complexes(self):
 
-        import pypath.complexes as complexes
-        import pypath.intera as intera
-
         return sorted((
             k
             for k in self.annot.keys()
-            if isinstance(k, intera.complex)
+            if isinstance(k, intera.Complex)
         ))
 
 
@@ -829,7 +837,15 @@ class AnnotationBase(resource.AbstractResource):
         )
 
 
+    @property
+    def has_fields(self):
+
+        return any(self.annot.values())
+
+
     def make_df(self):
+
+        self._log('Creating dataframe from `%s` annotations.' % self.name)
 
         discard = {'n/a', None}
 
@@ -842,17 +858,34 @@ class AnnotationBase(resource.AbstractResource):
             'record_id',
         ]
 
+        has_fields = self.has_fields
         records = []
-
         irec = 0
 
-        for uniprot, annots in iteritems(self.annot):
+        for element, annots in iteritems(self.annot):
 
-            if not annots:
+            if not element:
+
+                continue
+
+            genesymbol_str = (
+                'COMPLEX:%s' % element.genesymbol_str
+                    if hasattr(element, 'genesymbol_str') else
+                'COMPLEX:%s' % (
+                    complex.get_db().complexes[element].genesymbol_str
+                )
+                    if element.startswith('COMPLEX:') else
+                (
+                    mapping.map_name0(element, 'uniprot', 'genesymbol') or
+                    ''
+                )
+            )
+
+            if not has_fields:
 
                 records.append([
-                    uniprot,
-                    mapping.map_name0(uniprot, 'uniprot', 'genesymbol'),
+                    element.__str__(),
+                    genesymbol_str,
                     self.name,
                     'in %s' % self.name,
                     'yes',
@@ -874,8 +907,8 @@ class AnnotationBase(resource.AbstractResource):
                         value = ';'.join(map(str, value))
 
                     records.append([
-                        uniprot,
-                        mapping.map_name0(uniprot, 'uniprot', 'genesymbol'),
+                        element.__str__(),
+                        genesymbol_str,
                         self.name,
                         label,
                         str(value),
@@ -1276,6 +1309,33 @@ class Topdb(AnnotationBase):
         delattr(self, 'data')
 
 
+class Cpad(AnnotationBase):
+
+    _eq_fields = (
+        'effect_on_pathway',
+        'pathway',
+        'effect_on_cancer',
+        'cancer' ,
+    )
+
+
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+
+        AnnotationBase.__init__(
+            self,
+            name = 'CPAD',
+            input_method = 'cpad_annotations',
+            ncbi_tax_id = ncbi_tax_id,
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        self.annot = self.data
+        delattr(self, 'data')
+
+
 class Integrins(AnnotationBase):
 
     _eq_fields = ()
@@ -1430,6 +1490,115 @@ class Matrixdb(AnnotationBase):
         self.annot = self.data
 
         delattr(self, 'data')
+
+
+class SignorPathways(AnnotationBase):
+
+    _eq_fields = ('pathway',)
+
+
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+        """
+        Pathway annotations from Signor.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'Signor',
+            ncbi_tax_id = ncbi_tax_id,
+            input_method = 'signor_pathway_annotations',
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
+
+
+class SignalinkPathways(AnnotationBase):
+
+    _eq_fields = ('pathway',)
+
+
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+        """
+        Pathway annotations from SignaLink.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'SignaLink3',
+            ncbi_tax_id = ncbi_tax_id,
+            input_method = 'signalink_pathway_annotations',
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
+
+
+class KeggPathways(AnnotationBase):
+
+    _eq_fields = ('pathway',)
+
+
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+        """
+        Pathway annotations from KEGG.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'KEGG',
+            ncbi_tax_id = ncbi_tax_id,
+            input_method = 'kegg_pathway_annotations',
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
+
+
+class NetpathPathways(AnnotationBase):
+
+    _eq_fields = ('pathway',)
+
+
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+        """
+        Pathway annotations from NetPath.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'NetPath',
+            ncbi_tax_id = ncbi_tax_id,
+            input_method = 'netpath_pathway_annotations',
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
+
 
 
 class Locate(AnnotationBase):

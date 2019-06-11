@@ -273,12 +273,12 @@ class TableServer(BaseServer):
     list_fields = {
         'sources',
         'references',
-        'isoforms'
+        'isoforms',
     }
     
     int_list_fields = {
         'references',
-        'isoforms'
+        'isoforms',
     }
     
     args_reference = {
@@ -295,12 +295,14 @@ class TableServer(BaseServer):
                 'omnipath',
                 'tfregulons',
                 'kinaseextra',
-                'mirnatarget'
+                'ligrecextra',
+                'pathwayextra',
+                'mirnatarget',
             },
             'types': {
                 'PPI',
                 'TF',
-                'MTI'
+                'MTI',
             },
             'sources':  None,
             'targets':  None,
@@ -392,6 +394,25 @@ class TableServer(BaseServer):
             'fields': None,
             'genesymbols': {'1', '0', 'no', 'yes'},
         },
+        'intercell': {
+            'header': None,
+            'format': {
+                'json',
+                'tab',
+                'text',
+                'tsv',
+                'table'
+            },
+            'levels': {
+                'main',
+                'sub',
+                'small_main',
+                'above_main',
+            },
+            'categories': None,
+            'proteins': None,
+            'fields': None,
+        },
         'complexes': {
             'header': None,
             'format': {
@@ -407,12 +428,21 @@ class TableServer(BaseServer):
         },
     }
     
-    datasets_ = {'omnipath', 'tfregulons', 'kinaseextra', 'mirnatarget'}
+    datasets_ = {
+        'omnipath',
+        'tfregulons',
+        'kinaseextra',
+        'ligrecextra',
+        'pathwayextra',
+        'mirnatarget',
+    }
     tfregulons_methods = {'curated', 'coexp', 'chipseq', 'tfbs'}
     dataset2type = {
         'omnipath': 'PPI',
         'tfregulons': 'TF',
         'kinaseextra': 'PPI',
+        'ligrecextra': 'PPI',
+        'pathwayextra': 'PPI',
         'mirnatarget': 'MTI'
     }
     interaction_fields = {
@@ -432,6 +462,7 @@ class TableServer(BaseServer):
             'ptms': 'omnipath_webservice_ptms.tsv',
             'annotations': 'omnipath_webservice_annotations.tsv',
             'complexes': 'omnipath_webservice_complexes.tsv',
+            'intercell': 'omnipath_webservice_intercell.tsv',
         }):
         
         session_mod.Logger.__init__(self, name = 'server')
@@ -445,6 +476,7 @@ class TableServer(BaseServer):
         self._preprocess_ptms()
         self._preprocess_annotations()
         self._preprocess_complexes()
+        self._preprocess_intercell()
         
         BaseServer.__init__(self)
         self._log('TableServer startup ready.')
@@ -529,6 +561,13 @@ class TableServer(BaseServer):
         
         self._log('Preprocessing annotations.')
         pass
+    
+    
+    def _preprocess_intercell(self):
+        
+        self._log('Preprocessing intercell data.')
+        tbl = self.data['intercell']
+        tbl.drop('full_name', axis = 1, inplace = True)
     
     
     def _check_args(self, req):
@@ -1064,26 +1103,68 @@ class TableServer(BaseServer):
         # filtering for databases
         if b'databases' in req.args:
             
-            databases = set(req.args[b'databases'])
+            databases = self._args_set(req, 'databases')
             
-            tbl = tbl.source.isin(databases)
+            tbl = tbl[tbl.source.isin(databases)]
         
         # filtering for proteins
         if b'proteins' in req.args:
             
-            proteins = set(req.args[b'proteins'])
+            proteins = self._args_set(req, 'proteins')
             
-            tbl = tbl[tbl.uniprot.isin(proteins)]
+            tbl = tbl[
+                tbl.uniprot.isin(proteins) |
+                tbl.genesymbol.isin(proteins)
+            ]
         
         # provide genesymbols: yes or no
         if (
             b'genesymbols' in req.args and
-            self._parse_arg(req.args[b'genesymbols'])
+            self._parse_arg(req, 'genesymbols')
         ):
             genesymbols = True
             hdr.insert(1, 'genesymbol')
         else:
             genesymbols = False
+        
+        tbl = tbl.loc[:,hdr]
+        
+        return self._serve_dataframe(tbl, req)
+    
+    
+    def intercell(self, req):
+        
+        bad_req = self._check_args(req)
+        
+        if bad_req:
+            
+            return bad_req
+        
+        # starting from the entire dataset
+        tbl = self.data['intercell']
+        
+        hdr = tbl.columns
+        
+        # filtering for category level
+        if b'levels' in req.args:
+            
+            levels = self._args_set(req, 'levels')
+            
+            tbl = tbl[tbl.class_type.isin(levels)]
+        
+        # filtering for categories
+        if b'categories' in req.args:
+            
+            categories = self._args_set(req, 'categories')
+            
+            tbl = tbl[tbl.category.isin(categories)]
+        
+        # filtering for proteins
+        if b'proteins' in req.args:
+            
+            proteins = self._args_set(req, 'proteins')
+            
+            tbl = tbl[tbl.uniprot.isin(proteins)]
         
         tbl = tbl.loc[:,hdr]
         
@@ -1108,14 +1189,14 @@ class TableServer(BaseServer):
         # filtering for databases
         if b'databases' in req.args:
             
-            databases = set(req.args[b'databases'])
+            databases = self._args_set(req, 'databases')
             
-            tbl = tbl = tbl[tbl.set_databases & databases]
+            tbl = tbl = tbl[tbl.set_sources & databases]
         
         # filtering for proteins
         if b'proteins' in req.args:
             
-            proteins = set(req.args[b'proteins'])
+            proteins = self._args_set(req, 'proteins')
             
             tbl = tbl[tbl.set_proteins & proteins]
         

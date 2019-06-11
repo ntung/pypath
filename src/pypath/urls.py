@@ -335,7 +335,8 @@ urls = {
         'kgml_url':
         'http://www.kegg.jp/kegg-bin/download?entry=%s&format=kgml',
         'biopax_l3': 'http://www.pathwaycommons.org/archives/PC2/'
-        'v8/PathwayCommons.8.kegg.BIOPAX.owl.gz'
+        'v8/PathwayCommons.8.kegg.BIOPAX.owl.gz',
+        'kgml_url_2': 'http://rest.kegg.jp/get/%s/kgml',
     },
     'depod': {
         'label': 'Dephosphorylation substrates and sites',
@@ -493,6 +494,11 @@ urls = {
         'label': 'NetPath numeric pathway IDs can be translated to '
         'pathway names only by extracting them from HTML....',
         'url': 'http://www.netpath.org/browse'
+    },
+    'netpath_pw': {
+        'label': 'NetPath pathway page',
+        'mainpage': 'http://mirror.netpath.org/index.html',
+        'url': 'http://mirror.netpath.org/pathways?path_id=NetPath_%u'
     },
     'netpath_psimi': {
         'label': 'Batch download of NetPath pathways in PSI-MI format',
@@ -1001,6 +1007,10 @@ urls = {
             'http://cbdm-01.zdv.uni-mainz.de/~mschaefer/'
             'hippie/hippie_current.txt'
         ),
+    },
+    'cpad': {
+        'label': 'Literature curated regulator-pathway-cancer relationships',
+        'url': 'http://bio-bigdata.hrbmu.edu.cn/CPAD/download/CPAD-data.txt',
     },
 }
 

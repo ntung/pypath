@@ -50,13 +50,23 @@ class Export(object):
 
     default_header_bydirs = ['source', 'target', 'source_genesymbol',
                              'target_genesymbol', 'is_directed',
-                             'is_stimulation', 'is_inhibition', 'sources',
+                             'is_stimulation', 'is_inhibition',
+                             'consensus_direction',
+                             'consensus_stimulation',
+                             'consensus_inhibition',
+                             'sources',
                              'references', 'dip_url']
 
-    def __init__(self, pa, only_sources=None, extra_node_attrs=None,
-                 extra_edge_attrs=None, outfile=None,
-                 default_vertex_attr_processor=None,
-                 default_edge_attr_processor=None):
+    def __init__(
+            self,
+            pa,
+            only_sources = None,
+            extra_node_attrs = None,
+            extra_edge_attrs = None,
+            outfile = None,
+            default_vertex_attr_processor = None,
+            default_edge_attr_processor = None,
+        ):
 
         self.extra_node_attrs = extra_node_attrs or {}
         self.extra_edge_attrs = extra_edge_attrs or {}
@@ -86,8 +96,12 @@ class Export(object):
         new = getattr(mod, self.__class__.__name__)
         setattr(self, '__class__', new)
 
-    def make_df(self, unique_pairs=True, extra_node_attrs=None,
-                extra_edge_attrs=None):
+    def make_df(
+            self,
+            unique_pairs = True,
+            extra_node_attrs = None,
+            extra_edge_attrs = None,
+        ):
         """
         Creates a data frame from the network.
 
@@ -157,7 +171,7 @@ class Export(object):
             # adding default fields
             lines = (
                 self.process_edge_uniquepairs(e)
-                if unique_pairs else
+                    if unique_pairs else
                 self.process_edge_bydirection(e)
             )
 
@@ -237,12 +251,18 @@ class Export(object):
         """
 
         lines = []
+        
+        consensus_edges = set(map(tuple, e['dirs'].consensus_edges()))
+        consensus_dir = set(c[:3] for c in consensus_edges)
 
         for d in ['straight', 'reverse']:
 
             uniprots = getattr(e['dirs'], d)
 
             if e['dirs'].dirs[uniprots]:
+                
+                is_stimulation = int(e['dirs'].is_stimulation(uniprots))
+                is_inhibition = int(e['dirs'].is_inhibition(uniprots))
 
                 this_edge = [
                     uniprots[0],
@@ -250,8 +270,20 @@ class Export(object):
                     self.pa.nodLab[self.pa.nodDct[uniprots[0]]],
                     self.pa.nodLab[self.pa.nodDct[uniprots[1]]],
                     1, # is_directed
-                    int(e['dirs'].is_stimulation(uniprots)),
-                    int(e['dirs'].is_inhibition(uniprots))
+                    is_stimulation,
+                    is_inhibition,
+                    int(
+                        (uniprots[0], uniprots[1], 'directed')
+                        in consensus_dir
+                    ),
+                    int(
+                        (uniprots[0], uniprots[1], 'directed', 'positive')
+                        in consensus_edges
+                    ),
+                    int(
+                        (uniprots[0], uniprots[1], 'directed', 'negative')
+                        in consensus_edges
+                    ),
                 ]
 
                 dsources = (
@@ -281,12 +313,15 @@ class Export(object):
                 lines.append(this_edge)
 
         if not e['dirs'].is_directed():
-
+            
             this_edge = [
                 e['dirs'].nodes[0],
                 e['dirs'].nodes[1],
                 self.pa.nodLab[self.pa.nodDct[e['dirs'].nodes[0]]],
                 self.pa.nodLab[self.pa.nodDct[e['dirs'].nodes[1]]],
+                0,
+                0,
+                0,
                 0,
                 0,
                 0,
@@ -444,6 +479,12 @@ class Export(object):
         sources_kinase_extra = set(
             f.name for f in data_formats.ptm_misc.values()
         )
+        sources_ligrec_extra = set(
+            f.name for f in data_formats.ligand_receptor.values()
+        )
+        sources_pathway_extra = set(
+            f.name for f in data_formats.pathway_noref.values()
+        )
         sources_mirna = set(
             f.name for f in data_formats.mirna_target.values()
         )
@@ -472,6 +513,14 @@ class Export(object):
                 ),
                 'kinaseextra': lambda e, d: (
                     bool(e['dirs'].sources[d] & sources_kinase_extra) and
+                    'PPI' in e['type']
+                ),
+                'ligrecextra': lambda e, d: (
+                    bool(e['dirs'].sources[d] & sources_ligrec_extra) and
+                    'PPI' in e['type']
+                ),
+                'pathwayextra': lambda e, d: (
+                    bool(e['dirs'].sources[d] & sources_pathway_extra) and
                     'PPI' in e['type']
                 ),
                 'mirnatarget': lambda e, d: (

@@ -775,6 +775,7 @@ def compleat_complexes(predicted = True):
     complexes = {}
 
     for rec in tab:
+        
 
         is_predicted = (
             rec['predicted'] and
@@ -790,7 +791,7 @@ def compleat_complexes(predicted = True):
             continue
 
         uniprots = []
-
+        
         for entrez in rec['members'].split():
 
             uniprot = mapping.map_name0(entrez.strip(), 'entrez', 'uniprot')
@@ -4917,6 +4918,7 @@ def get_goslim(url = None):
 
 
 def netpath_names():
+    
     repwnum = re.compile(r'_([0-9]+)$')
     result = {}
     url = urls.urls['netpath_names']['url']
@@ -4927,7 +4929,72 @@ def netpath_names():
         if a.attrs['href'].startswith('pathways'):
             num = repwnum.findall(a.attrs['href'])[0]
             name = a.text
-            result[num] = name
+            result[num] = name.strip()
+    return result
+
+
+def netpath_pathway_annotations():
+    
+    NetpathPathway = collections.namedtuple(
+        'NetpathPathway', ['pathway'],
+    )
+    
+    
+    result = collections.defaultdict(set)
+    
+    url_template = urls.urls['netpath_pw']['url']
+    
+    url_main = urls.urls['netpath_pw']['mainpage']
+    c = curl.Curl(url_main, cache = False)
+    cookie = [
+        h.decode().split(':')[1].split(';')[0].strip()
+        for h in c.resp_headers
+        if h.startswith(b'Set-Cookie')
+    ]
+    cookie_hdr = ['Cookie: %s' % '; '.join(cookie)]
+    
+    pathway_ids = netpath_names()
+    
+    for _id, pathway in iteritems(pathway_ids):
+        
+        url = url_template % int(_id)
+        c = curl.Curl(
+            url,
+            req_headers = cookie_hdr,
+            silent = False,
+            encoding = 'iso-8859-1',
+        )
+        
+        soup = bs4.BeautifulSoup(c.result, 'html.parser')
+        
+        for tbl in soup.find_all('table'):
+            
+            hdr = tbl.find('td', {'class': 'barhead'})
+            
+            if not hdr or not hdr.text.strip().startswith('Molecules Invol'):
+                
+                continue
+            
+            for td in tbl.find_all('td'):
+                
+                genesymbol = td.text.strip()
+                
+                if not genesymbol:
+                    
+                    continue
+                
+                uniprot = mapping.map_name0(
+                    genesymbol,
+                    'genesymbol',
+                    'uniprot',
+                )
+                
+                result[uniprot].add(
+                    NetpathPathway(
+                        pathway = pathway
+                    )
+                )
+    
     return result
 
 
@@ -5601,6 +5668,144 @@ def adhesome_interactions():
         )
     
     return result
+
+
+
+
+def get_cpad():
+    
+    url = urls.urls['cpad']['url']
+    
+    c = curl.Curl(url, silent = False, large = True, encoding = 'iso-8859-1')
+    
+    reader = csv.DictReader(c.result, delimiter = '\t')
+    
+    return reader
+
+
+def cpad_annotations(include_unknown_type = False):
+    
+    CpadAnnotation = collections.namedtuple(
+        'CpadAnnotation',
+        [
+            'regulator_type',
+            'effect_on_pathway',
+            'pathway',
+            'effect_on_cancer',
+            'effect_on_cancer_outcome',
+            'cancer',
+            'pathway_category',
+        ]
+    )
+    
+    cpad = get_cpad()
+    
+    result = collections.defaultdict(set)
+    
+    for rec in cpad:
+        
+        if rec['Regulator'] == 'NULL':
+            
+            continue
+        
+        for regulator in rec['Regulator'].split(' and '):
+            
+            uniprot = mapping.map_name0(regulator, 'genesymbol', 'uniprot')
+            
+            if uniprot:
+                
+                regulator_name = uniprot
+                regulator_type = 'protein'
+                
+            else:
+                
+                mirbase = mapping.map_name(
+                    'hsa-%s' % regulator,
+                    'mir-mat-name',
+                    'mirbase',
+                )
+                
+                if not mirbase:
+                    
+                    mirbase = mapping.map_name(
+                        'hsa-%s' % regulator,
+                        'mir-name',
+                        'mirbase',
+                    )
+                
+                if mirbase:
+                    
+                    regulator_name = mirbase
+                    regulator_type = 'mirna'
+                    
+                else:
+                    
+                    if include_unknown_type:
+                        
+                        regulator_name = regulator
+                        regulator_type = 'unknown'
+                        
+                    else:
+                        
+                        continue
+            
+            if isinstance(regulator_name, common.basestring):
+                
+                regulator_name = (regulator_name,)
+            
+            for regulator_name_0 in regulator_name:
+                
+                record = CpadAnnotation(
+                    regulator_type = regulator_type,
+                    effect_on_pathway = rec['Regulator_Type'],
+                    effect_on_cancer = rec['Regulation_Type'],
+                    effect_on_cancer_outcome = rec['Outcome_Description'],
+                    pathway = rec['Pathway'],
+                    pathway_category = rec['Pathway_Category'],
+                    cancer = rec['Cancer'],
+                )
+                
+                result[regulator_name_0].add(record)
+    
+    return result
+
+
+def cpad_pathway_cancer():
+    """
+    Collects only the pathway-cancer relationships. Returns sets of records
+    grouped in dicts by cancer and by pathway.
+    """
+    
+    CpadPathwayCancer = collections.namedtuple(
+        'CpadPathwayCancer',
+        [
+            'pathway',
+            'cancer',
+            'pathway_category',
+            'effect_on_cancer',
+            'effect_on_cancer_outcome',
+        ]
+    )
+    
+    cpad = get_cpad()
+    
+    by_cancer = collections.defaultdict(set)
+    by_pathway = collections.defaultdict(set)
+    
+    for rec in cpad:
+        
+        record = CpadPathwayCancer(
+            pathway = rec['Pathway'],
+            cancer = rec['Cancer'],
+            pathway_category = rec['Pathway_Category'],
+            effect_on_cancer = rec['Regulation_Type'],
+            effect_on_cancer_outcome = rec['Outcome_Description'],
+        )
+        
+        by_cancer[rec['Cancer']].add(record)
+        by_pathway[rec['Pathway']].add(record)
+    
+    return by_cancer, by_pathway
 
 
 def get_integrins():
@@ -6862,14 +7067,17 @@ def load_macrophage():
     data = data.replace('?', '').replace('->', ',')
 
 
-def get_kegg():
+def kegg_interactions():
     """
     Downloads and processes KEGG Pathways.
     Returns list of interactions.
     """
+    
     rehsa = re.compile(r'.*(hsa[0-9]+).*')
-    req_hdrs = ['Referer: http://www.genome.jp/kegg-bin/show_pathway'
-        '?map=hsa04710&show_description=show']
+    req_hdrs = [
+        'Referer: http://www.genome.jp/kegg-bin/show_pathway'
+        '?map=hsa04710&show_description=show'
+    ]
     hsa_list = []
     interactions = []
 
@@ -6888,7 +7096,7 @@ def get_kegg():
     for hsa, pw in hsa_list:
 
         prg.step()
-        c = curl.Curl(urls.urls['kegg_pws']['kgml_url'] % hsa,
+        c = curl.Curl(urls.urls['kegg_pws']['kgml_url_2'] % hsa,
                       silent = True,
                       req_headers = req_hdrs)
         kgml = c.result
@@ -6911,18 +7119,26 @@ def get_kegg():
 
         for rel in kgmlsoup.find_all('relation'):
             st = rel.find('subtype')
-            if rel.attrs['entry1'] in uentries and rel.attrs['entry2'] in uentries and \
-                    st and 'name' in st.attrs:
+            if (
+                rel.attrs['entry1'] in uentries and
+                rel.attrs['entry2'] in uentries and
+                st and
+                'name' in st.attrs
+            ):
+                
                 for u1 in uentries[rel.attrs['entry1']]:
+                    
                     for u2 in uentries[rel.attrs['entry2']]:
+                        
                         interactions.append((u1, u2, st.attrs['name'], pw))
+    
     prg.terminate()
     return common.uniqList(interactions)
 
 
 def kegg_pathways():
 
-    data = get_kegg()
+    data = kegg_interactions()
     pws = common.uniqList(map(lambda i: i[3], data))
     proteins_pws = dict(map(lambda pw: (pw, set([])), pws))
     interactions_pws = dict(map(lambda pw: (pw, set([])), pws))
@@ -6931,6 +7147,28 @@ def kegg_pathways():
         proteins_pws[pw].add(u2)
         interactions_pws[pw].add((u1, u2))
     return proteins_pws, interactions_pws
+
+
+def kegg_pathway_annotations():
+    
+    KeggPathway = collections.namedtuple(
+        'KeggPathway', ['pathway'],
+    )
+    
+    
+    result = collections.defaultdict(set)
+    
+    proteins, interactions = kegg_pathways()
+    
+    for pathway, uniprots in iteritems(proteins):
+        
+        record = KeggPathway(pathway = pathway)
+        
+        for uniprot in uniprots:
+            
+            result[uniprot].add(record)
+    
+    return result
 
 
 def signor_pathways(**kwargs):
@@ -6948,22 +7186,24 @@ def signor_pathways(**kwargs):
 
     soup = bs4.BeautifulSoup(c.result, 'html.parser')
 
-    prg = progress.Progress(
-        len(soup.find('select', {'name': 'pathway_list'}).findAll('option')),
-        'Downloading data from Signor',
-        1,
-        percent = False
-    )
-
-    for short, full in [
+    pathway_names = [
         (opt['value'], opt.text)
         for opt in soup.find(
             'select', {'name': 'pathway_list'}
         ).findAll('option')
-    ]:
+    ]
+    
+    prg = progress.Progress(
+        len(pathway_names),
+        'Downloading data from Signor',
+        1,
+        percent = False
+    )
+    
+    for short, full in pathway_names:
 
         prg.step()
-
+        
         if not short:
 
             continue
@@ -6979,7 +7219,9 @@ def signor_pathways(**kwargs):
             binary_data = binary_data,
             encoding = 'utf-8',
         )
-
+        
+        #csv.DictReader(c_pw.result)
+        
         sep = '@#@#@'
         lines = csv_sep_change(
             c_pw.result,
@@ -6998,17 +7240,17 @@ def signor_pathways(**kwargs):
                 )
             )
         )
-
+        
         proteins_pathways[full] = set([])
 
         proteins_pathways[full] = (
             proteins_pathways[full] | set(
                 map(
                     lambda l:
-                        l[5],
+                        l[4],
                     filter(
                         lambda l:
-                            l[4].lower() == 'protein',
+                            l[3].lower() == 'protein',
                         data
                     )
                 )
@@ -7019,10 +7261,10 @@ def signor_pathways(**kwargs):
             proteins_pathways[full] | set(
                 map(
                     lambda l:
-                        l[10],
+                        l[8],
                     filter(
                         lambda l:
-                            l[9].lower() == 'protein',
+                            l[7].lower() == 'protein',
                         data
                     )
                 )
@@ -7032,11 +7274,11 @@ def signor_pathways(**kwargs):
         interactions_pathways[full] = set(
             map(
                 lambda l:
-                    (l[5], l[10]),
+                    (l[4], l[8]),
                 filter(
                     lambda l:
-                        l[4].lower() == 'protein' and
-                        l[9].lower() == 'protein',
+                        l[3].lower() == 'protein' and
+                        l[7].lower() == 'protein',
                     data
                 )
             )
@@ -7045,6 +7287,28 @@ def signor_pathways(**kwargs):
     prg.terminate()
 
     return proteins_pathways, interactions_pathways
+
+
+def signor_pathway_annotations():
+    
+    SignorPathway = collections.namedtuple(
+        'SignorPathway', ['pathway']
+    )
+    
+    
+    result = collections.defaultdict(set)
+    
+    proteins, interactions = signor_pathways()
+    
+    for pathway, uniprots in iteritems(proteins):
+        
+        record = SignorPathway(pathway = pathway)
+        
+        for uniprot in uniprots:
+            
+            result[uniprot].add(record)
+    
+    return result
 
 
 def csv_sep_change(csv, old, new):
@@ -7275,7 +7539,7 @@ def signor_complexes(organism = 9606):
                 else:
 
                     cplex = intera.Complex(
-                        name = name,
+                        name = name.replace('"', '').strip(),
                         components = this_components,
                         sources = 'Signor',
                         ids = id_,
@@ -7322,7 +7586,7 @@ def signor_complexes(organism = 9606):
             else:
 
                 cplex = intera.Complex(
-                    name = rec[1],
+                    name = rec[1].replace('"', '').strip(),
                     components = this_components,
                     sources = 'Signor',
                     ids = rec[0],
@@ -8312,7 +8576,9 @@ def signalink_interactions():
     Reads and processes SignaLink3 interactions from local file.
     Returns list of interactions.
     """
+    
     repar = re.compile(r'.*\(([a-z\s]+)\)')
+    repref = re.compile(r'(?:.*:)?((?:[\w]+[^\s])?)\s?')
     notNeeded = set(['acsn', 'reactome'])
     edgesFile = os.path.join(common.ROOT, 'data',
                              urls.files['signalink']['edges'])
@@ -8332,27 +8598,39 @@ def signalink_interactions():
             return attr
 
     with open(nodesFile, 'r') as f:
+        
         for l in f:
+            
             if len(l) > 0:
+                
                 l = l.split('\t')
                 _id = int(l[0])
-                uniprot = l[1].replace('uniprot:', '')
+                uniprot = repref.sub('\\1', l[1])
                 pathways = [
-                    pw.split(':')[-1] for pw in l[4].split('|')
+                    pw.split(':')[-1].strip() for pw in l[4].split('|')
                     if pw.split(':')[0] not in notNeeded
                 ]
                 nodes[_id] = [uniprot, pathways]
+    
     prg = progress.Progress(os.path.getsize(edgesFile), 'Reading file', 33)
+    
     with open(edgesFile, 'r') as f:
+        
         lPrev = None
+        
         for l in f:
+            
             prg.step(len(l))
             l = l.strip().split('\t')
+            
             if lPrev is not None:
                 l = lPrev + l[1:]
                 lPrev = None
+                
             if len(l) == 13:
+                
                 if l[-1] == '0':
+                    
                     dbs = [
                         _process_attr(db.split(':')[-1])
                         for db in l[9].replace('"', '').split('|')
@@ -8362,8 +8640,14 @@ def signalink_interactions():
                         continue
                     idSrc = int(l[1])
                     idTgt = int(l[2])
-                    uniprotSrc = l[3].replace('uniprot:', '')
-                    uniprotTgt = l[4].replace('uniprot:', '')
+                    
+                    uniprotSrc = repref.sub('\\1', l[3])
+                    uniprotTgt = repref.sub('\\1', l[4])
+                    
+                    if not uniprotSrc or not uniprotTgt:
+                        
+                        continue
+                    
                     refs = [ref.split(':')[-1] for ref in l[7].split('|')]
                     attrs = dict(
                         tuple(attr.strip().split(':', 1))
@@ -8380,6 +8664,34 @@ def signalink_interactions():
                 lPrev = l
     prg.terminate()
     return interactions
+
+
+def signalink_pathway_annotations():
+    
+    SignalinkPathway = collections.namedtuple(
+        'SignalinkPathway', ['pathway'],
+    )
+    
+    
+    result = collections.defaultdict(set)
+    
+    interactions = signalink_interactions()
+    
+    for i in interactions:
+        
+        for pathway in i[8].split(';'):
+            
+            result[i[0]].add(
+                SignalinkPathway(pathway = pathway)
+            )
+        
+        for pathway in i[9].split(';'):
+            
+            result[i[1]].add(
+                SignalinkPathway(pathway = pathway)
+            )
+    
+    return result
 
 
 def get_laudanna_directions():
@@ -8446,11 +8758,12 @@ def get_acsn_effects():
     return effects
 
 
-def get_wang_effects():
+def wang_interactions():
     """
     Downloads and processes Wang Lab HumanSignalingNetwork.
-    Returns list of effects.
+    Returns list of interactions.
     """
+    
     url = urls.urls['wang']['url']
     c = curl.Curl(url, silent = False)
     data = c.result
@@ -8459,7 +8772,9 @@ def get_wang_effects():
     nodes = {}
     reading_nodes = False
     reading_edges = False
+    
     for l in data:
+        
         if len(l.strip()) == 0:
             reading_nodes = False
             reading_edges = False
@@ -8473,6 +8788,7 @@ def get_wang_effects():
         if l[0].startswith('From'):
             reading_nodes = False
             reading_edges = True
+    
     return effects
 
 
