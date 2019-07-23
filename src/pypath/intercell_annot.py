@@ -950,7 +950,7 @@ annot_combined_classes = (
                 'extracellular_cspa',
                 'extracellular_hpmr',
                 'extracellular_cellphonedb',
-                'extracellular_comppi',
+                #'extracellular_comppi',
             ),
             op = set.union,
         ),
@@ -969,13 +969,7 @@ annot_combined_classes = (
                         },
                     },
                 ),
-                af.AnnotDef(
-                    name = 'locate_secretome',
-                    source = 'Locate',
-                    args = {
-                        'cls': 'secretome',
-                    },
-                ),
+                'secreted_locate',
             ),
             op = set.union,
         ),
@@ -993,7 +987,13 @@ annot_combined_classes = (
     ),
     af.AnnotDef(
         name = 'extracellular_matrixdb',
-        source = 'Matrixdb',
+        source = 'MatrixDB',
+        args = {
+            'mainclass': {
+                'secreted',
+                'ecm',
+            },
+        },
     ),
     af.AnnotDef(
         name = 'extracellular_cspa',
@@ -1264,11 +1264,33 @@ annot_combined_classes = (
         name = 'surface_ligand',
         source = af.AnnotOp(
             annots = (
+                'surface_ligand_go',
+                'surface_ligand_cellphonedb',
+            ),
+            op = set.union
+        ),
+    ),
+    af.AnnotDef(
+        name = 'surface_ligand_go',
+        source = af.AnnotOp(
+            annots = (
                 'cell_surface',
                 'ligand_go',
             ),
             op = set.intersection,
         ),
+    ),
+    af.AnnotDef(
+        name = 'surface_ligand_cellphonedb',
+        source = 'CellPhoneDB',
+        args = {
+            'method': lambda a: (
+                not a.receptor and (
+                    a.peripheral or
+                    a.transmembrane
+                )
+            ),
+        },
     ),
     # transporter
     af.AnnotDef(
@@ -1354,7 +1376,7 @@ annot_combined_classes = (
         source = af.AnnotOp(
             annots = (
                 af.AnnotDef(
-                    name = 'matrisome_secreted',
+                    name = 'secreted_matrisome',
                     source = 'Matrisome',
                     args = {
                         'mainclass': 'Matrisome-associated',
@@ -1377,24 +1399,34 @@ annot_combined_classes = (
         name = 'secreted',
         source = af.AnnotOp(
             annots = (
-                af.AnnotDef(
-                    name = 'locate_secreted',
-                    source = 'Locate',
-                    args = {
-                        'location': 'secreted',
-                    }
-                ),
-                af.AnnotDef(
-                    name = 'matrisome_secreted',
-                    source = 'Matrisome',
-                    args = {
-                        'mainclass': 'Matrisome-associated',
-                        'subclass': 'Secreted Factors',
-                    },
-                ),
+                'secreted_locate',
+                'secreted_matrisome',
+                'secreted_cellphonedb',
             ),
             op = set.union,
         ),
+    ),
+    af.AnnotDef(
+        name = 'secreted_locate',
+        source = 'Locate',
+        args = {
+            'cls': 'secretome',
+        },
+    ),
+    af.AnnotDef(
+        name = 'secreted_matrisome',
+        source = 'Matrisome',
+        args = {
+            'mainclass': 'Matrisome-associated',
+            'subclass': 'Secreted Factors',
+        },
+    ),
+    af.AnnotDef(
+        name = 'secreted_cellphonedb',
+        source = 'CellPhoneDB',
+        args = {
+            'secreted': bool,
+        },
     ),
     # junctions
     af.AnnotDef(
@@ -1447,3 +1479,47 @@ class_types = {
 }
 
 
+class_labels = {
+    'ecm': 'Extracellular matrix',
+    'interleukins_hgnc': 'Interleukins (HGNC)',
+    'chemokine_ligands_hgnc': 'Chemokine ligands (HGNC)',
+    'endogenous_ligands_hgnc': 'Endogenous ligands (HGNC)',
+    'interleukin_receptors_hgnc': 'Interleukin receptors (HGNC)',
+}
+
+
+resource_labels = {
+    'cellphonedb': 'CellPhoneDB',
+    'topdb': 'TopDB',
+    'locate': 'LOCATE',
+    'go': 'Gene Ontology',
+    'matrixdb': 'MatrixDB',
+    'opm': 'OPM',
+    'zhong2015': 'Zhong 2015',
+    'kirouac': 'Kirouac 2010',
+    'hgnc': 'HGNC',
+    'hpmr': 'HPMR',
+    'cspa': 'CSPA',
+    'comppi': 'ComPPI',
+    'ramilowski': 'Ramilowski 2015',
+    'guide2pharma': 'Guide to Pharm',
+}
+
+
+def get_label(key, exceptions):
+    
+    return (
+        exceptions[key]
+            if key in exceptions else
+        key.replace('_', ' ').capitalize()
+    )
+
+
+def get_class_label(class_key):
+    
+    return get_label(class_key, class_labels)
+
+
+def get_resource_label(resource_key):
+    
+    return get_label(resource_key, resource_labels)

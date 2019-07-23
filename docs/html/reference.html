@@ -1,844 +1,185 @@
 
-<!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <title>Module reference &#8212; pypath 0.8.18 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Module reference &mdash; pypath 0.8.27 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
     
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
     
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Webservice" href="webservice.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="webservice.html" title="Webservice"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.18 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pypath
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.27
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#annot">annot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bel">bel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cellphonedb">cellphonedb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.complex">complex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.go">go</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.homology">homology</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.intera">intera</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intercell">intercell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.network">network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.pdb">pdb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.ptm">ptm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.pyreact">pyreact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.seq">seq</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.unichem">unichem</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="webservice.html">Webservice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Release history</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pypath</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Module reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/reference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="module-reference">
 <h1>Module reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-pypath.annot">
-<span id="annot"></span><h2>annot<a class="headerlink" href="#module-pypath.annot" title="Permalink to this headline">¶</a></h2>
-<p>Annotation module. Contains classes and methods to load different
-annotation data from different sources.</p>
-<dl class="class">
-<dt id="pypath.annot.Adhesome">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Adhesome</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Adhesome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Adhesome" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.AnnotationBase">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">AnnotationBase</code><span class="sig-paren">(</span><em>name</em>, <em>ncbi_tax_id=9606</em>, <em>input_method=None</em>, <em>input_args=None</em>, <em>entity_type='protein'</em>, <em>swissprot_only=True</em>, <em>proteins=()</em>, <em>complexes=()</em>, <em>reference_set=()</em>, <em>infer_complexes=True</em>, <em>dump=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="pypath.annot.AnnotationBase.add_complexes_by_inference">
-<code class="descname">add_complexes_by_inference</code><span class="sig-paren">(</span><em>complexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.add_complexes_by_inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.add_complexes_by_inference" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates complex annotations by in silico inference and adds them
-to this annotation set.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.all_proteins">
-<code class="descname">all_proteins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.all_proteins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.all_proteins" title="Permalink to this definition">¶</a></dt>
-<dd><p>All UniProt IDs annotated in this resource.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.annotate_complex">
-<code class="descname">annotate_complex</code><span class="sig-paren">(</span><em>cplex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.annotate_complex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.annotate_complex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Infers annotations for a single complex.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.complex_inference">
-<code class="descname">complex_inference</code><span class="sig-paren">(</span><em>complexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.complex_inference"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.complex_inference" title="Permalink to this definition">¶</a></dt>
-<dd><p>Annotates all complexes in <cite>complexes</cite>, by default in the default
-complex database (existing in the <cite>complex</cite> module or generated
-on demand according to the module’s current settings).</p>
-<p>Dict with complexes as keys and sets of annotations as values.
-Complexes with no valid information in this annotation resource
-won’t be in the dict.</p>
-<dl class="simple">
-<dt>complexes<span class="classifier">iterable</span></dt><dd><p>Iterable yielding complexes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.get_subset">
-<code class="descname">get_subset</code><span class="sig-paren">(</span><em>method=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.get_subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.get_subset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves a subset by filtering based on <code class="docutils literal notranslate"><span class="pre">kwargs</span></code>.
-Each argument should be a name and a value or set of values.
-Elements having the provided values in the annotation will be
-returned.
-Returns a set of UniProt IDs.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.load_proteins">
-<code class="descname">load_proteins</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.load_proteins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.load_proteins" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves a set of all UniProt IDs to have a base set of the entire
-proteome.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.AnnotationBase.reload">
-<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#AnnotationBase.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.AnnotationBase.reload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reloads the object from the module level.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CellPhoneDB">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CellPhoneDB</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CellPhoneDB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CellPhoneDB" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.annot.CellPhoneDB.record">
-<code class="descname">record</code><a class="headerlink" href="#pypath.annot.CellPhoneDB.record" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">pypath.dataio.CellPhoneDBAnnotation</span></code></p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CellPhoneDBComplex">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CellPhoneDBComplex</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CellPhoneDBComplex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CellPhoneDBComplex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CellSurfaceProteinAtlas">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CellSurfaceProteinAtlas</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CellSurfaceProteinAtlas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CellSurfaceProteinAtlas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Comppi">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Comppi</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Comppi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Comppi" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Corum">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Corum</code><span class="sig-paren">(</span><em>name</em>, <em>annot_attr</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Corum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Corum" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CorumFuncat">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CorumFuncat</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CorumFuncat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CorumFuncat" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CorumGO">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CorumGO</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CorumGO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CorumGO" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Cpad">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Cpad</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Cpad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Cpad" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.CustomAnnotation">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">CustomAnnotation</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>pickle_file=None</em>, <em>annotdb_pickle_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Custom annotation base class. Inherits from
-<code class="xref py py-class docutils literal notranslate"><span class="pre">pypath.session_mod.Logger</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>class_definitions</strong> (<em>dict</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Contains the annotation classes’
-definitions. This is, <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an
-<code class="docutils literal notranslate"><span class="pre">'args'</span></code> parameter.</p></li>
-<li><p><strong>pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. The path to an annotation classes
-pickle file.</p></li>
-<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Path to the annotation database
-pickle file.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Variables</dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>pickle_file</strong> (<em>str</em>) – The path to an annotation classes pickle file.</p></li>
-<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Path to the annotation database
-pickle file.</p></li>
-<li><p><strong>annotdb</strong> (<em>pypath.annot.AnnotationTable</em>) – An instance of the annotation table class. Loads, contains and
-manages the annotation data.</p></li>
-<li><p><strong>classes</strong> (<em>dict</em>) – Contains the entities by their class definition according to
-their role.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.add_class_definitions">
-<code class="descname">add_class_definitions</code><span class="sig-paren">(</span><em>class_definitions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.add_class_definitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.add_class_definitions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a class definition to the current instance.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>class_definitions</strong> (<em>dict</em>) – Contains the annotation classes’ definitions to add. This
-is, <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code> parameter.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.classes_by_entity">
-<code class="descname">classes_by_entity</code><span class="sig-paren">(</span><em>element</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.classes_by_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.classes_by_entity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.counts">
-<code class="descname">counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.counts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.counts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a dict with number of elements in each class.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.create_class">
-<code class="descname">create_class</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.create_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.create_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a category of entities with specific role in
-intercellular communication.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>classdef</strong> (<em>object</em>) – The new class definition for the new category. Should
-contain <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code>
-parameters.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.export">
-<code class="descname">export</code><span class="sig-paren">(</span><em>fname</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.export"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.export" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.get_class">
-<code class="descname">get_class</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.get_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.get_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves a class by its name and loads it if hasn’t been loaded yet
-but the name present in the class definitions.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.load_from_pickle">
-<code class="descname">load_from_pickle</code><span class="sig-paren">(</span><em>pickle_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.load_from_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.load_from_pickle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loads the annotation classes from pickle file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pickle_file</strong> (<em>str</em>) – The path to an annotation classes pickle file.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.make_df">
-<code class="descname">make_df</code><span class="sig-paren">(</span><em>all_annotations=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.make_df"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.make_df" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.populate_classes">
-<code class="descname">populate_classes</code><span class="sig-paren">(</span><em>update=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.populate_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.populate_classes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a classification of proteins according to their roles
-in the intercellular communication. Loads from pickle
-<code class="docutils literal notranslate"><span class="pre">pickle_file``(if</span> <span class="pre">available)</span> <span class="pre">or</span> <span class="pre">from</span> <span class="pre">``class_definitions</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>update</strong> (<em>bool</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">False</span></code> by default. Whether to reload all
-classes or just the ones not already loaded.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.process_annot">
-<code class="descname">process_annot</code><span class="sig-paren">(</span><em>classdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.process_annot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.process_annot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Processes an annotation definition and returns a set of
-identifiers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>classdef</strong> (<em>object</em>) – The class definition to process for the new category. Should
-contain <code class="docutils literal notranslate"><span class="pre">'name'</span></code>, a <code class="docutils literal notranslate"><span class="pre">'source'</span></code> and an <code class="docutils literal notranslate"><span class="pre">'args'</span></code>
-parameters.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.reload">
-<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.reload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reloads the object from the module level.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="pypath.annot.CustomAnnotation.save_to_pickle">
-<code class="descname">save_to_pickle</code><span class="sig-paren">(</span><em>pickle_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#CustomAnnotation.save_to_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.CustomAnnotation.save_to_pickle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the annotation classes on a pickle file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pickle_file</strong> (<em>str</em>) – The path to save the annotation pickle file.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Exocarta">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Exocarta</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Exocarta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Exocarta" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.GOIntercell">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">GOIntercell</code><span class="sig-paren">(</span><em>categories=None</em>, <em>go_annot=None</em>, <em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#GOIntercell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.GOIntercell" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.GuideToPharmacology">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">GuideToPharmacology</code><span class="sig-paren">(</span><em>load_sources=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#GuideToPharmacology"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.GuideToPharmacology" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Hgnc">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Hgnc</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Hgnc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Hgnc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.HpmrComplex">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">HpmrComplex</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#HpmrComplex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.HpmrComplex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.HumanPlasmaMembraneReceptome">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">HumanPlasmaMembraneReceptome</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#HumanPlasmaMembraneReceptome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.HumanPlasmaMembraneReceptome" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.HumanProteinAtlas">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">HumanProteinAtlas</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#HumanProteinAtlas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.HumanProteinAtlas" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Integrins">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Integrins</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Integrins"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Integrins" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.KeggPathways">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">KeggPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#KeggPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.KeggPathways" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Kirouac2010">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Kirouac2010</code><span class="sig-paren">(</span><em>load_sources=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Kirouac2010"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Kirouac2010" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.LigandReceptor">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">LigandReceptor</code><span class="sig-paren">(</span><em>name</em>, <em>ligand_col=None</em>, <em>receptor_col=None</em>, <em>ligand_id_type=None</em>, <em>receptor_id_type=None</em>, <em>record_processor_method=None</em>, <em>record_extra_fields=None</em>, <em>record_defaults=None</em>, <em>extra_fields_methods=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#LigandReceptor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.LigandReceptor" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Locate">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Locate</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>literature=True</em>, <em>external=True</em>, <em>predictions=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Locate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Locate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Matrisome">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Matrisome</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Matrisome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Matrisome" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Matrixdb">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Matrixdb</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Matrixdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Matrixdb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Membranome">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Membranome</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Membranome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Membranome" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.NetpathPathways">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">NetpathPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#NetpathPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.NetpathPathways" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Opm">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Opm</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Opm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Opm" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Ramilowski2015">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Ramilowski2015</code><span class="sig-paren">(</span><em>load_sources=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Ramilowski2015"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Ramilowski2015" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Ramilowski2015Location">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Ramilowski2015Location</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Ramilowski2015Location"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Ramilowski2015Location" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.SignalinkPathways">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">SignalinkPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#SignalinkPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.SignalinkPathways" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.SignorPathways">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">SignorPathways</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#SignorPathways"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.SignorPathways" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Surfaceome">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Surfaceome</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Surfaceome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Surfaceome" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Topdb">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Topdb</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Topdb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Topdb" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Vesiclepedia">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Vesiclepedia</code><span class="sig-paren">(</span><em>ncbi_tax_id=9606</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Vesiclepedia"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Vesiclepedia" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="class">
-<dt id="pypath.annot.Zhong2015">
-<em class="property">class </em><code class="descclassname">pypath.annot.</code><code class="descname">Zhong2015</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#Zhong2015"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.Zhong2015" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="data">
-<dt id="pypath.annot.complex_sources_default">
-<code class="descclassname">pypath.annot.</code><code class="descname">complex_sources_default</code><em class="property"> = {'CellPhoneDBComplex', 'CorumFuncat', 'CorumGO', 'HpmrComplex'}</em><a class="headerlink" href="#pypath.annot.complex_sources_default" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default protein complex annotation sources</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="pypath.annot.default_fields">
-<code class="descclassname">pypath.annot.</code><code class="descname">default_fields</code><em class="property"> = {'CellPhoneDB': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'CellPhoneDB_Complex': ('receptor', 'adhesion', 'cytoplasm', 'peripheral', 'secretion', 'secreted', 'transporter', 'transmembrane', 'extracellular'), 'Cpad': ('cancer', 'effect_on_cancer'), 'Exocarta': ('vesicle',), 'HPA': ('tissue', 'level'), 'Locate': ('location',), 'Matrisome': ('mainclass', 'subclass'), 'Ramilowski_location': ('location',), 'Vesiclepedia': ('vesicle',)}</em><a class="headerlink" href="#pypath.annot.default_fields" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default annotation classes by source</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pypath.annot.get_db">
-<code class="descclassname">pypath.annot.</code><code class="descname">get_db</code><span class="sig-paren">(</span><em>keep_annotators=True</em>, <em>create_dataframe=False</em>, <em>use_complexes=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#get_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.get_db" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves the current database instance and initializes it if does
-not exist yet.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pypath.annot.init_db">
-<code class="descclassname">pypath.annot.</code><code class="descname">init_db</code><span class="sig-paren">(</span><em>keep_annotators=True</em>, <em>create_dataframe=False</em>, <em>use_complexes=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/annot.html#init_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.annot.init_db" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initializes or reloads the annotation database.
-The database will be assigned to the <code class="docutils literal notranslate"><span class="pre">db</span></code> attribute of this module.</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="pypath.annot.protein_sources_default">
-<code class="descclassname">pypath.annot.</code><code class="descname">protein_sources_default</code><em class="property"> = {'Adhesome', 'CellPhoneDB', 'CellSurfaceProteinAtlas', 'Comppi', 'Cpad', 'Exocarta', 'GOIntercell', 'GuideToPharmacology', 'Hgnc', 'HumanPlasmaMembraneReceptome', 'HumanProteinAtlas', 'Integrins', 'KeggPathways', 'Kirouac2010', 'Locate', 'Matrisome', 'Matrixdb', 'Membranome', 'NetpathPathways', 'Opm', 'Ramilowski2015', 'Ramilowski2015Location', 'SignalinkPathways', 'SignorPathways', 'Surfaceome', 'Topdb', 'Vesiclepedia', 'Zhong2015'}</em><a class="headerlink" href="#pypath.annot.protein_sources_default" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default protein annotation sources</p>
-</dd></dl>
-
+<div class="section" id="annot">
+<h2>annot<a class="headerlink" href="#annot" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="bel">
 <h2>bel<a class="headerlink" href="#bel" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-pypath.cellphonedb">
-<span id="cellphonedb"></span><h2>cellphonedb<a class="headerlink" href="#module-pypath.cellphonedb" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex">
-<em class="property">class </em><code class="descclassname">pypath.cellphonedb.</code><code class="descname">CellPhoneDBComplex</code><span class="sig-paren">(</span><em>name</em>, <em>uniprot_1</em>, <em>uniprot_2</em>, <em>uniprot_3</em>, <em>uniprot_4</em>, <em>adhesion</em>, <em>cytoplasm</em>, <em>extracellular</em>, <em>integrin_interaction</em>, <em>other</em>, <em>other_desc</em>, <em>peripheral</em>, <em>receptor</em>, <em>receptor_desc</em>, <em>secreted_desc</em>, <em>secreted_highlight</em>, <em>secretion</em>, <em>transmembrane</em>, <em>transporter</em>, <em>pdb_structure</em>, <em>pdb_id</em>, <em>stoichiometry</em>, <em>comments_complex</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.adhesion">
-<code class="descname">adhesion</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.adhesion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 5</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.comments_complex">
-<code class="descname">comments_complex</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.comments_complex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 22</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.cytoplasm">
-<code class="descname">cytoplasm</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.cytoplasm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 6</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.extracellular">
-<code class="descname">extracellular</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.extracellular" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 7</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.integrin_interaction">
-<code class="descname">integrin_interaction</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.integrin_interaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 8</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.name">
-<code class="descname">name</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.other">
-<code class="descname">other</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.other" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 9</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.other_desc">
-<code class="descname">other_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.other_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 10</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.pdb_id">
-<code class="descname">pdb_id</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.pdb_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 20</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.pdb_structure">
-<code class="descname">pdb_structure</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.pdb_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 19</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.peripheral">
-<code class="descname">peripheral</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.peripheral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 11</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.receptor">
-<code class="descname">receptor</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.receptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 12</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.receptor_desc">
-<code class="descname">receptor_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.receptor_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 13</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.secreted_desc">
-<code class="descname">secreted_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.secreted_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 14</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.secreted_highlight">
-<code class="descname">secreted_highlight</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.secreted_highlight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 15</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.secretion">
-<code class="descname">secretion</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.secretion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 16</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.stoichiometry">
-<code class="descname">stoichiometry</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.stoichiometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 21</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.transmembrane">
-<code class="descname">transmembrane</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.transmembrane" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 17</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.transporter">
-<code class="descname">transporter</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.transporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 18</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.uniprot_1">
-<code class="descname">uniprot_1</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.uniprot_1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.uniprot_2">
-<code class="descname">uniprot_2</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.uniprot_2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.uniprot_3">
-<code class="descname">uniprot_3</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.uniprot_3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBComplex.uniprot_4">
-<code class="descname">uniprot_4</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBComplex.uniprot_4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 4</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.cellphonedb.CellPhoneDBGene">
-<em class="property">class </em><code class="descclassname">pypath.cellphonedb.</code><code class="descname">CellPhoneDBGene</code><span class="sig-paren">(</span><em>gene_name</em>, <em>uniprot</em>, <em>hgnc_symbol</em>, <em>ensembl</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBGene" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBGene.ensembl">
-<code class="descname">ensembl</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBGene.ensembl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBGene.gene_name">
-<code class="descname">gene_name</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBGene.gene_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBGene.hgnc_symbol">
-<code class="descname">hgnc_symbol</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBGene.hgnc_symbol" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBGene.uniprot">
-<code class="descname">uniprot</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBGene.uniprot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction">
-<em class="property">class </em><code class="descclassname">pypath.cellphonedb.</code><code class="descname">CellPhoneDBInteraction</code><span class="sig-paren">(</span><em>comments_interaction</em>, <em>dlrp</em>, <em>family</em>, <em>iuphar</em>, <em>multidata_name_1</em>, <em>multidata_name_2</em>, <em>score_1</em>, <em>score_2</em>, <em>source</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.comments_interaction">
-<code class="descname">comments_interaction</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.comments_interaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.dlrp">
-<code class="descname">dlrp</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.dlrp" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.family">
-<code class="descname">family</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.family" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.iuphar">
-<code class="descname">iuphar</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.iuphar" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.multidata_name_1">
-<code class="descname">multidata_name_1</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.multidata_name_1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 4</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.multidata_name_2">
-<code class="descname">multidata_name_2</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.multidata_name_2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 5</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.score_1">
-<code class="descname">score_1</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.score_1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 6</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.score_2">
-<code class="descname">score_2</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.score_2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 7</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBInteraction.source">
-<code class="descname">source</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBInteraction.source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 8</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein">
-<em class="property">class </em><code class="descclassname">pypath.cellphonedb.</code><code class="descname">CellPhoneDBProtein</code><span class="sig-paren">(</span><em>uniprot</em>, <em>adhesion</em>, <em>cytoplasm</em>, <em>entry_name</em>, <em>extracellular</em>, <em>integrin_interaction</em>, <em>other</em>, <em>other_desc</em>, <em>pdb_id</em>, <em>pdb_structure</em>, <em>peripheral</em>, <em>receptor</em>, <em>receptor_desc</em>, <em>secreted_desc</em>, <em>secreted_highlight</em>, <em>secretion</em>, <em>stoichiometry</em>, <em>tags_description</em>, <em>transmembrane</em>, <em>transporter</em>, <em>tags</em>, <em>tags_reason</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.adhesion">
-<code class="descname">adhesion</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.adhesion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.cytoplasm">
-<code class="descname">cytoplasm</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.cytoplasm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.entry_name">
-<code class="descname">entry_name</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.entry_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.extracellular">
-<code class="descname">extracellular</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.extracellular" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 4</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.integrin_interaction">
-<code class="descname">integrin_interaction</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.integrin_interaction" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 5</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.other">
-<code class="descname">other</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.other" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 6</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.other_desc">
-<code class="descname">other_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.other_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 7</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.pdb_id">
-<code class="descname">pdb_id</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.pdb_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 8</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.pdb_structure">
-<code class="descname">pdb_structure</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.pdb_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 9</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.peripheral">
-<code class="descname">peripheral</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.peripheral" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 10</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.receptor">
-<code class="descname">receptor</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.receptor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 11</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.receptor_desc">
-<code class="descname">receptor_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.receptor_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 12</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.secreted_desc">
-<code class="descname">secreted_desc</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.secreted_desc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 13</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.secreted_highlight">
-<code class="descname">secreted_highlight</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.secreted_highlight" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 14</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.secretion">
-<code class="descname">secretion</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.secretion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 15</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.stoichiometry">
-<code class="descname">stoichiometry</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.stoichiometry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 16</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.tags">
-<code class="descname">tags</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.tags" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 20</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.tags_description">
-<code class="descname">tags_description</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.tags_description" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 17</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.tags_reason">
-<code class="descname">tags_reason</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.tags_reason" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 21</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.transmembrane">
-<code class="descname">transmembrane</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.transmembrane" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 18</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.transporter">
-<code class="descname">transporter</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.transporter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 19</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.cellphonedb.CellPhoneDBProtein.uniprot">
-<code class="descname">uniprot</code><a class="headerlink" href="#pypath.cellphonedb.CellPhoneDBProtein.uniprot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="cellphonedb">
+<h2>cellphonedb<a class="headerlink" href="#cellphonedb" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pypath.complex">
 <span id="complex"></span><h2>complex<a class="headerlink" href="#module-pypath.complex" title="Permalink to this headline">¶</a></h2>
@@ -984,47 +325,8 @@ i.e. residues, post-translational modifications,
 short motifs, domains, domain-motifs and
 domain-motif interactions, binding interfaces.</p>
 </div>
-<div class="section" id="module-pypath.intercell">
-<span id="intercell"></span><h2>intercell<a class="headerlink" href="#module-pypath.intercell" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="pypath.intercell.Intercell">
-<em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">Intercell</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>network=None</em>, <em>network_param=None</em>, <em>omnipath=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#Intercell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.Intercell" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="pypath.intercell.Intercell.reload">
-<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#Intercell.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.Intercell.reload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reloads the object from the module level.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.intercell.IntercellAnnotation">
-<em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">IntercellAnnotation</code><span class="sig-paren">(</span><em>class_definitions=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#IntercellAnnotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.IntercellAnnotation" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="pypath.intercell.IntercellAnnotation.reload">
-<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pypath/intercell.html#IntercellAnnotation.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pypath.intercell.IntercellAnnotation.reload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reloads the object from the module level.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="pypath.intercell.IntercellRole">
-<em class="property">class </em><code class="descclassname">pypath.intercell.</code><code class="descname">IntercellRole</code><span class="sig-paren">(</span><em>source</em>, <em>role</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.intercell.IntercellRole" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
-<dt id="pypath.intercell.IntercellRole.role">
-<code class="descname">role</code><a class="headerlink" href="#pypath.intercell.IntercellRole.role" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="pypath.intercell.IntercellRole.source">
-<code class="descname">source</code><a class="headerlink" href="#pypath.intercell.IntercellRole.source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
-
-</dd></dl>
-
+<div class="section" id="intercell">
+<h2>intercell<a class="headerlink" href="#intercell" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-pypath.network">
 <span id="network"></span><h2>network<a class="headerlink" href="#module-pypath.network" title="Permalink to this headline">¶</a></h2>
@@ -1246,80 +548,52 @@ for all isoforms, by default only first isoform.</p>
 </div>
 
 
+           </div>
+           
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Module reference</a><ul>
-<li><a class="reference internal" href="#module-pypath.annot">annot</a></li>
-<li><a class="reference internal" href="#bel">bel</a></li>
-<li><a class="reference internal" href="#module-pypath.cellphonedb">cellphonedb</a></li>
-<li><a class="reference internal" href="#module-pypath.complex">complex</a></li>
-<li><a class="reference internal" href="#module-pypath.go">go</a></li>
-<li><a class="reference internal" href="#module-pypath.homology">homology</a></li>
-<li><a class="reference internal" href="#module-pypath.intera">intera</a></li>
-<li><a class="reference internal" href="#module-pypath.intercell">intercell</a></li>
-<li><a class="reference internal" href="#module-pypath.network">network</a></li>
-<li><a class="reference internal" href="#module-pypath.pdb">pdb</a></li>
-<li><a class="reference internal" href="#module-pypath.ptm">ptm</a></li>
-<li><a class="reference internal" href="#module-pypath.pyreact">pyreact</a></li>
-<li><a class="reference internal" href="#module-pypath.seq">seq</a></li>
-<li><a class="reference internal" href="#module-pypath.unichem">unichem</a></li>
-</ul>
-</li>
-</ul>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="webservice.html" class="btn btn-neutral float-right" title="Webservice" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="previous chapter">Installation</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="webservice.html"
-                        title="next chapter">Webservice</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/reference.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Dénes Türei
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="webservice.html" title="Webservice"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="installation.html" title="Installation"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">pypath 0.8.18 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2019, Dénes Türei.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
-    </div>
-  </body>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
 </html>

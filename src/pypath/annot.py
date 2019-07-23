@@ -31,6 +31,7 @@ import sys
 import imp
 import collections
 import itertools
+import traceback
 
 try:
     import cPickle as pickle
@@ -54,6 +55,7 @@ import pypath.intera as intera
 
 #: Default protein annotation sources
 protein_sources_default = {
+    'Dgidb',
     'Membranome',
     'Exocarta',
     'Vesiclepedia',
@@ -82,6 +84,13 @@ protein_sources_default = {
     'KeggPathways',
     'NetpathPathways',
     'Cpad',
+    'Disgenet',
+    'Kinases',
+    'Phosphatome',
+    'Tfcensus',
+    'Intogen',
+    'Kinases',
+    'CancerGeneCensus',
 }
 
 #: Default protein complex annotation sources
@@ -126,6 +135,9 @@ default_fields = {
     'Cpad': (
         'cancer',
         'effect_on_cancer',
+    ),
+    'Disgenet': (
+        'disease',
     ),
 }
 
@@ -214,8 +226,13 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         if self.pickle_file:
+<<<<<<< HEAD
             self.load_from_pickle(fname=self.pickle_file)
 
+=======
+            
+            self.load_from_pickle(pickle_file = self.pickle_file)
+>>>>>>> dev
             return
 
         for classdef in self._class_definitions.values():
@@ -346,12 +363,67 @@ class CustomAnnotation(session_mod.Logger):
         """
         """
 
+<<<<<<< HEAD
         map_gs = mapping.map_name0(uniprot, 'uniprot',
                           'genesymbol')
         self.df = pd.DataFrame(data = [[cls, uniprot, map_gs,
                                         '; '.join(mapping.map_name(uniprot,
                                                                    'uniprot',
                                                                    'protein-name')), ] + ([self.annotdb.all_annotations_str(uniprot)] if all_annotations else []) for cls, members in iteritems(self.classes) for uniprot in members], columns = ['category', 'uniprot', 'genesymbol', 'full_name'] + (['all_annotations'] if all_annotations else []))
+=======
+    def make_df(self, all_annotations = False, full_name = False):
+        
+        header = ['category', 'uniprot', 'genesymbol']
+        dtypes = {
+            'category':   'category',
+            'uniprot':    'category',
+            'genesymbol': 'category',
+        }
+        
+        if full_name:
+            
+            header.append('full_name')
+            dtypes['full_name'] = 'category'
+        
+        self.df = pd.DataFrame(
+            [
+                [
+                    cls,
+                    uniprot.__str__(),
+                    (
+                        mapping.map_name0(uniprot, 'uniprot', 'genesymbol')
+                            if isinstance(uniprot, common.basestring) else
+                        uniprot.genesymbol_str
+                            if hasattr(uniprot, 'genesymbol_str') else
+                        uniprot.__str__()
+                    ),
+                ] +
+                (
+                    [
+                        '; '.join(
+                            mapping.map_name(
+                                uniprot,
+                                'uniprot',
+                                'protein-name',
+                            )
+                        ),
+                    ]
+                    if full_name else []
+                ) +
+                (
+                    [self.annotdb.all_annotations_str(uniprot)]
+                        if all_annotations else
+                    []
+                )
+                for cls, members in iteritems(self.classes)
+                for uniprot in members
+            ],
+            columns = header + (
+                ['all_annotations'] if all_annotations else []
+            ),
+        ).astype(dtypes)
+
+>>>>>>> dev
 
     def export(self, fname, **kwargs):
         """
@@ -957,6 +1029,14 @@ class AnnotationBase(resource.AbstractResource):
         self.df = pd.DataFrame(
             records,
             columns = columns,
+        ).astype(
+            {
+                'uniprot': 'category',
+                'genesymbol': 'category',
+                'source': 'category',
+                'label': 'category',
+                'record_id': 'int32',
+            }
         )
 
 
@@ -1373,6 +1453,30 @@ class Cpad(AnnotationBase):
         delattr(self, 'data')
 
 
+class Disgenet(AnnotationBase):
+    
+    _eq_fields = (
+        'disease',
+    )
+    
+    
+    def __init__(self, ncbi_tax_id = 9606, **kwargs):
+        
+        AnnotationBase.__init__(
+            self,
+            name = 'DisGeNet',
+            input_method = 'disgenet_annotations',
+            ncbi_tax_id = ncbi_tax_id,
+            **kwargs
+        )
+    
+    
+    def _process_method(self):
+        
+        self.annot = self.data
+        delattr(self, 'data')
+
+
 class Integrins(AnnotationBase):
 
     _eq_fields = ()
@@ -1405,6 +1509,48 @@ class HumanProteinAtlas(AnnotationBase):
 
     def _process_method(self):
 
+        self.annot = self.data
+        delattr(self, 'data')
+
+
+class CancerGeneCensus(AnnotationBase):
+    
+    _eq_fields = None
+    
+    
+    def __init__(self, **kwargs):
+        
+        AnnotationBase.__init__(
+            self,
+            name = 'CancerGeneCensus',
+            input_method = 'cancer_gene_census_annotations',
+            **kwargs
+        )
+    
+    
+    def _process_method(self):
+        
+        self.annot = self.data
+        delattr(self, 'data')
+
+
+class Intogen(AnnotationBase):
+    
+    _eq_fields = ('type', 'role')
+    
+    
+    def __init__(self, **kwargs):
+        
+        AnnotationBase.__init__(
+            self,
+            name = 'IntOGen',
+            input_method = 'intogen_annotations',
+            **kwargs
+        )
+    
+    
+    def _process_method(self):
+        
         self.annot = self.data
         delattr(self, 'data')
 
@@ -1492,6 +1638,85 @@ class HumanPlasmaMembraneReceptome(AnnotationBase):
             self,
             name = 'HPMR',
             input_method = 'hpmr_annotations',
+            **kwargs
+        )
+
+
+    def _process_method(self):
+
+        self.annot = self.data
+        del self.data
+
+
+class Kinases(AnnotationBase):
+    
+    _eq_fields = ()
+    
+    
+    def __init__(self, **kwargs):
+        """
+        Kinases from `kinase.com`.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'Kinases',
+            input_method = 'get_kinases',
+            **kwargs
+        )
+
+
+class Tfcensus(AnnotationBase):
+    
+    _eq_fields = ()
+    
+    
+    def __init__(self, **kwargs):
+        """
+        Transcription factors from TF census (Vaquerizas et al 2009).
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'TFcensus',
+            input_method = 'get_tfcensus',
+            **kwargs
+        )
+
+
+class Dgidb(AnnotationBase):
+    
+    _eq_fields = ()
+    
+    
+    def __init__(self, **kwargs):
+        """
+        Druggable proteins from DGIdb (Drug Gene Interaction Database).
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'DGIdb',
+            input_method = 'get_dgidb',
+            **kwargs
+        )
+
+
+class Phosphatome(AnnotationBase):
+    
+    _eq_fields = ()
+    
+    
+    def __init__(self, **kwargs):
+        """
+        The list of phosphatases from Chen et al, Science Signaling (2017)
+        Table S1.
+        """
+
+        AnnotationBase.__init__(
+            self,
+            name = 'Phosphatome',
+            input_method = 'phosphatome_annotations',
             **kwargs
         )
 
@@ -2133,8 +2358,16 @@ class AnnotationTable(session_mod.Logger):
         self._module = sys.modules[self.__module__]
         self.pickle_file = pickle_file
         self.complexes = complexes
-        self.protein_sources = protein_sources or protein_sources_default
-        self.complex_sources = complex_sources or complex_sources_default
+        self.protein_sources = (
+            protein_sources
+                if protein_sources is not None else
+            protein_sources_default
+        )
+        self.complex_sources = (
+            complex_sources
+                if complex_sources is not None else
+            complex_sources_default
+        )
         self.use_fields = use_fields or default_fields
         self.ncbi_tax_id = ncbi_tax_id
         self.keep_annotators = keep_annotators
@@ -2314,6 +2547,7 @@ class AnnotationTable(session_mod.Logger):
         for cls in definitions:
 
             cls = cls if callable(cls) else getattr(self._module, cls)
+<<<<<<< HEAD
 
             annot = cls(
                 ncbi_tax_id = self.ncbi_tax_id,
@@ -2323,6 +2557,31 @@ class AnnotationTable(session_mod.Logger):
             self.annots[annot.name] = annot
 
 
+=======
+            
+            try:
+                
+                annot = cls(
+                    ncbi_tax_id = self.ncbi_tax_id,
+                    reference_set = reference_set,
+                )
+                
+                self.annots[annot.name] = annot
+                
+            except Exception:
+                
+                self._log(
+                    'Failed to load annotations from resource `%s`.\n'
+                    '%s\n' % (
+                        cls.__name__
+                            if hasattr(cls, '__name__') else
+                        str(cls),
+                        traceback.format_exc(),
+                    )
+                )
+    
+    
+>>>>>>> dev
     def make_dataframe(self, reference_set = None):
 
         if self.create_dataframe:

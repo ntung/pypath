@@ -22,6 +22,8 @@ from future.utils import iteritems
 
 import sys
 import os
+import copy
+import collections
 
 try:
     import twisted.web.resource
@@ -319,26 +321,26 @@ class TableServer(BaseServer):
                 'type',
                 'ncbi_tax_id',
                 'databases',
-                'organism'
+                'organism',
             },
             'tfregulons_levels':  {'A', 'B', 'C', 'D', 'E'},
             'tfregulons_methods': {
                 'curated',
                 'chipseq',
                 'coexp',
-                'tfbs'
+                'tfbs',
             },
             'organisms': {
                 '9606',
                 '10090',
-                '10116'
+                '10116',
             },
             'databases': None,
             'source_target': {
                 'AND',
                 'OR',
                 'and',
-                'or'
+                'or',
             },
             'directed': {'1', '0', 'no', 'yes'},
             'signed': {'1', '0', 'no', 'yes'},
@@ -350,7 +352,7 @@ class TableServer(BaseServer):
                 'tab',
                 'text',
                 'tsv',
-                'table'
+                'table',
             },
             'enzymes':     None,
             'substrates':  None,
@@ -359,7 +361,7 @@ class TableServer(BaseServer):
             'organisms': {
                 '9606',
                 '10090',
-                '10116'
+                '10116',
             },
             'databases': None,
             'residues':  None,
@@ -371,13 +373,13 @@ class TableServer(BaseServer):
                 'ncbi_tax_id',
                 'organism',
                 'databases',
-                'isoforms'
+                'isoforms',
             },
             'enzyme_substrate': {
                 'AND',
                 'OR',
                 'and',
-                'or'
+                'or',
             }
         },
         'annotations': {
@@ -387,7 +389,7 @@ class TableServer(BaseServer):
                 'tab',
                 'text',
                 'tsv',
-                'table'
+                'table',
             },
             'databases': None,
             'proteins': None,
@@ -401,7 +403,7 @@ class TableServer(BaseServer):
                 'tab',
                 'text',
                 'tsv',
-                'table'
+                'table',
             },
             'levels': {
                 'main',
@@ -420,7 +422,7 @@ class TableServer(BaseServer):
                 'tab',
                 'text',
                 'tsv',
-                'table'
+                'table',
             },
             'databases': None,
             'proteins': None,
@@ -455,21 +457,93 @@ class TableServer(BaseServer):
         'references', 'sources', 'databases',
         'isoforms', 'organism', 'ncbi_tax_id'
     }
+    default_input_files = {
+        'interactions': 'omnipath_webservice_interactions.tsv',
+        'ptms': 'omnipath_webservice_ptms.tsv',
+        'annotations': 'omnipath_webservice_annotations.tsv',
+        'complexes': 'omnipath_webservice_complexes.tsv',
+        'intercell': 'omnipath_webservice_intercell.tsv',
+    }
+    default_dtypes = collections.defaultdict(
+        dict,
+        interactions = {
+            'source': 'category',
+            'target': 'category',
+            'source_genesymbol': 'category',
+            'target_genesymbol': 'category',
+            'is_directed': 'int8',
+            'is_stimulation': 'int8',
+            'is_inhibition': 'int8',
+            'consensus_direction': 'int8',
+            'consensus_stimulation': 'int8',
+            'consensus_inhibition': 'int8',
+            'sources': 'category',
+            'references': 'category',
+            'dip_url': 'category',
+            'tfregulons_curated': 'category',
+            'tfregulons_chipseq': 'category',
+            'tfregulons_tfbs': 'category',
+            'tfregulons_coexp': 'category',
+            'tfregulons_level': 'category',
+            'type': 'category',
+            'ncbi_tax_id_source': 'int16',
+            'ncbi_tax_id_target': 'int16',
+        },
+        annotations = {
+            'uniprot': 'category',
+            'genesymbol': 'category',
+            'source': 'category',
+            'label': 'category',
+            'value': 'category',
+            'record_id': 'uint32',
+        },
+        ptms = {
+            'enzyme': 'category',
+            'substrate': 'category',
+            'enzyme_genesymbol': 'category',
+            'substrate_genesymbol': 'category',
+            'isoforms': 'category',
+            'residue_type': 'category',
+            'residue_offset': 'uint16',
+            'modification': 'category',
+            'sources': 'category',
+            'references': 'category',
+            'ncbi_tax_id': 'int16',
+        },
+        complexes = {
+            'name': 'category',
+            'stoichiometry': 'category',
+            'sources': 'category',
+            'references': 'category',
+            'identifiers': 'category',
+        },
+        intercell = {
+            'category': 'category',
+            'uniprot': 'category',
+            'genesymbol': 'category',
+            'mainclass': 'category',
+            'class_type': 'category',
+        }
+    )
     
     
-    def __init__(self, a = 'hey', tbls = {
-            'interactions': 'omnipath_webservice_interactions.tsv',
-            'ptms': 'omnipath_webservice_ptms.tsv',
-            'annotations': 'omnipath_webservice_annotations.tsv',
-            'complexes': 'omnipath_webservice_complexes.tsv',
-            'intercell': 'omnipath_webservice_intercell.tsv',
-        }):
+    def __init__(
+            self,
+            input_files = None,
+        ):
+        """
+        Server based on ``pandas`` data frames.
+        
+        :param dict input_files:
+            Paths to tables exported by the ``pypath.websrvtab`` module.
+        """
         
         session_mod.Logger.__init__(self, name = 'server')
         
         self._log('TableServer starting up.')
         
-        self.tbls = tbls
+        self.input_files = copy.deepcopy(self.default_input_files)
+        self.input_files.update(input_files or {})
         self.data = {}
         self._read_tables()
         self._preprocess_interactions()
@@ -486,7 +560,7 @@ class TableServer(BaseServer):
         
         self._log('Loading data tables.')
         
-        for name, fname in iteritems(self.tbls):
+        for name, fname in iteritems(self.input_files):
             
             if not os.path.exists(fname):
                 
@@ -495,10 +569,13 @@ class TableServer(BaseServer):
                 )
                 continue
             
+            dtype = self.default_dtypes[name]
+            
             self.data[name] = pd.read_csv(
                 fname,
                 sep = '\t',
                 index_col = False,
+                dtype = dtype,
             )
             
             self._log(
@@ -567,7 +644,7 @@ class TableServer(BaseServer):
         
         self._log('Preprocessing intercell data.')
         tbl = self.data['intercell']
-        tbl.drop('full_name', axis = 1, inplace = True)
+        tbl.drop('full_name', axis = 1, inplace = True, errors = 'ignore')
     
     
     def _check_args(self, req):
@@ -773,8 +850,15 @@ class TableServer(BaseServer):
             return bad_req
         
         hdr = [
-            'source', 'target', 'is_directed', 'is_stimulation',
-            'is_inhibition', 'dip_url'
+            'source',
+            'target',
+            'is_directed',
+            'is_stimulation',
+            'is_inhibition',
+            'consensus_direction',
+            'consensus_stimulation',
+            'consensus_inhibition',
+            'dip_url',
         ]
         
         if b'source_target' in req.args:
@@ -901,13 +985,21 @@ class TableServer(BaseServer):
             
             tbl = tbl[
                 np.logical_not(tbl.tfregulons) |
-                (tbl.set_tfregulons_level & args['tfregulons_levels'])
+                [
+                    bool(levels & args['tfregulons_levels'])
+                    for levels in tbl.set_tfregulons_level
+                ]
             ]
         
         # filter by databases
         if args['databases']:
             
-            tbl = tbl[tbl.set_sources & args['databases']]
+            tbl = tbl[
+                [
+                    bool(sources & args['databases'])
+                    for sources in tbl.set_sources
+                ]
+            ]
         
         # filtering by TF Regulons methods
         if 'TF' in args['types'] and args['tfregulons_methods']:
@@ -1029,7 +1121,11 @@ class TableServer(BaseServer):
         # then we filter by enzyme and substrate
         # which matched against both standard names
         # and gene symbols
-        if args['enzymes'] and args['substrates'] and enzyme_substrate == 'OR':
+        if (
+            args['enzymes'] and
+            args['substrates'] and
+            enzyme_substrate == 'OR'
+        ):
             
             tbl = tbl[
                 tbl.substrate.isin(args['substrates']) |
@@ -1058,7 +1154,12 @@ class TableServer(BaseServer):
         # filter by databases
         if args['databases']:
             
-            tbl = tbl[tbl.set_sources & args['databases']]
+            tbl = tbl[
+                [
+                    bool(args['databases'] & sources)
+                    for sources in tbl.set_sources
+                ]
+            ]
         
         if req.args[b'fields']:
             
@@ -1164,7 +1265,12 @@ class TableServer(BaseServer):
             
             proteins = self._args_set(req, 'proteins')
             
-            tbl = tbl[tbl.uniprot.isin(proteins)]
+            tbl = tbl[
+                np.logical_or(
+                    tbl.uniprot.isin(proteins),
+                    tbl.genesymbol.isin(proteins),
+                )
+            ]
         
         tbl = tbl.loc[:,hdr]
         
@@ -1191,14 +1297,24 @@ class TableServer(BaseServer):
             
             databases = self._args_set(req, 'databases')
             
-            tbl = tbl = tbl[tbl.set_sources & databases]
+            tbl = tbl[
+                [
+                    bool(sources & databases)
+                    for sources in tbl.set_sources
+                ]
+            ]
         
         # filtering for proteins
         if b'proteins' in req.args:
             
             proteins = self._args_set(req, 'proteins')
             
-            tbl = tbl[tbl.set_proteins & proteins]
+            tbl = tbl[
+                [
+                    bool(this_proteins & proteins)
+                    for this_proteins in tbl.set_proteins
+                ]
+            ]
         
         tbl = tbl.loc[:,hdr]
         

@@ -655,10 +655,19 @@ class FileOpener(session_mod.Logger):
         self.fileobj.seek(-4, 2)
         self.size = struct.unpack('I', self.fileobj.read(4))[0]
         self.fileobj.seek(0)
-        self.gzfile = gzip.GzipFile(fileobj = self.fileobj, mode = 'rb')
+        self.gzfile = gzip.GzipFile(fileobj = self.fileobj)
+        
         # try:
         if self.large:
-            self.result = self.iterfile(self.gzfile)
+            self._gzfile_mode_r = io.TextIOWrapper(
+                self.gzfile,
+                encoding = self.encoding,
+            )
+            self.result = self.iterfile(
+                self.gzfile
+                    if self.default_mode == 'rb' else
+                self._gzfile_mode_r
+            )
             self._log(
                 'Result is an iterator over the '
                 'lines of `%s`.' % self.fileobj.name
@@ -784,7 +793,9 @@ class Curl(FileOpener):
             compr = None,
             encoding = None,
             files_needed = None,
-            timeout = 300,
+            connect_timeout = 300,
+            timeout = 2400,
+            ignore_content_length = False,
             init_url = None,
             init_fun = 'get_jsessionid',
             init_use_cache  =  False,
@@ -809,6 +820,7 @@ class Curl(FileOpener):
             process = True,
             retries = 3,
             cache_dir = None,
+            bypass_url_encoding = False,
         ):
         
         if not hasattr(self, '_logger'):
@@ -827,6 +839,7 @@ class Curl(FileOpener):
         self.local_file = os.path.exists(self.url)
         self.get = get
         self.force_quote = force_quote
+        self.bypass_url_encoding = bypass_url_encoding
         
         self._log(
             'Creating Curl object to retrieve '
@@ -854,6 +867,8 @@ class Curl(FileOpener):
 
         self.follow_http_redirect = follow
         self.timeout = timeout
+        self.connect_timeout = connect_timeout
+        self.ignore_content_length = ignore_content_length
         self.override_post = override_post
         self.retries = retries
         self.req_headers = req_headers or []
@@ -997,13 +1012,25 @@ class Curl(FileOpener):
         """
         From http://stackoverflow.com/a/121017/854988
         """
+        
+        if self.bypass_url_encoding:
+            
+            return
+        
         if type(self.url) is bytes:
+            
             self.url = self._bytes_to_unicode(self.url, encoding = charset)
+        
         scheme, netloc, path, qs, anchor = urlparse.urlsplit(self.url)
+        
         if self.force_quote or not self.is_quoted(path):
+            
             path = urllib.quote(path, '/%')
+            
         if self.force_quote or not self.is_quoted_plus(qs):
+            
             qs = urllib.quote_plus(qs, '& = ')
+            
         self.url = urlparse.urlunsplit((scheme, netloc, path, qs, anchor))
     
     
@@ -1106,7 +1133,14 @@ class Curl(FileOpener):
         self.set_url(url = url)
         self.curl.setopt(self.curl.SSL_VERIFYPEER, False)
         self.curl.setopt(self.curl.FOLLOWLOCATION, self.follow_http_redirect)
-        self.curl.setopt(self.curl.CONNECTTIMEOUT, self.timeout)
+        self.curl.setopt(self.curl.CONNECTTIMEOUT, self.connect_timeout)
+        self.curl.setopt(self.curl.TIMEOUT, self.timeout)
+        self.curl.setopt(self.curl.TCP_KEEPALIVE, 1)
+        self.curl.setopt(self.curl.TCP_KEEPIDLE, 2)
+        
+        if self.ignore_content_length:
+            
+            self.curl.setopt(self.curl.IGNORE_CONTENT_LENGTH, 136)
     
     
     def set_url(self, url = False):
@@ -1170,6 +1204,16 @@ class Curl(FileOpener):
                         % attempt)
                 self.curl.perform()
                 
+                self.target.flush()
+                
+                if os.stat(self.cache_file_name).st_size == 0:
+                    
+                    self._log(
+                        'Empty file retrieved, attempting downlad again'
+                    )
+                    
+                    continue
+                
                 if self.url.startswith('http'):
                     self.status = self.curl.getinfo(pycurl.HTTP_CODE)
                     if self.status == 200:
@@ -1194,6 +1238,9 @@ class Curl(FileOpener):
                 self.print_debug_info('ERROR',
                                       'PycURL error: %s' % str(e.args))
         if self.status != 200:
+            self.download_failed = True
+        if os.stat(self.cache_file_name).st_size == 0:
+            self.status = 500
             self.download_failed = True
         self.curl.close()
         self.target.close()
@@ -1410,7 +1457,13 @@ class Curl(FileOpener):
         if type(CACHE) is bool:
             self.cache = CACHE
         
-        if self.cache and os.path.exists(self.cache_file_name):
+        if (
+            self.cache and
+            os.path.exists(self.cache_file_name) and
+            # if the cache file is empty
+            # try to download again
+            os.stat(self.cache_file_name).st_size > 0
+        ):
             
             self._log('Cache file found, no need for download.')
             
@@ -1640,19 +1693,21 @@ class Curl(FileOpener):
         sys.stdout.write(self.sftp_ask)
         sys.stdout.flush()
         while True:
-            self.user = raw_input('\n\tUsername: ')
-            self.passwd = raw_input(
+            self.user = input('\n\tUsername: ')
+            self.passwd = input(
                 '\tPassword (leave empty if no password needed): ')
-            correct = raw_input('Are these details correct? '
+            correct = input('Are these details correct? '
                                 'User: `%s`, password: `%s` [Y/n]\n' %
                                 (self.user, self.passwd))
             if correct.lower().strip() not in ['', 'y', 'yes']:
                 continue
-            save = raw_input(
+            save = input(
                 'Do you wish to save your login details unencripted\n'
-                'to the following file, so you don\'t need to enter them next '
-                'time? File: %s\nSave login details [Y/n]' %
-                self.sftp_passwd_file)
+                'to the following file, so you don\'t '
+                'need to enter them next time? File: %s\n'
+                'Save login details [Y/n]' %
+                self.sftp_passwd_file
+            )
             break
         if save.lower().strip() in ['', 'y', 'yes']:
             with open(self.sftp_passwd_file, 'w') as f:
@@ -1661,30 +1716,44 @@ class Curl(FileOpener):
     
     def sftp_download(self):
         
-        self.sftp_ask = 'Please enter your login details for %s\n' % self.host \
-            if self.sftp_ask is None else self.sftp_ask
-        self.sftp_passwd_file = os.path.join('cache', '%s.login' % self.sftp_host) \
-            if self.sftp_passwd_file is None else self.sftp_passwd_file
+        self.sftp_ask = (
+            'Please enter your login details for %s\n' % self.host
+                if self.sftp_ask is None else
+            self.sftp_ask
+        )
+        self.sftp_passwd_file = (
+            os.path.join('cache', '%s.login' % self.sftp_host)
+                if self.sftp_passwd_file is None else
+            self.sftp_passwd_file
+        )
         if self.sftp_user is None:
             self.ask_passwd()
         while True:
-            self.sftp_passwd = None \
-                if self.sftp_passwd.strip() == '' \
-                else self.sftp_passwd
+            
+            self.sftp_passwd = self.sftp_passwd or None
+            cnopts = pysftp.CnOpts()
+            cnopts.hostkeys = None
+            
             with pysftp.Connection(
-                    host = self.sftp_host,
-                    username = self.sftp_user,
-                    password = self.sftp_passwd,
-                    port = self.sftp_port) as con:
+                host = self.sftp_host,
+                username = self.sftp_user,
+                password = self.sftp_passwd,
+                port = self.sftp_port,
+                cnopts = cnopts
+            ) as con:
+                
                 try:
+                    
                     con.get(self.sftp_filename, self.cache_file_name)
                     break
+                    
                 except IOError:
+                    
                     msg = 'Failed to get %s from %s\n'\
                         'Try again (1) || Enter new login details (2) '\
                         '|| Cancel (3) ?\n' % (
                             self.sftp_filename, self.sftp_host)
-                    whattodo = raw_input(msg)
+                    whattodo = input(msg)
                     if '1' in whattodo:
                         continue
                     if '2' in whattodo:

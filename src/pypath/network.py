@@ -20,6 +20,7 @@
 
 import imp
 import collections
+import itertools
 
 import pandas as pd
 
@@ -45,7 +46,7 @@ Interaction = collections.namedtuple(
 class Network(session_mod.Logger):
     
     
-    def __init__(self, records, hdr = None):
+    def __init__(self, records, dtypes = None, **kwargs):
         
         session_mod.Logger.__init__(self, name = 'network')
         
@@ -59,9 +60,15 @@ class Network(session_mod.Logger):
                 
                 records = list(records)
             
-            hdr = hdr or records[0]._fields
+            if 'columns' not in kwargs and hasattr(records[0], '_fields'):
+                
+                kwargs['columns'] = records[0]._fields
             
-            self.records = pd.DataFrame(records, columns = hdr)
+            self.records = pd.DataFrame(records, **kwargs)
+        
+        if dtypes:
+            
+            self.records = self.records.astype(dtypes)
     
     
     def reload(self):
@@ -82,4 +89,46 @@ class Network(session_mod.Logger):
         Creates an instance using a ``pypath.main.PyPath`` object.
         """
         
-        return cls(records = list(pa))
+        return cls(
+            records = list(pa),
+            dtypes = {
+                'id_a': 'category',
+                'id_b': 'category',
+                'type_a': 'category',
+                'type_b': 'category',
+                'effect': 'int8',
+            },
+        )
+    
+    
+    @property
+    def resources(self):
+        """
+        Returns a set of all resources.
+        """
+        
+        return set.union(*self.records.sources)
+    
+    
+    def entities_by_resource(self):
+        """
+        Returns a dict of sets with resources as keys and sets of entity IDs
+        as values.
+        """
+        
+        return dict(
+            (
+                resource,
+                set(
+                    itertools.chain(
+                        *self.records[
+                            [
+                                resource in resources
+                                for resources in self.records.sources
+                            ]
+                        ][['id_a', 'id_b']].values
+                    )
+                )
+            )
+            for resource in self.resources
+        )

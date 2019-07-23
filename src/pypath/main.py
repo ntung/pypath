@@ -1641,15 +1641,12 @@ class PyPath(session_mod.Logger):
         )
 
         if save:
-            sys.stdout.write('\t:: Saving igraph object to file `%s`...' %
-                             pfile)
-            sys.stdout.flush()
-            self.save_network()
-            sys.stdout.write(
-                '\r%s\r\t:: Network saved successfully to file `%s`.\n' %
-                (' ' * 90, pfile))
-            sys.stdout.flush()
-
+            
+            self._log('Saving igraph object to file `%s`...' % pfile)
+            self.save_network(pfile = pfile)
+            self._log('Network saved successfully to file `%s`.' % pfile)
+    
+    
     def save_network(self, pfile=None):
         """Saves the network object.
 
@@ -2643,110 +2640,8 @@ class PyPath(session_mod.Logger):
             self.data[param.name] = edge_list_mapped
 
         self.raw_data = edge_list_mapped
-
-
-    def load_list(self, lst, name): # XXX: Not used anywhere
-        """
-        Loads a custom list to the object's node data lists. See
-        :py:attr:`pypath.main.PyPath.lists` attribute for more
-        information.
-
-        :arg list lst:
-            The list containing the node names [str] from the given
-            category (*name*).
-        :arg str name:
-            The category or identifier for the list of nodes provided.
-        """
-
-        self.lists[name] = lst
-
-    def receptors_list(self):
-        """
-        Loads the Human Plasma Membrane Receptome as a list. This
-        resource is human only.
-        The list name is ``rec``.
-        """
-
-        self.lists['rec'] = common.uniqList(common.flatList([
-            mapping.map_name(rec, 'genesymbol', 'uniprot',
-                                 ncbi_tax_id = 9606)
-            for rec in dataio.get_hpmr()]))
-
-    def cspa_list(self):
-        """
-        Loads a list of cell surface proteins from the Cell Surface Protein
-        Atlas as a list. This resource is available for human and mouse.
-        The list name is ``cspa``.
-        """
-
-        self.lists['cspa'] = list(
-            dataio.get_cspa(organism = self.ncbi_tax_id)
-        )
-
-    def surfaceome_list(self, score_threshold = .0):
-        """
-        Loads a list of cell surface proteins from the In Silico Human
-        Surfaceome as a list. This resource is human only.
-        The list name is ``ishs``.
-        """
-
-        self.lists['ishs'] = [
-            uniprot
-            for uniprot, data in iteritems(dataio.get_surfaceome())
-            if data[0] >= score_threshold
-        ]
-
-    def druggability_list(self):
-        """
-        Loads the list of druggable proteins from DgiDB. This resource
-        is human only.
-        The list name is ``dgb``.
-        """
-
-        self.lists['dgb'] = common.uniqList(common.flatList([
-            mapping.map_name(dgb, 'genesymbol', 'uniprot', 9606)
-            for dgb in dataio.get_dgidb()]))
-
-    def kinases_list(self):
-        """
-        Loads the list of all known kinases in the proteome from
-        kinase.com. This resource is human only.
-        """
-
-        self.lists['kin'] = common.uniqList(common.flatList([
-            mapping.map_name(kin, 'genesymbol', 'uniprot', 9606)
-            for kin in dataio.get_kinases()]))
-
-    def tfs_list(self):
-        """
-        Loads the list of all known transcription factors from TF census
-        (Vaquerizas 2009). This resource is human only.
-        """
-
-        tfs = dataio.get_tfcensus()
-
-        utfs = [mapping.map_name(tf, 'ensembl', 'uniprot', 9606)
-                for tf in tfs['ensg']]
-        utfs += [mapping.map_name(h, 'genesymbol', 'uniprot', 9606)
-                 for h in tfs['hgnc']]
-
-        self.lists['tf'] = common.uniqList(common.flatList(utfs))
-
-    def disease_genes_list(self, dataset='curated'):
-        """
-        Loads the list of all disease related genes from DisGeNet. This
-        resource is human only.
-        """
-
-        diss = dataio.get_disgenet(dataset=dataset)
-        dis = []
-
-        for di in diss:
-            dis.extend(mapping.map_name(di['entrez'], 'entrez', 'uniprot',
-                                            9606))
-
-        self.lists['dis'] = common.uniqList(dis)
-
+    
+    
     def signaling_proteins_list(self):
         """
         Compiles a list of signaling proteins (as opposed to other
@@ -2784,19 +2679,6 @@ class PyPath(session_mod.Logger):
         upsig = spsig & set(self.lists['proteome'])
 
         self.lists['sig'] = list(upsig)
-
-    def proteome_list(self, swissprot=True):
-        """
-        Loads the whole proteome as a list.
-
-        :arg bool swissprot:
-            Optional, ``True`` by default. Determines whether to use
-            also the information from SwissProt.
-        """
-
-        swissprot = 'yes' if swissprot else None
-        self.lists['proteome'] = dataio.all_uniprots(self.ncbi_tax_id,
-                                                     swissprot=swissprot)
 
     def cancer_gene_census_list(self):
         """
@@ -2864,6 +2746,24 @@ class PyPath(session_mod.Logger):
             else set([])
 
         return len(set(self.graph.vs['name']) & lst) / float(len(lst))
+    
+    
+    def entities_by_resources(self):
+        """
+        Returns a dict of sets with resources as keys and sets of entity IDs
+        as values.
+        """
+        
+        results = collections.defaultdict(set)
+        
+        for v in self.graph.vs:
+            
+            for resource in v['sources']:
+                
+                result[resource].add(v['name'])
+        
+        return result
+    
 
     def fisher_enrichment(self, lst, attr, ref='proteome'):
         """
@@ -2906,6 +2806,7 @@ class PyPath(session_mod.Logger):
 
         return stats.fisher_exact(cont)
 
+
     def read_list_file(self, settings, **kwargs):
         """
         Reads a list from a file and adds it to
@@ -2944,11 +2845,12 @@ class PyPath(session_mod.Logger):
             _input = settings.input
 
         original_name_type = settings.id_type
-        default_name_type = self.default_name_type[settings.typ]
+        default_name_type = self.default_name_type[settings.entity_type]
         mapTbl = ''.join([original_name_type, "_", default_name_type])
 
         if type(_input) in common.charTypes and os.path.isfile(_input):
-            _input = curl.Curl(_input).result
+            
+            _input = curl.Curl(_input, large = True).result
 
             #codecs.open(_input, encoding='utf-8', mode='r')
 
@@ -2988,12 +2890,16 @@ class PyPath(session_mod.Logger):
 
                 # reading names and attributes
                 try:
-                    newItem = {"name": line[settings.id_col],
-                               "id_type": settings.id_type,
-                               "type": settings.typ,
-                               "source": settings.name}
+                    newItem = {
+                        "name": line[settings.id_col],
+                       "id_type": settings.id_type,
+                       "type": settings.entity_type,
+                       "source": settings.name
+                    }
 
                 except:
+                    
+                    print(line)
                     self._log(
                         'Wrong name column indexes (%u and %u), '
                         'or wrong separator (%s)? Line #%u' % (
@@ -4207,12 +4113,12 @@ class PyPath(session_mod.Logger):
             d.delete_vertices(list(set(toDel)))
 
         if not graph:
+            
             self.dgraph = d
             self._directed = self.dgraph
-
-        self._get_directed()
-        self._get_undirected()
-        self.update_vname()
+            self._get_directed()
+            self._get_undirected()
+            self.update_vname()
 
         self._log('Directed igraph object created.')
 
@@ -5763,6 +5669,7 @@ class PyPath(session_mod.Logger):
             rand_pathlen["header"] = ["path_len", "random"]
             self.write_table(rand_pathlen, "rand_pathlen", sep=";")
 
+
     def update_vertex_sources(self):
         """
         Updates the all the vertex attributes ``'sources'`` and
@@ -5778,6 +5685,7 @@ class PyPath(session_mod.Logger):
             for e in g.es:
                 g.vs[e.source][attr].update(e[attr])
                 g.vs[e.target][attr].update(e[attr])
+
 
     def set_categories(self):
         """
@@ -5817,7 +5725,8 @@ class PyPath(session_mod.Logger):
 
                     if s in e['refs_by_source']:
                         e['refs_by_cat'][cat].update(e['refs_by_source'][s])
-
+    
+    
     def basic_stats_intergroup(self, groupA, groupB, header=None): # TODO
         """
 
@@ -7104,6 +7013,7 @@ class PyPath(session_mod.Logger):
             f.write('\n\t<!-- edges -->\n\n')
 
             for e in g.es:
+                
                 f.write(
                     '<edge id="%s_%s" source="%s" target="%s" directed="%s">\n'
                     % (g.vs[e.source]['name'], g.vs[e.target]['name'],
@@ -7114,8 +7024,21 @@ class PyPath(session_mod.Logger):
                     '\t<data key="PubMedIDs">%s</data>\n' %
                     (';'.join(list(map(lambda r: r.pmid, e['references'])))))
     # XXX: attribute 'dirs_by_source' does not exist (nor created anywhere)
-                f.write('\t<data key="Undirected">%s</data>\n' %
-                        (';'.join(common.uniqList(e['dirs_by_source'][0]))))
+                f.write(
+                    '\t<data key="Undirected">%s</data>\n' % (
+                        ';'.join(sorted(
+                            e['dirs'].sources['undirected']
+                        ))
+                    )
+                )
+                
+                f.write(
+                    '\t<data key="DirectionAB">%s</data>\n' % (
+                        ';'.join(sorted(
+                            e['dirs'].sources[e['dirs'].straight]
+                        ))
+                    )
+                )
                 f.write('\t<data key="DirectionAB">%s</data>\n' %
                         (';'.join(common.uniqList(e['dirs_by_source'][1]))))
                 f.write('\t<data key="DirectionBA">%s</data>\n' %
@@ -8556,7 +8479,7 @@ class PyPath(session_mod.Logger):
             self.nodLab,
         )
 
-    def up_neighborhood(self, uniprot, order=1, mode='ALL'):
+    def up_neighborhood(self, uniprots, order = 1, mode = 'ALL'):
         """
         """
 
@@ -9617,9 +9540,17 @@ class PyPath(session_mod.Logger):
         if self.seq is None or update:
             self.seq = se.swissprot_seq(self.ncbi_tax_id, isoforms)
 
-    def load_ptms2(self, input_methods=None, map_by_homology_from=[9606],
-                   homology_only_swissprot=True, ptm_homology_strict=False,
-                   nonhuman_direct_lookup=True, inputargs={}):
+    def load_ptms2(
+            self,
+            input_methods = None,
+            map_by_homology_from = [9606],
+            homology_only_swissprot = True,
+            ptm_homology_strict = False,
+            nonhuman_direct_lookup = True,
+            inputargs = {},
+            database = None,
+            force_load = False,
+        ):
         """
         This is a new method which will replace `load_ptms`.
         It uses `pypath.ptm.PtmAggregator`, a newly introduced
@@ -9653,20 +9584,36 @@ class PyPath(session_mod.Logger):
             `{'Signor': {...}, 'PhosphoSite': {...}, ...}`.
             Those not used by `PtmProcessor` are forwarded to the
             `pypath.dataio` methods.
+        :param database:
+            A ``PtmAggregator`` object. If provided no new database will be
+            created.
+        :param bool force_load:
+            If ``True`` the database will be loaded with the parameters
+            provided here; otherwise if the ``ptm`` module already has a
+            database no new database will be created. This means the
+            parameters specified in other arguments might have no effect.
         """
-
-        ptma = pypath.ptm.PtmAggregator(
-            input_methods = input_methods,
-            ncbi_tax_id = self.ncbi_tax_id,
-            map_by_homology_from = map_by_homology_from,
-            # here we don't share the mapper as later many
-            # tables which we don't need any more would
-            # just occupy memory
-            homology_only_swissprot = homology_only_swissprot,
-            ptm_homology_strict = ptm_homology_strict,
-            nonhuman_direct_lookup = nonhuman_direct_lookup,
-            inputargs = inputargs
-        )
+        
+        if database:
+            
+            ptma = database
+            
+        else:
+            
+            method = 'init_db' if force_load else 'get_db'
+            
+            _ = getattr(pypath.ptm, 'method')(
+                input_methods = input_methods,
+                ncbi_tax_id = self.ncbi_tax_id,
+                map_by_homology_from = map_by_homology_from,
+                homology_only_swissprot = homology_only_swissprot,
+                ptm_homology_strict = ptm_homology_strict,
+                nonhuman_direct_lookup = nonhuman_direct_lookup,
+                inputargs = inputargs
+            )
+            
+            ptma = pypath.ptm.get_db()
+            
         ptma.assign_to_network(self)
 
         if self.ncbi_tax_id == 9606 and (
@@ -9826,7 +9773,12 @@ class PyPath(session_mod.Logger):
         for p in data:
             prg.step()
 
-            if p['kinase'] is not None and len(p['kinase']) > 0:
+            if (
+                p['kinase'] is not None and
+                not isinstance(p['kinase'], intera.Complex) and
+                not isinstance(p['substrate'], intera.Complex) and
+                len(p['kinase']) > 0
+            ):
 
                 # database specific id conversions
                 if source in ['PhosphoSite', 'phosphoELM', 'Signor']:
@@ -9858,8 +9810,13 @@ class PyPath(session_mod.Logger):
                         p['substrate'], 'genesymbol', 'uniprot')
 
                 if source == 'MIMP':
-                    substrate_ups_all += mapping.map_name(
-                        p['substrate_refseq'], 'refseq', 'uniprot')
+                    substrate_ups_all.update(
+                        mapping.map_name(
+                            p['substrate_refseq'],
+                            'refseq',
+                            'uniprot',
+                        )
+                    )
                     substrate_ups_all = list(set(substrate_ups_all))
 
                 if source in ['phosphoELM', 'dbPTM', 'PhosphoSite', 'Signor']:

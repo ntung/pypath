@@ -33,6 +33,7 @@ import pypath.network as network_mod
 import pypath.data_formats as data_formats
 import pypath.annot as annot
 import pypath.intercell as intercell
+import pypath.omnipath as omnipath
 
 
 CellPhoneDBGene = collections.namedtuple(
@@ -50,27 +51,20 @@ CellPhoneDBProtein = collections.namedtuple(
     'CellPhoneDBProtein',
     [
         'uniprot',
-        'adhesion',
-        'cytoplasm',
-        'entry_name',
-        'extracellular',
-        'integrin_interaction',
-        'other',
-        'other_desc',
-        'pdb_id',
-        'pdb_structure',
+        'protein_name',
+        'transmembrane',
         'peripheral',
-        'receptor',
-        'receptor_desc',
+        'secreted',
         'secreted_desc',
         'secreted_highlight',
-        'secretion',
-        'stoichiometry',
-        'tags_description',
-        'transmembrane',
-        'transporter',
+        'receptor',
+        'receptor_desc',
+        'integrin',
+        'other',
+        'other_desc',
         'tags',
         'tags_reason',
+        'tags_description',
     ],
 )
 
@@ -78,14 +72,12 @@ CellPhoneDBProtein = collections.namedtuple(
 CellPhoneDBInteraction = collections.namedtuple(
     'CellPhoneDBInteraction',
     [
-        'comments_interaction',
-        'dlrp',
-        'family',
-        'iuphar',
-        'multidata_name_1',
-        'multidata_name_2',
-        'score_1',
-        'score_2',
+        'id_cp_interaction',
+        'partner_a',
+        'partner_b',
+        'protein_name_a',
+        'protein_name_b',
+        'annotation_strategy',
         'source',
     ],
 )
@@ -94,27 +86,23 @@ CellPhoneDBInteraction = collections.namedtuple(
 CellPhoneDBComplex = collections.namedtuple(
     'CellPhoneDBComplex',
     [
-        'name',
+        'complex_name',
         'uniprot_1',
         'uniprot_2',
         'uniprot_3',
         'uniprot_4',
-        'adhesion',
-        'cytoplasm',
-        'extracellular',
-        'integrin_interaction',
-        'other',
-        'other_desc',
+        'transmembrane',
         'peripheral',
-        'receptor',
-        'receptor_desc',
+        'secreted',
         'secreted_desc',
         'secreted_highlight',
-        'secretion',
-        'transmembrane',
-        'transporter',
-        'pdb_structure',
+        'receptor',
+        'receptor_desc',
+        'integrin',
+        'other',
+        'other_desc',
         'pdb_id',
+        'pdb_structure',
         'stoichiometry',
         'comments_complex',
     ],
@@ -141,16 +129,22 @@ categories_receiver = {
 categories = categories_transmitter | categories_receiver
 
 
-class CellPhoneDB(session_mod.Logger):
+class CellPhoneDB(omnipath.OmniPath):
     
     def __init__(
             self,
             output_dir = None,
             network = None,
             annotation = None,
+            complexes = None,
+            intercell = None,
             network_param = None,
-            annot_param = None,
-            omnipath = False,
+            intercell_param = None,
+            use_omnipath = False,
+            network_pickle = None,
+            annotation_pickle = None,
+            intercell_pickle = None,
+            complex_pickle = None,
         ):
         
         if not hasattr(self, '_log_name'):
@@ -159,10 +153,25 @@ class CellPhoneDB(session_mod.Logger):
         
         self.output_dir = output_dir
         self.network = network
-        self.annotation = annotation
+        self.annot = annotation
+        self.complex = complexes
+        self.intercell = intercell
         self.network_param = network_param or {}
-        self.annot_param = annot_param or {}
-        self.omnipath = omnipath
+        self.intercell_param = intercell_param or {}
+        self.use_omnipath = use_omnipath
+        
+        omnipath.OmniPath.__init__(
+            self,
+            network_pickle = network_pickle,
+            annotation_pickle = annotation_pickle,
+            intercell_pickle = intercell_pickle,
+            complex_pickle = complex_pickle,
+            load_network = not self.network,
+            load_complexes = not self.complex,
+            load_annotations = not self.intercell and not self.annot,
+            load_intercell = not self.intercell,
+            load_enz_sub = False,
+        )
     
     
     def reload(self):
@@ -177,6 +186,7 @@ class CellPhoneDB(session_mod.Logger):
     
     def main(self):
         
+        omnipath.OmniPath.main(self)
         self.setup()
         self.build()
         self.export()
@@ -203,7 +213,7 @@ class CellPhoneDB(session_mod.Logger):
         setattr(
             self,
             '%s_path' % name,
-            os.path.join(self.output_dir, '%s.csv' % name),
+            os.path.join(self.output_dir, '%s_input.csv' % name),
         )
     
     
@@ -211,7 +221,7 @@ class CellPhoneDB(session_mod.Logger):
         
         if self.network is None:
             
-            if not self.omnipath and 'lst' not in self.network_param:
+            if not self.use_omnipath and 'lst' not in self.network_param:
                 
                 self.network_param['lst'] = data_formats.pathway
             
@@ -229,10 +239,10 @@ class CellPhoneDB(session_mod.Logger):
     
     def setup_annotation(self):
         
-        if self.annotation is None:
+        if self.intercell is None:
             
-            self.annotation = intercell.IntercellAnnotation(
-                **self.annot_param
+            self.intercell = intercell.IntercellAnnotation(
+                **self.intercell_param
             )
     
     
@@ -247,11 +257,30 @@ class CellPhoneDB(session_mod.Logger):
     
     def build_interaction(self):
         
+        
+        def get_id_name(entity):
+            
+            id_ = entity.__str__()
+            
+            name = (
+                id_
+                    if 'COMPLEX' in id_ else
+                mapping.map_name0(
+                    id_,
+                    'uniprot',
+                    'uniprot-entry',
+                )
+            )
+            
+            return id_, name
+        
+        
         iuphar = {'Guide2Pharma', 'Guide2Pharma_CP'}
         
         self._entities = set()
-        self.interaction = set()
+        self.cpdb_interaction = set()
         
+        int_id = 0
         for iaction in self.network.records.itertuples():
             
             if (
@@ -260,48 +289,56 @@ class CellPhoneDB(session_mod.Logger):
                 # is a receiver
                 iaction.directed and
                 (
-                    self.annotation.classes_by_entity(iaction.id_a) &
+                    self.intercell.classes_by_entity(iaction.id_a) &
                     categories_transmitter
                 ) and
                 (
-                    self.annotation.classes_by_entity(iaction.id_b) &
+                    self.intercell.classes_by_entity(iaction.id_b) &
                     categories_transmitter
                 )
             ) or (
                 # or it is indirected but both partners belong to the same
                 # intercellular communication role category
-                self.annotation.classes_by_entity(iaction.id_a) &
-                self.annotation.classes_by_entity(iaction.id_b) &
+                self.intercell.classes_by_entity(iaction.id_a) &
+                self.intercell.classes_by_entity(iaction.id_b) &
                 categories_transmitter
             ) or (
-                self.annotation.classes_by_entity(iaction.id_a) &
-                self.annotation.classes_by_entity(iaction.id_b) &
+                self.intercell.classes_by_entity(iaction.id_a) &
+                self.intercell.classes_by_entity(iaction.id_b) &
                 categories_receiver
             ):
                 
-                self.interaction.add(
+                id_a, name_a = get_id_name(iaction.id_a)
+                id_b, name_b = get_id_name(iaction.id_b)
+                
+                self.cpdb_interaction.add(
                     CellPhoneDBInteraction(
-                        comments_interaction = '',
-                        dlrp = False, # we don't have this info
-                        family = '',
-                        iuphar = bool(iaction.sources & iuphar),
-                        multidata_name_1 = iaction.id_a.__str__(),
-                        multidata_name_2 = iaction.id_b.__str__(),
-                        score_1 = '',
-                        score_2 = '',
-                        source = ';'.join(sorted(iaction.sources)),
+                        id_cp_interaction = 'CPI-%06u' % int_id,
+                        partner_a = id_a,
+                        partner_b = id_b,
+                        protein_name_a = name_a,
+                        protein_name_b = name_b,
+                        annotation_strategy = (
+                            'OmniPath,%s' % ','.join(sorted(iaction.sources))
+                        ),
+                        source = ','.join(
+                            'PMID: %s' % pmid
+                            for pmid in sorted(iaction.references)
+                        ),
                     )
                 )
                 
                 self._entities.add(iaction.id_a)
                 self._entities.add(iaction.id_b)
+                
+                int_id += 1
     
     
     def build_protein(self):
         
         integrins = annot.db.annots['Integrins']
         
-        self.protein = set()
+        self.cpdb_protein = set()
         
         for entity in self._entities:
             
@@ -317,36 +354,29 @@ class CellPhoneDB(session_mod.Logger):
             
             for comp in components:
                 
-                classes = self.annotation.classes_by_entity(comp)
+                classes = self.intercell.classes_by_entity(comp)
                 
-                self.protein.add(
+                self.cpdb_protein.add(
                     CellPhoneDBProtein(
                         uniprot = comp.__str__(),
-                        adhesion = 'adhesion' in classes,
-                        cytoplasm = 'intracellular' in classes,
-                        entry_name = mapping.map_name0(
+                        protein_name = mapping.map_name0(
                             comp,
                             'uniprot',
                             'uniprot-entry',
                         ),
-                        extracellular = 'extracellular' in classes,
-                        integrin_interaction = comp in integrins,
-                        other = '',
-                        other_desc = '',
-                        pdb_id = '',
-                        pdb_structure = '',
+                        transmembrane = 'transmembrane' in classes,
                         peripheral = 'cell_surface' in classes,
-                        receptor = 'receptor' in classes,
-                        receptor_desc = '',
+                        secreted = 'secreted' in classes,
                         secreted_desc = '',
                         secreted_highlight = '',
-                        secretion = 'secreted' in classes,
-                        stoichiometry = '',
-                        tags_description = '',
-                        transmembrane = 'transmembrane' in classes,
-                        transporter = 'transporter' in classes,
+                        receptor = 'receptor' in classes,
+                        receptor_desc = '',
+                        integrin = comp in integrins,
+                        other = '',
+                        other_desc = '',
                         tags = '',
                         tags_reason = '',
+                        tags_description = '',
                     )
                 )
     
@@ -357,9 +387,10 @@ class CellPhoneDB(session_mod.Logger):
             
             return components[idx] if len(components) > idx else ''
         
+        
         integrins = annot.db.annots['Integrins']
         
-        self.complex = set()
+        self.cpdb_complex = set()
         
         for entity in self._entities:
             
@@ -370,35 +401,31 @@ class CellPhoneDB(session_mod.Logger):
             # hey, what to do with complexes with more than 4 components???
             components = sorted(entity.components.keys())
             
-            classes = self.annotation.classes_by_entity(entity)
+            classes = self.intercell.classes_by_entity(entity)
             
-            self.complex.add(
+            self.cpdb_complex.add(
                 CellPhoneDBComplex(
-                    name = entity.__str__(),
+                    complex_name = entity.__str__(),
                     uniprot_1 = get_component(components, 0),
                     uniprot_2 = get_component(components, 1),
                     uniprot_3 = get_component(components, 2),
                     uniprot_4 = get_component(components, 3),
-                    adhesion = 'adhesion' in classes,
-                    cytoplasm = 'intracellular' in classes,
-                    extracellular = 'extracellular' in classes,
-                    integrin_interaction = entity in integrins,
-                    other = '',
-                    other_desc = '',
+                    transmembrane = 'transmembrane' in classes,
                     peripheral = 'cell_surface' in classes,
-                    receptor = 'receptor' in classes,
-                    receptor_desc = '',
+                    secreted = 'secreted' in classes,
                     secreted_desc = '',
                     secreted_highlight = '',
-                    secretion = 'secreted' in classes,
-                    transmembrane = 'transmembrane' in classes,
-                    transporter = 'transporter' in classes,
-                    pdb_structure = '',
+                    receptor = 'receptor' in classes,
+                    receptor_desc = '',
+                    integrin = entity in integrins,
+                    other = '',
+                    other_desc = '',
                     pdb_id = (
                         ';'.join(sorted(entity.ids['PDB']))
                             if 'PDB' in entity.ids else
                         ''
                     ),
+                    pdb_structure = '',
                     stoichiometry = entity.stoichiometry_str_genesymbols,
                     comments_complex = '',
                 )
@@ -407,7 +434,7 @@ class CellPhoneDB(session_mod.Logger):
     
     def build_gene(self):
         
-        self.gene = set()
+        self.cpdb_gene = set()
         
         for entity in self._entities:
             
@@ -428,7 +455,7 @@ class CellPhoneDB(session_mod.Logger):
                 
                 for ensembl in ensembl_genes:
                     
-                    self.gene.add(
+                    self.cpdb_gene.add(
                         CellPhoneDBGene(
                             gene_name = name,
                             uniprot = comp,
@@ -442,7 +469,7 @@ class CellPhoneDB(session_mod.Logger):
         
         for name in ('interaction', 'protein', 'complex', 'gene'):
             
-            data = list(getattr(self, name))
+            data = list(getattr(self, 'cpdb_%s' % name))
             columns = globals()['CellPhoneDB%s' % name.capitalize()]._fields
             
             setattr(
@@ -492,3 +519,9 @@ class CellPhoneDB(session_mod.Logger):
     def export_interaction(self):
         
         self._export('interaction')
+
+
+# example:
+# IL12 receptor: 'COMPLEX:P42701-Q99665'
+# IL12 ligand: 'COMPLEX:P29459-P29460'
+# 

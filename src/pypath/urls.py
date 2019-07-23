@@ -524,7 +524,7 @@ urls = {
         'pathology': 'http://www.proteinatlas.org/download/pathology.tsv.zip',
         'subcell': 'https://www.proteinatlas.org/download/'\
             'subcellular_location.tsv.zip',
-        
+
     },
     'lincs-compounds': {
         'label':
@@ -587,10 +587,9 @@ urls = {
     },
     'disgenet': {
         'label': 'Disease-gene associations',
-        'url':
-        'http://www.disgenet.org/ds/DisGeNET/results/'\
-            '%s_gene_disease_associations.tsv.gz',
-        'datasets': ['curated', 'literature', 'befree', 'all']
+        'url': 'http://www.disgenet.org/static/disgenet_ap1/files/'\
+            'downloads/%s_gene_disease_associations.tsv.gz',
+        'datasets': ['curated', 'literature', 'befree', 'all'],
     },
     'hsn': {
         'label': 'The Wang Human Signaling Network',
@@ -628,6 +627,11 @@ urls = {
         'url':
         'http://kinase.com/static/colt/data/human/kinome/tables/'\
             'Kincat_Hsap.08.02.xls'
+    },
+    'phosphatome': {
+        'label': 'List of human and other phosphatases',
+        'url': 'https://stke.sciencemag.org/highwire/filestream/210607/'\
+            'field_highwire_adjunct_files/2/aag1796_Tables_S1_to_S23.zip',
     },
     'dgidb': {
         'label': 'Druggable genes compiled from multiple resources',
@@ -720,7 +724,9 @@ urls = {
     'cgc': {
         'label': 'Cancer Gene Census: list of cancer related (driver) genes',
         'host': 'sftp-cancer.sanger.ac.uk',
-        'file': '/files/grch38/cosmic/v76/cancer_gene_census.csv'
+        'file': '/files/grch38/cosmic/v76/cancer_gene_census.csv',
+        'url_new': 'https://cancer.sanger.ac.uk/cosmic/file_download/'\
+            'GRCh38/cosmic/v89/cancer_gene_census.csv',
     },
     'havugimana': {
         'label': 'Census of human soluble protein complexes',
@@ -899,17 +905,16 @@ urls = {
     'cellphonedb_git': {
         'label': 'Intercellular communication database from Teichmann lab',
         'proteins': 'https://raw.githubusercontent.com/Teichlab/'\
-            'cellphonedb/master/cellphonedb/src/core/data/protein.csv',
+            'cellphonedb/master/cellphonedb/src/core/data/protein_input.csv',
         'complexes': 'https://raw.githubusercontent.com/Teichlab/'\
-            'cellphonedb/master/cellphonedb/src/core/data/complex.csv',
+            'cellphonedb/master/cellphonedb/src/core/data/complex_input.csv',
         'interactions': 'https://raw.githubusercontent.com/Teichlab/'\
-            'cellphonedb/master/cellphonedb/src/core/data/interaction.csv',
+            'cellphonedb/master/cellphonedb/src/core/data/'\
+            'interaction_input.csv',
         'curated': 'https://raw.githubusercontent.com/Teichlab/'\
-            'cellphonedb/master/cellphonedb/tools/data/'\
-            'interaction_curated_20180729.csv',
+            'cellphonedb-data/data/sources/interaction_curated.csv',
         'negative': 'https://raw.githubusercontent.com/Teichlab/'\
-            'cellphonedb/master/cellphonedb/tools/data/'\
-            'remove_interactions_20180330.csv',
+            'cellphonedb-data/master/data/sources/excluded_interaction.csv',
     },
     'stitch': {
         'label': 'The STITCH small molecule-protein interaction database',
@@ -1012,6 +1017,16 @@ urls = {
         'label': 'Literature curated regulator-pathway-cancer relationships',
         'url': 'http://bio-bigdata.hrbmu.edu.cn/CPAD/download/CPAD-data.txt',
     },
+    'compartments': {
+        'label': 'Compartments subcellular localization database',
+        'url': 'http://download.jensenlab.org/%s_compartment_%s_full.tsv',
+    },
+    'intogen': {
+        'label': 'IntOGen is a database of cancer related '\
+            'genes and mutations',
+        'drivers_url': 'https://www.intogen.org/repository/downloads/'\
+            'intogen_cancer_drivers-2014.12.zip',
+    }
 }
 
 files = {
