@@ -6138,37 +6138,7 @@ def guide2pharma_complexes(**kwargs):
     return complexes
 
 
-def _cellphonedb_ligands_receptors_old():
-    """
-    Retrieves the set of ligands and receptors from CellPhoneDB.
-    Returns tuple of sets.
-    """
-
-    receptors = set()
-    ligands   = set()
-
-    url = urls.urls['cellphonedb']['proteins']
-
-    c = curl.Curl(url, large = True)
-
-    _ = next(c.result)
-
-    for l in c.result:
-
-        l = l.strip().split(',')
-
-        if l[2] == 'True' or l[4] == 'True':
-
-            receptors.add(_cellphonedb_get_uniprot(l[0]))
-
-        if l[3] == 'True':
-
-            ligands.add(_cellphonedb_get_uniprot(l[0]))
-
-    return ligands, receptors
-
-
-def _cellphonedb_ligands_receptors_old():
+def cellphonedb_ligands_receptors():
     """
     Retrieves the set of ligands and receptors from CellPhoneDB.
     Returns tuple of sets.
@@ -6181,7 +6151,7 @@ def _cellphonedb_ligands_receptors_old():
     complexes = cellphonedb_complex_annotations()
     
     for _id, annot in itertools.chain(
-        iteritems(protein),
+        iteritems(proteins),
         iteritems(complexes)
     ):
         
@@ -6197,6 +6167,8 @@ def _cellphonedb_ligands_receptors_old():
         ):
             
             ligands.add(_id)
+    
+    return ligands, receptors
 
 
 def _cellphonedb_annotations(url, name_method):
@@ -6228,168 +6200,62 @@ def _cellphonedb_annotations(url, name_method):
     tab = list(csv.DictReader(c.result))
 
     for rec in tab:
-
-        annot[name_method(rec)] = record(
-            receptor = get_desc(rec, 'receptor'),
-            adhesion = get_bool(rec, 'adhesion'),
-            cytoplasm = get_bool(rec, 'cytoplasm'),
-            peripheral = get_bool(rec, 'peripheral'),
-            secretion = get_bool(rec, 'secretion'),
-            secreted = get_desc(rec, 'secreted'),
-            transporter = get_bool(rec, 'transporter'),
-            transmembrane = get_bool(rec, 'transmembrane'),
-            extracellular = get_bool(rec, 'extracellular'),
-            integrin = get_bool(rec, 'integrin_interaction'),
-        )
+        
+        names = name_method(rec)
+        
+        if isinstance(names, (common.basestring, intera.Complex)):
+            
+            names = (names,)
+        
+        for name in names:
+            
+            annot[name] = record(
+                receptor = get_desc(rec, 'receptor'),
+                adhesion = get_bool(rec, 'adhesion'),
+                cytoplasm = get_bool(rec, 'cytoplasm'),
+                peripheral = get_bool(rec, 'peripheral'),
+                secretion = get_bool(rec, 'secretion'),
+                secreted = get_desc(rec, 'secreted'),
+                transporter = get_bool(rec, 'transporter'),
+                transmembrane = get_bool(rec, 'transmembrane'),
+                extracellular = get_bool(rec, 'extracellular'),
+                integrin = get_bool(rec, 'integrin_interaction'),
+            )
 
     return annot
 
 
 def cellphonedb_protein_annotations():
-
+    
+    def name_method(rec):
+        
+        uniprot = rec['uniprot']
+        uniprot = _cellphonedb_hla(uniprot)
+        
+        return uniprot
+    
+    
     return _cellphonedb_annotations(
         url = urls.urls['cellphonedb_git']['proteins'],
-        name_method = lambda rec: rec['uniprot'],
-    )
-
-
-def cellphonedb_complex_annotations():
-
-    def name_method(rec):
-
-        return '-'.join(sorted(
-            uniprot
-            for uniprot in
-            (rec['uniprot_%u' % i] for i in xrange(1, 5))
-            if uniprot
-        ))
-
-
-    return _cellphonedb_annotations(
-        url = urls.urls['cellphonedb_git']['complexes'],
         name_method = name_method,
     )
 
 
-def _cellphonedb_get_uniprot(uniprot):
-
-    if ':' in uniprot:
-
-        uniprot = uniprot.split(':')[1]
-
-    if '_' in uniprot:
-
-        uniprot = mapping.map_name0(uniprot, 'uniprot-entry', 'uniprot')
-
-    return uniprot
-
-
-def cellphonedb_interactions(
-        ligand_receptor = True,
-        receptor_receptor = True,
-        ligand_ligand = True,
-    ):
-
-    repmid = re.compile(r'PMID: ([0-9]+)')
+def _cellphonedb_hla(uniprot):
+    
+    uniprots = None
+    
+    if uniprot.startswith('HLA') and '-' not in uniprot:
+        
+        genesymbol = 'HLA-%s' % uniprot[3:]
+        uniprots = mapping.map_name(genesymbol, 'genesymbol', 'uniprot')
+    
+    return uniprots or uniprot
 
 
-    ligands, receptors = cellphonedb_ligands_receptors()
-
-    url = urls.urls['cellphonedb']['interactions']
-
-    c = curl.Curl(url, silent = False, large = True)
-
-    _ = next(c.result)
-
-    for l in c.result:
-
-        l = l.strip().split(',')
-
-        if l[2][:6] != 'simple' or l[3][:6] != 'simple':
-
-            continue
-
-        uniprot1 = _cellphonedb_get_uniprot(l[2])
-        uniprot2 = _cellphonedb_get_uniprot(l[3])
-
-        sources = (
-            'CellPhoneDB'
-                if l[1] == 'curated' else
-            '%s;CellPhoneDB' % (
-                l[1].replace('guidetopharmacology.org', 'Guide2Pharma_CP')
-            )
-        )
-        refs   = ';'.join(repmid.findall(l[8]))
-
-        if uniprot1 in ligands and uniprot2 in receptors:
-
-            yield (
-                uniprot1,
-                uniprot2,
-                sources,
-                refs,
-                'ligand-receptor',
-                'ligand',
-                'receptor',
-            )
-
-        if uniprot2 in ligands and uniprot1 in receptors:
-
-            yield (
-                uniprot2,
-                uniprot1,
-                sources,
-                refs,
-                'ligand-receptor',
-                'ligand',
-                'receptor',
-            )
-
-    if not ligand_ligand and not receptor_receptor:
-
-        return
-
-    url = urls.urls['cellphonedb']['heterodimers']
-
-    c = curl.Curl(url, silent = False, large = True)
-
-    _ = next(c.result)
-
-    for l in c.result:
-
-        l = l.strip().split(',')
-
-        uniprot1 = _cellphonedb_get_uniprot(l[11])
-        uniprot2 = _cellphonedb_get_uniprot(l[16])
-
-        if receptor_receptor and (l[1] == 'True' or l[3] == 'True'):
-
-            yield (
-                uniprot1,
-                uniprot2,
-                'CellPhoneDB',
-                '',
-                'receptor-receptor',
-                'receptor',
-                'receptor',
-            )
-
-        if ligand_ligand and l[2] == 'True':
-
-            yield (
-                uniprot1,
-                uniprot2,
-                'CellPhoneDB',
-                '',
-                'ligand-ligand',
-                'ligand',
-                'ligand',
-            )
-
-
-def cellphonedb_complexes():
-
-
+def cellphonedb_complex_annotations():
+    
+    
     def get_uniprots(rec):
 
         return tuple(
@@ -6410,18 +6276,10 @@ def cellphonedb_complexes():
             mapping.map_name0(genesymbol, 'genesymbol', 'uniprot')
             for genesymbol in rec['stoichiometry'].split(';')
         )
-
-
-    url = urls.urls['cellphonedb_git']['complexes']
-    c = curl.Curl(url, silent = False, large = True)
-    tab = list(csv.DictReader(c.result))
-
-    annot = cellphonedb_complex_annotations()
-
-    complexes = {}
-
-    for rec in tab:
-
+    
+    
+    def name_method(rec):
+        
         comp = get_stoichiometry(rec)
 
         cplex = intera.Complex(
@@ -6430,7 +6288,142 @@ def cellphonedb_complexes():
             sources = 'CellPhoneDB',
             ids = rec['complex_name'],
         )
+        
+        return cplex
 
+
+    return _cellphonedb_annotations(
+        url = urls.urls['cellphonedb_git']['complexes'],
+        name_method = name_method,
+    )
+
+
+def _cellphonedb_get_entity(name, complexes):
+    
+    if name in complexes:
+        
+        return (complexes[name],)
+    
+    if ':' in name:
+
+        name = name.split(':')[1]
+
+    if '_' in name:
+
+        name = mapping.map_name0(name, 'name-entry', 'name')
+        
+    if not uniprot_input.is_uniprot(name):
+        
+        uniprot = mapping.map_name0(name, 'genesymbol', 'uniprot')
+        
+        name = uniprot or name
+    
+    name = _cellphonedb_hla(name)
+
+    return (name,) if isinstance(name, common.basestring) else name
+
+
+def cellphonedb_interactions():
+    
+    
+    def get_type(entity):
+        
+        return (
+            'ligand'
+                if entity in ligands else
+            'receptor'
+                if entity in receptors else
+            'unknown'
+        )
+    
+    
+    CellphonedbInteraction = collections.namedtuple(
+        'CellphonedbInteraction',
+        [
+            'id_a',
+            'id_b',
+            'sources',
+            'references',
+            'interaction_type',
+            'type_a',
+            'type_b',
+        ]
+    )
+
+
+    repmid = re.compile(r'PMID: ([0-9]+)')
+
+
+    ligands, receptors = cellphonedb_ligands_receptors()
+    complexes = dict(
+        (
+            _id,
+            cplex
+        )
+        for cplex in cellphonedb_complexes().values()
+        for _id in cplex.ids['CellPhoneDB']
+    )
+
+    url = urls.urls['cellphonedb_git']['interactions']
+
+    c = curl.Curl(url, silent = False, large = True)
+
+    reader = csv.DictReader(c.result)
+
+    for rec in reader:
+        
+        _partner_a = _cellphonedb_get_entity(
+            rec['partner_a'],
+            complexes = complexes,
+        )
+        _partner_b = _cellphonedb_get_entity(
+            rec['partner_b'],
+            complexes = complexes,
+        )
+        
+        for partner_a, partner_b in itertools.product(_partner_a, _partner_b):
+            
+            type_a = get_type(partner_a)
+            type_b = get_type(partner_b)
+            rev = partner_b == 'ligand' and partner_b == 'receptor'
+            _type_a = type_b if rev else type_a
+            _type_b = type_a if rev else type_b
+
+            sources = (
+                'CellPhoneDB'
+                    if rec['annotation_strategy'] == 'curated' else
+                '%s;CellPhoneDB' % (
+                    rec['annotation_strategy'].replace(
+                        'guidetopharmacology.org',
+                        'Guide2Pharma_CP'
+                    )
+                )
+            )
+            refs   = ';'.join(repmid.findall(rec['source']))
+            
+            type_b if rev else type_b
+            
+            yield(
+                CellphonedbInteraction(
+                    id_a = partner_b if rev else partner_a,
+                    id_b = partner_a if rev else partner_b,
+                    sources = sources,
+                    references = refs,
+                    interaction_type = '%s-%s' % (_type_a, _type_b),
+                    type_a = _type_a,
+                    type_b = _type_b,
+                )
+            )
+
+
+def cellphonedb_complexes():
+
+    annot = cellphonedb_complex_annotations()
+
+    complexes = {}
+    
+    for cplex in annot.keys():
+        
         key = cplex.__str__()
 
         if key in annot:
@@ -6449,6 +6442,7 @@ def open_pubmed(pmid):
     @pmid : str or int
         PubMed ID
     """
+    
     pmid = str(pmid)
     url = urls.urls['pubmed']['url'] % pmid
     webbrowser.open(url)
@@ -6665,7 +6659,7 @@ def load_lmpid(fname = 'LMPID_DATA_pubmed_ref.xml', organism = 9606):
     with open(os.path.join(common.ROOT, 'data', fname), 'r') as f:
         data = f.read()
     soup = bs4.BeautifulSoup(data, 'html.parser')
-    uniprots = uniprot_input.all_uniprots(organism = organism, swissprot = None)
+    uniprots = uniprot_input.get_db(organism = organism, swissprot = None)
     prg = progress.Progress(
         len(soup.find_all('record')), 'Processing data from LMPID', 21)
     for rec in soup.find_all('record'):
@@ -10948,7 +10942,35 @@ def get_tfregulons(
 
     For details see https://github.com/saezlab/DoRothEA.
     """
-
+    
+    evidence_types = (
+        'chipSeq',
+        'TFbindingMotif',
+        'coexpression',
+        'curateddatabase'
+    )
+    
+    DorotheaInteraction = collections.namedtuple(
+        'DorotheaInteraction',
+        [
+            'tf',
+            'target',
+            'effect',
+            'level',
+            'curated',
+            'chipseq',
+            'predicted',
+            'coexp',
+            'curated_sources',
+            'chipseq_sources',
+            'predicted_sources',
+            'coexp_sources',
+            'all_sources',
+            'pubmed',
+            'kegg_pathways',
+        ]
+    )
+    
     url = urls.urls['tfregulons_git']['url']
 
     c = curl.Curl(
@@ -10958,37 +10980,67 @@ def get_tfregulons(
         files_needed = ['database.csv'],
     )
 
-    _ = c.result['database.csv'].readline()
+    reader = csv.DictReader(c.result['database.csv'])
 
-    for l in c.result['database.csv']:
-
-        l = csv_sep_change(l, ',', '%&%&%&')
-
-        l = l.replace('"', '').strip('\n\r').split('%&%&%&')
+    for rec in reader:
 
         # process only the ones of the requested levels or if curated
-        if l[3] not in levels and not (only_curated and ll[4] == 'TRUE'):
+        if (
+            rec['score'] not in levels and
+            not (
+                only_curated and
+                rec['is_evidence_curateddatabase'] == 'TRUE'
+            )
+        ):
 
             continue
+        
+        rec = dict(
+            (k, v if v not in {'-', 'none'} else '')
+            for k, v in iteritems(rec)
+        )
+        
+        yield DorotheaInteraction(
+            **dict(zip(
+                DorotheaInteraction._fields,
+                itertools.chain(
+                    # TF, target, effect, score
+                    (
+                        rec[key] for key in 
+                        ('TF', 'target', 'effect', 'score')
+                    ),
+                    # boolean values for curated, chipseq, motif pred. and coexp
+                    (
+                        rec['is_evidence_%s' % key] == 'TRUE'
+                        for key in evidence_types
+                    ),
+                    # databases & datasets
+                    (
+                        rec['which_%s' % key]
+                        for key in evidence_types
+                    ),
+                    # all data sources (or only the curated ones)
+                    (
+                        (
+                            ','.join(
+                            rec[key]
+                                for key in
+                                ('which_%s' % evt for evt in evidence_types)
+                                if rec[key]
+                            )
+                                if not only_curated else
+                            rec['which_curateddatabase']
+                        ),
+                    ),
+                    # PubMed and KEGG pw
+                    (
+                        rec['pubmedID_from_curated_resources'],
+                        rec['kegg_pathway'],
+                    )
+                )
+            ))
+        )
 
-        l = tuple(f if f not in  {'-', 'none'} else '' for f in l)
-
-        yield list(itertools.chain(
-            # TF, target, effect, score
-            l[:4],
-            # boolean values for curated, chipseq, motif pred. and coexp
-            (s == 'TRUE' for s in l[4:8]),
-            # databases & datasets
-            l[-6:-2],
-            # all data sources (or only the curated ones)
-            (
-                ','.join(s for s in l[-6:-2] if s)
-                    if not only_curated else
-                l[-3],
-            ),
-            # PubMed and KEGG pw
-            l[-2:],
-        ))
 
 def stitch_interactions(threshold = None):
 
