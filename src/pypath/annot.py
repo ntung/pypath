@@ -162,8 +162,7 @@ class CustomAnnotation(session_mod.Logger):
     :var str pickle_file:
         The path to an annotation classes pickle file.
     :var str annotdb_pickle_file:
-        Optional, ``None`` by default. Path to the annotation database
-        pickle file.
+        Path to the annotation database pickle file.
     :var pypath.annot.AnnotationTable annotdb:
         An instance of the annotation table class. Loads, contains and
         manages the annotation data.
@@ -172,20 +171,15 @@ class CustomAnnotation(session_mod.Logger):
         their role.
     """
 
-    def __init__(
-            self,
-            class_definitions = None,
-            pickle_file = None,
-            annotdb_pickle_file = None,
-        ):
+    def __init__(self, class_definitions=None, pickle_file=None,
+                 annotdb_pickle_file=None):
 
         if not hasattr(self, '_log_name'):
-
-            session_mod.Logger.__init__(self, name = 'annot')
+            session_mod.Logger.__init__(self, name='annot')
 
         self.pickle_file = pickle_file
         self.annotdb_pickle_file = annotdb_pickle_file
-        self.annotdb = get_db(pickle_file = self.annotdb_pickle_file)
+        self.annotdb = get_db(pickle_file=self.annotdb_pickle_file)
 
         self._class_definitions = {}
         self.add_class_definitions(class_definitions or {})
@@ -200,7 +194,7 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         modname = self.__class__.__module__
-        mod = __import__(modname, fromlist = [modname.split('.')[0]])
+        mod = __import__(modname, fromlist=[modname.split('.')[0]])
         imp.reload(mod)
         new = getattr(mod, self.__class__.__name__)
         setattr(self, '__class__', new)
@@ -216,7 +210,6 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         if not isinstance(class_definitions, dict):
-
             class_definitions = dict(
                 (
                     classdef.name,
@@ -227,7 +220,7 @@ class CustomAnnotation(session_mod.Logger):
         self._class_definitions.update(class_definitions)
 
 
-    def populate_classes(self, update = False):
+    def populate_classes(self, update=False):
         """
         Creates a classification of proteins according to their roles
         in the intercellular communication. Loads from pickle
@@ -239,14 +232,12 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         if self.pickle_file:
-
-            self.load_from_pickle(pickle_file = self.pickle_file)
+            self.load_from_pickle(pickle_file=self.pickle_file)
             return
 
         for classdef in self._class_definitions.values():
 
             if classdef.name not in self.classes or update:
-
                 self.create_class(classdef)
 
 
@@ -259,7 +250,6 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         with open(pickle_file, 'rb') as fp:
-
             self.classes = pickle.load(fp)
 
 
@@ -272,11 +262,7 @@ class CustomAnnotation(session_mod.Logger):
         """
 
         with open(pickle_file, 'wb') as fp:
-
-            pickle.dump(
-                obj = self.classes,
-                file = fp,
-            )
+            pickle.dump(obj=self.classes, file=fp)
 
 # XXX: Double-check!
     def create_class(self, classdef):
@@ -313,21 +299,16 @@ class CustomAnnotation(session_mod.Logger):
             if classdef.source in self.annotdb.annots:
 
                 if not classdef.args:
-
                     return self.annotdb.annots[classdef.source].to_set()
 
                 else:
-
                     return self.annotdb.annots[classdef.source].get_subset(
-                        **classdef.args
-                    )
+                        **classdef.args)
 
         elif callable(classdef.source):
-
             return classdef.source(**(classdef.args or {}))
 
         elif isinstance(classdef.source, annot_formats.AnnotOp):
-
             return self._execute_operation(classdef.source)
 
         return set()
