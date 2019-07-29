@@ -191,25 +191,6 @@
 <span class="p">)</span>
 
 
-<span class="n">resource_labels</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;opm&#39;</span><span class="p">:</span> <span class="s1">&#39;OPM&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;guide2pharma&#39;</span><span class="p">:</span> <span class="s1">&#39;Guide to Pharm.&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;adhesome&#39;</span><span class="p">:</span> <span class="s1">&#39;Adhesome&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;matrixdb&#39;</span><span class="p">:</span> <span class="s1">&#39;MatrixDB&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;go&#39;</span><span class="p">:</span> <span class="s1">&#39;Gene Ontology&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;hpmr&#39;</span><span class="p">:</span> <span class="s1">&#39;HPMR&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cellphonedb&#39;</span><span class="p">:</span> <span class="s1">&#39;CellPhoneDB&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;comppi&#39;</span><span class="p">:</span> <span class="s1">&#39;ComPPI&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;kirouac&#39;</span><span class="p">:</span> <span class="s1">&#39;Kirouac 2010&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ramilowski&#39;</span><span class="p">:</span> <span class="s1">&#39;Ramilowski 2015&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;topdb&#39;</span><span class="p">:</span> <span class="s1">&#39;TopDB&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;cspa&#39;</span><span class="p">:</span> <span class="s1">&#39;CSPA&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;zhong2015&#39;</span><span class="p">:</span> <span class="s1">&#39;Zhong 2015&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;hgnc&#39;</span><span class="p">:</span> <span class="s1">&#39;HGNC&#39;</span><span class="p">,</span>
-<span class="p">}</span>
-
-
-
 <div class="viewcode-block" id="IntercellAnnotation"><a class="viewcode-back" href="../../reference.html#pypath.intercell.IntercellAnnotation">[docs]</a><span class="k">class</span> <span class="nc">IntercellAnnotation</span><span class="p">(</span><span class="n">annot</span><span class="o">.</span><span class="n">CustomAnnotation</span><span class="p">):</span>
 
 
@@ -277,20 +258,20 @@
     <span class="k">def</span> <span class="nf">add_classes_to_df</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;mainclass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">main_classes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">category</span>
-            <span class="p">]))</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">main_classes</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">category</span><span class="p">])</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;mainclass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;mainclass&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;class_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
                 <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">class_types</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
                         <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_types</span> <span class="k">else</span>
                     <span class="s1">&#39;sub&#39;</span>
                 <span class="p">)</span>
                 <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">category</span>
-            <span class="p">]))</span><span class="o">.</span><span class="n">values</span>
+            <span class="p">])</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;class_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;class_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">collect_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -309,40 +290,43 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_labels</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+
+            <span class="n">mainclass</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="k">if</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="n">intercell_annot</span><span class="o">.</span><span class="n">class_types</span><span class="p">[</span><span class="s1">&#39;misc&#39;</span><span class="p">]:</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">continue</span>
 
-            <span class="n">cls_split</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-            <span class="n">mainclass</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
 
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cls_split</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">cls_split</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
 
-                <span class="n">this_part</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cls_split</span><span class="p">[:</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cls_split</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    
+                    <span class="n">this_part</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cls_split</span><span class="p">[:</span><span class="n">j</span><span class="p">])</span>
 
-                <span class="k">if</span> <span class="n">this_part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">this_part</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_names</span><span class="p">:</span>
 
-                    <span class="n">mainclass</span> <span class="o">=</span> <span class="n">this_part</span>
+                        <span class="n">mainclass</span> <span class="o">=</span> <span class="n">this_part</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">mainclass</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">mainclass</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">mainclass</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">mainclass</span>
 
-            <span class="n">resource</span> <span class="o">=</span> <span class="n">cls_split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">resource</span> <span class="o">=</span> <span class="n">cls_split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">mainclass</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">resource</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mainclass</span><span class="p">:</span>
 
-                <span class="n">resource</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">resource_labels</span><span class="p">[</span><span class="n">resource</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="n">resource</span> <span class="ow">in</span> <span class="n">resource_labels</span> <span class="k">else</span>
-                    <span class="n">resource</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resource_labels</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">intercell_annot</span><span class="o">.</span><span class="n">get_resource_label</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
                 <span class="p">)</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">resource</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">class_labels</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">intercell_annot</span><span class="o">.</span><span class="n">get_class_label</span><span class="p">(</span><span class="n">mainclass</span> <span class="ow">or</span> <span class="bp">cls</span><span class="p">)</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Intercell"><a class="viewcode-back" href="../../reference.html#pypath.intercell.Intercell">[docs]</a><span class="k">class</span> <span class="nc">Intercell</span><span class="p">(</span><span class="n">IntercellAnnotation</span><span class="p">):</span>
@@ -408,6 +392,20 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="n">network_mod</span><span class="o">.</span><span class="n">Network</span><span class="p">):</span>
 
             <span class="k">pass</span></div>
+
+
+<span class="k">def</span> <span class="nf">init_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">IntercellAnnotation</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="s1">&#39;db&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+
+        <span class="n">init_db</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">globals</span><span class="p">()[</span><span class="s1">&#39;db&#39;</span><span class="p">]</span>
 </pre></div>
 
            </div>

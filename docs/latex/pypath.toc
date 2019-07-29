@@ -13,39 +13,39 @@
 \contentsline {subsection}{\numberline {1.3.3}Known issues}{5}{subsection.1.3.3}% 
 \contentsline {chapter}{\numberline {2}Module reference}{7}{chapter.2}% 
 \contentsline {section}{\numberline {2.1}annot}{7}{section.2.1}% 
-\contentsline {section}{\numberline {2.2}bel}{7}{section.2.2}% 
-\contentsline {section}{\numberline {2.3}cellphonedb}{7}{section.2.3}% 
-\contentsline {section}{\numberline {2.4}complex}{7}{section.2.4}% 
-\contentsline {section}{\numberline {2.5}go}{8}{section.2.5}% 
-\contentsline {section}{\numberline {2.6}homology}{8}{section.2.6}% 
-\contentsline {section}{\numberline {2.7}intera}{8}{section.2.7}% 
-\contentsline {section}{\numberline {2.8}intercell}{8}{section.2.8}% 
-\contentsline {section}{\numberline {2.9}network}{8}{section.2.9}% 
-\contentsline {section}{\numberline {2.10}pdb}{9}{section.2.10}% 
-\contentsline {section}{\numberline {2.11}ptm}{9}{section.2.11}% 
-\contentsline {section}{\numberline {2.12}pyreact}{9}{section.2.12}% 
-\contentsline {section}{\numberline {2.13}seq}{10}{section.2.13}% 
-\contentsline {section}{\numberline {2.14}unichem}{10}{section.2.14}% 
-\contentsline {chapter}{\numberline {3}Webservice}{11}{chapter.3}% 
-\contentsline {section}{\numberline {3.1}Mouse and rat}{11}{section.3.1}% 
-\contentsline {section}{\numberline {3.2}Examples}{11}{section.3.2}% 
-\contentsline {chapter}{\numberline {4}Release history}{13}{chapter.4}% 
-\contentsline {section}{\numberline {4.1}0.1.0}{13}{section.4.1}% 
-\contentsline {section}{\numberline {4.2}0.2.0}{13}{section.4.2}% 
-\contentsline {section}{\numberline {4.3}0.3.0}{13}{section.4.3}% 
-\contentsline {section}{\numberline {4.4}0.4.0}{13}{section.4.4}% 
-\contentsline {section}{\numberline {4.5}0.5.0}{13}{section.4.5}% 
-\contentsline {section}{\numberline {4.6}0.7.74}{14}{section.4.6}% 
-\contentsline {section}{\numberline {4.7}Upcoming}{14}{section.4.7}% 
-\contentsline {chapter}{\numberline {5}Features}{15}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}ID conversion}{15}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}Pathways}{15}{section.5.2}% 
-\contentsline {section}{\numberline {5.3}Structural features}{15}{section.5.3}% 
-\contentsline {section}{\numberline {5.4}Sequences}{15}{section.5.4}% 
-\contentsline {section}{\numberline {5.5}Tissue expression}{16}{section.5.5}% 
-\contentsline {section}{\numberline {5.6}Functional annotations}{16}{section.5.6}% 
-\contentsline {section}{\numberline {5.7}Drug compounds}{16}{section.5.7}% 
-\contentsline {section}{\numberline {5.8}Technical}{16}{section.5.8}% 
-\contentsline {chapter}{\numberline {6}OmniPath in R}{17}{chapter.6}% 
-\contentsline {chapter}{Python Module Index}{19}{section*.48}% 
-\contentsline {chapter}{Index}{21}{section*.49}% 
+\contentsline {section}{\numberline {2.2}bel}{10}{section.2.2}% 
+\contentsline {section}{\numberline {2.3}cellphonedb}{10}{section.2.3}% 
+\contentsline {section}{\numberline {2.4}complex}{13}{section.2.4}% 
+\contentsline {section}{\numberline {2.5}go}{14}{section.2.5}% 
+\contentsline {section}{\numberline {2.6}homology}{14}{section.2.6}% 
+\contentsline {section}{\numberline {2.7}intera}{14}{section.2.7}% 
+\contentsline {section}{\numberline {2.8}intercell}{14}{section.2.8}% 
+\contentsline {section}{\numberline {2.9}network}{15}{section.2.9}% 
+\contentsline {section}{\numberline {2.10}pdb}{15}{section.2.10}% 
+\contentsline {section}{\numberline {2.11}ptm}{15}{section.2.11}% 
+\contentsline {section}{\numberline {2.12}pyreact}{15}{section.2.12}% 
+\contentsline {section}{\numberline {2.13}seq}{16}{section.2.13}% 
+\contentsline {section}{\numberline {2.14}unichem}{17}{section.2.14}% 
+\contentsline {chapter}{\numberline {3}Webservice}{19}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Mouse and rat}{19}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Examples}{19}{section.3.2}% 
+\contentsline {chapter}{\numberline {4}Release history}{21}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}0.1.0}{21}{section.4.1}% 
+\contentsline {section}{\numberline {4.2}0.2.0}{21}{section.4.2}% 
+\contentsline {section}{\numberline {4.3}0.3.0}{21}{section.4.3}% 
+\contentsline {section}{\numberline {4.4}0.4.0}{21}{section.4.4}% 
+\contentsline {section}{\numberline {4.5}0.5.0}{21}{section.4.5}% 
+\contentsline {section}{\numberline {4.6}0.7.74}{22}{section.4.6}% 
+\contentsline {section}{\numberline {4.7}Upcoming}{22}{section.4.7}% 
+\contentsline {chapter}{\numberline {5}Features}{23}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}ID conversion}{23}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Pathways}{23}{section.5.2}% 
+\contentsline {section}{\numberline {5.3}Structural features}{23}{section.5.3}% 
+\contentsline {section}{\numberline {5.4}Sequences}{23}{section.5.4}% 
+\contentsline {section}{\numberline {5.5}Tissue expression}{24}{section.5.5}% 
+\contentsline {section}{\numberline {5.6}Functional annotations}{24}{section.5.6}% 
+\contentsline {section}{\numberline {5.7}Drug compounds}{24}{section.5.7}% 
+\contentsline {section}{\numberline {5.8}Technical}{24}{section.5.8}% 
+\contentsline {chapter}{\numberline {6}OmniPath in R}{25}{chapter.6}% 
+\contentsline {chapter}{Python Module Index}{27}{section*.169}% 
+\contentsline {chapter}{Index}{29}{section*.170}% 

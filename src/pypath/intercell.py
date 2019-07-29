@@ -118,14 +118,9 @@ class IntercellAnnotation(annot.CustomAnnotation):
                 for c in self.df.category
             ])
         )
-<<<<<<< HEAD
-
-
-=======
         self.df['class_type'] = self.df['class_type'].astype('category')
-    
-    
->>>>>>> dev
+
+
     def collect_classes(self):
 
         self.class_names = set(
@@ -142,80 +137,43 @@ class IntercellAnnotation(annot.CustomAnnotation):
 
         self.children = collections.defaultdict(set)
         self.parents = {}
-<<<<<<< HEAD
-        self.labels = {}
-
-        for cls in self.classes.keys():
-
-=======
         self.class_labels = {}
         self.resource_labels = {}
-        
+
         for cls in self.classes.keys():
-            
+
             mainclass = None
-            
->>>>>>> dev
+
             if cls in intercell_annot.class_types['misc']:
 
                 self.parents[cls] = None
-<<<<<<< HEAD
-                continue
 
-            cls_split = cls.split('_')
-            mainclass = None
-
-            for j in range(len(cls_split) + 1):
-
-                this_part = '_'.join(cls_split[:j])
-
-                if this_part in self.class_names:
-
-                    mainclass = this_part
-
-            self.children[mainclass].add(cls)
-            self.parents[cls] = mainclass
-
-            resource = cls_split[-1]
-
-            if mainclass is not None and resource not in mainclass:
-
-                resource = (
-                    resource_labels[resource]
-                        if resource in resource_labels else
-                    resource.capitalize()
-                )
-
-                self.labels[cls] = resource
-=======
-                
             else:
-                
+
                 cls_split = cls.split('_')
-                
+
                 for j in range(len(cls_split) + 1):
                     
                     this_part = '_'.join(cls_split[:j])
-                    
+
                     if this_part in self.class_names:
-                        
+
                         mainclass = this_part
-                
+
                 self.children[mainclass].add(cls)
                 self.parents[cls] = mainclass
-                
+
                 resource = cls_split[-1]
-            
+
             if mainclass is not None and resource not in mainclass:
-                
+
                 self.resource_labels[cls] = (
                     intercell_annot.get_resource_label(resource)
                 )
-            
+
             self.class_labels[cls] = (
                 intercell_annot.get_class_label(mainclass or cls)
             )
->>>>>>> dev
 
 
 class Intercell(IntercellAnnotation):
@@ -284,14 +242,14 @@ class Intercell(IntercellAnnotation):
 
 
 def init_db(**kwargs):
-    
+
     globals()['db'] = IntercellAnnotation(**kwargs)
 
 
 def get_db(**kwargs):
-    
+
     if 'db' not in globals():
-        
+
         init_db(**kwargs)
-    
+
     return globals()['db']

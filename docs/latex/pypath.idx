@@ -1,55 +1,179 @@
-\indexentry{pypath.complex (module)@\spxentry{pypath.complex}\spxextra{module}|hyperpage}{7}
-\indexentry{AbstractComplexResource (class in pypath.complex)@\spxentry{AbstractComplexResource}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{CellPhoneDB (class in pypath.complex)@\spxentry{CellPhoneDB}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Compleat (class in pypath.complex)@\spxentry{Compleat}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{ComplexAggregator (class in pypath.complex)@\spxentry{ComplexAggregator}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{reload() (pypath.complex.ComplexAggregator method)@\spxentry{reload()}\spxextra{pypath.complex.ComplexAggregator method}|hyperpage}{7}
-\indexentry{ComplexPortal (class in pypath.complex)@\spxentry{ComplexPortal}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Corum (class in pypath.complex)@\spxentry{Corum}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{GuideToPharmacology (class in pypath.complex)@\spxentry{GuideToPharmacology}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Havugimana (class in pypath.complex)@\spxentry{Havugimana}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Hpmr (class in pypath.complex)@\spxentry{Hpmr}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Humap (class in pypath.complex)@\spxentry{Humap}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Pdb (class in pypath.complex)@\spxentry{Pdb}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{Signor (class in pypath.complex)@\spxentry{Signor}\spxextra{class in pypath.complex}|hyperpage}{7}
-\indexentry{all\_complexes() (in module pypath.complex)@\spxentry{all\_complexes()}\spxextra{in module pypath.complex}|hyperpage}{7}
-\indexentry{get\_db() (in module pypath.complex)@\spxentry{get\_db()}\spxextra{in module pypath.complex}|hyperpage}{7}
-\indexentry{init\_db() (in module pypath.complex)@\spxentry{init\_db()}\spxextra{in module pypath.complex}|hyperpage}{7}
-\indexentry{pypath.go (module)@\spxentry{pypath.go}\spxextra{module}|hyperpage}{8}
-\indexentry{annotate() (in module pypath.go)@\spxentry{annotate()}\spxextra{in module pypath.go}|hyperpage}{8}
-\indexentry{get\_db() (in module pypath.go)@\spxentry{get\_db()}\spxextra{in module pypath.go}|hyperpage}{8}
-\indexentry{init\_db() (in module pypath.go)@\spxentry{init\_db()}\spxextra{in module pypath.go}|hyperpage}{8}
-\indexentry{load\_go() (in module pypath.go)@\spxentry{load\_go()}\spxextra{in module pypath.go}|hyperpage}{8}
-\indexentry{pypath.homology (module)@\spxentry{pypath.homology}\spxextra{module}|hyperpage}{8}
-\indexentry{pypath.intera (module)@\spxentry{pypath.intera}\spxextra{module}|hyperpage}{8}
-\indexentry{pypath.network (module)@\spxentry{pypath.network}\spxextra{module}|hyperpage}{8}
-\indexentry{Interaction (class in pypath.network)@\spxentry{Interaction}\spxextra{class in pypath.network}|hyperpage}{8}
-\indexentry{directed (pypath.network.Interaction attribute)@\spxentry{directed}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{effect (pypath.network.Interaction attribute)@\spxentry{effect}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{id\_a (pypath.network.Interaction attribute)@\spxentry{id\_a}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{id\_b (pypath.network.Interaction attribute)@\spxentry{id\_b}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{references (pypath.network.Interaction attribute)@\spxentry{references}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{sources (pypath.network.Interaction attribute)@\spxentry{sources}\spxextra{pypath.network.Interaction attribute}|hyperpage}{8}
-\indexentry{type (pypath.network.Interaction attribute)@\spxentry{type}\spxextra{pypath.network.Interaction attribute}|hyperpage}{9}
-\indexentry{type\_a (pypath.network.Interaction attribute)@\spxentry{type\_a}\spxextra{pypath.network.Interaction attribute}|hyperpage}{9}
-\indexentry{type\_b (pypath.network.Interaction attribute)@\spxentry{type\_b}\spxextra{pypath.network.Interaction attribute}|hyperpage}{9}
-\indexentry{pypath.pdb (module)@\spxentry{pypath.pdb}\spxextra{module}|hyperpage}{9}
-\indexentry{ResidueMapper (class in pypath.pdb)@\spxentry{ResidueMapper}\spxextra{class in pypath.pdb}|hyperpage}{9}
-\indexentry{clean() (pypath.pdb.ResidueMapper method)@\spxentry{clean()}\spxextra{pypath.pdb.ResidueMapper method}|hyperpage}{9}
-\indexentry{pypath.ptm (module)@\spxentry{pypath.ptm}\spxextra{module}|hyperpage}{9}
-\indexentry{pypath.pyreact (module)@\spxentry{pypath.pyreact}\spxextra{module}|hyperpage}{9}
-\indexentry{BioPaxReader (class in pypath.pyreact)@\spxentry{BioPaxReader}\spxextra{class in pypath.pyreact}|hyperpage}{9}
-\indexentry{biopax\_size() (pypath.pyreact.BioPaxReader method)@\spxentry{biopax\_size()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{9}
-\indexentry{cleanup\_hook() (pypath.pyreact.BioPaxReader method)@\spxentry{cleanup\_hook()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{9}
-\indexentry{close\_biopax() (pypath.pyreact.BioPaxReader method)@\spxentry{close\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{9}
-\indexentry{extract() (pypath.pyreact.BioPaxReader method)@\spxentry{extract()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{9}
-\indexentry{init\_etree() (pypath.pyreact.BioPaxReader method)@\spxentry{init\_etree()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{10}
-\indexentry{iterate() (pypath.pyreact.BioPaxReader method)@\spxentry{iterate()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{10}
-\indexentry{open\_biopax() (pypath.pyreact.BioPaxReader method)@\spxentry{open\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{10}
-\indexentry{process() (pypath.pyreact.BioPaxReader method)@\spxentry{process()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{10}
-\indexentry{set\_progress() (pypath.pyreact.BioPaxReader method)@\spxentry{set\_progress()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{10}
-\indexentry{pypath.seq (module)@\spxentry{pypath.seq}\spxextra{module}|hyperpage}{10}
-\indexentry{get\_isoforms() (in module pypath.seq)@\spxentry{get\_isoforms()}\spxextra{in module pypath.seq}|hyperpage}{10}
-\indexentry{read\_fasta() (in module pypath.seq)@\spxentry{read\_fasta()}\spxextra{in module pypath.seq}|hyperpage}{10}
-\indexentry{swissprot\_seq() (in module pypath.seq)@\spxentry{swissprot\_seq()}\spxextra{in module pypath.seq}|hyperpage}{10}
-\indexentry{pypath.unichem (module)@\spxentry{pypath.unichem}\spxextra{module}|hyperpage}{10}
+\indexentry{pypath.annot (module)@\spxentry{pypath.annot}\spxextra{module}|hyperpage}{7}
+\indexentry{Adhesome (class in pypath.annot)@\spxentry{Adhesome}\spxextra{class in pypath.annot}|hyperpage}{7}
+\indexentry{AnnotationBase (class in pypath.annot)@\spxentry{AnnotationBase}\spxextra{class in pypath.annot}|hyperpage}{7}
+\indexentry{add\_complexes\_by\_inference() (pypath.annot.AnnotationBase method)@\spxentry{add\_complexes\_by\_inference()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{all\_proteins() (pypath.annot.AnnotationBase method)@\spxentry{all\_proteins()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{annotate\_complex() (pypath.annot.AnnotationBase method)@\spxentry{annotate\_complex()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{complex\_inference() (pypath.annot.AnnotationBase method)@\spxentry{complex\_inference()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{get\_subset() (pypath.annot.AnnotationBase method)@\spxentry{get\_subset()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{load\_proteins() (pypath.annot.AnnotationBase method)@\spxentry{load\_proteins()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{reload() (pypath.annot.AnnotationBase method)@\spxentry{reload()}\spxextra{pypath.annot.AnnotationBase method}|hyperpage}{7}
+\indexentry{CancerGeneCensus (class in pypath.annot)@\spxentry{CancerGeneCensus}\spxextra{class in pypath.annot}|hyperpage}{7}
+\indexentry{CellPhoneDB (class in pypath.annot)@\spxentry{CellPhoneDB}\spxextra{class in pypath.annot}|hyperpage}{7}
+\indexentry{record (pypath.annot.CellPhoneDB attribute)@\spxentry{record}\spxextra{pypath.annot.CellPhoneDB attribute}|hyperpage}{7}
+\indexentry{CellPhoneDBComplex (class in pypath.annot)@\spxentry{CellPhoneDBComplex}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{CellSurfaceProteinAtlas (class in pypath.annot)@\spxentry{CellSurfaceProteinAtlas}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{Comppi (class in pypath.annot)@\spxentry{Comppi}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{Corum (class in pypath.annot)@\spxentry{Corum}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{CorumFuncat (class in pypath.annot)@\spxentry{CorumFuncat}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{CorumGO (class in pypath.annot)@\spxentry{CorumGO}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{Cpad (class in pypath.annot)@\spxentry{Cpad}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{CustomAnnotation (class in pypath.annot)@\spxentry{CustomAnnotation}\spxextra{class in pypath.annot}|hyperpage}{8}
+\indexentry{add\_class\_definitions() (pypath.annot.CustomAnnotation method)@\spxentry{add\_class\_definitions()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{8}
+\indexentry{counts() (pypath.annot.CustomAnnotation method)@\spxentry{counts()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{8}
+\indexentry{create\_class() (pypath.annot.CustomAnnotation method)@\spxentry{create\_class()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{8}
+\indexentry{get\_class() (pypath.annot.CustomAnnotation method)@\spxentry{get\_class()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{8}
+\indexentry{load\_from\_pickle() (pypath.annot.CustomAnnotation method)@\spxentry{load\_from\_pickle()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{8}
+\indexentry{populate\_classes() (pypath.annot.CustomAnnotation method)@\spxentry{populate\_classes()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{9}
+\indexentry{process\_annot() (pypath.annot.CustomAnnotation method)@\spxentry{process\_annot()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{9}
+\indexentry{reload() (pypath.annot.CustomAnnotation method)@\spxentry{reload()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{9}
+\indexentry{save\_to\_pickle() (pypath.annot.CustomAnnotation method)@\spxentry{save\_to\_pickle()}\spxextra{pypath.annot.CustomAnnotation method}|hyperpage}{9}
+\indexentry{Dgidb (class in pypath.annot)@\spxentry{Dgidb}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Disgenet (class in pypath.annot)@\spxentry{Disgenet}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Exocarta (class in pypath.annot)@\spxentry{Exocarta}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{GOIntercell (class in pypath.annot)@\spxentry{GOIntercell}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{GuideToPharmacology (class in pypath.annot)@\spxentry{GuideToPharmacology}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Hgnc (class in pypath.annot)@\spxentry{Hgnc}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{HpmrComplex (class in pypath.annot)@\spxentry{HpmrComplex}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{HumanPlasmaMembraneReceptome (class in pypath.annot)@\spxentry{HumanPlasmaMembraneReceptome}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{HumanProteinAtlas (class in pypath.annot)@\spxentry{HumanProteinAtlas}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Integrins (class in pypath.annot)@\spxentry{Integrins}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Intogen (class in pypath.annot)@\spxentry{Intogen}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{KeggPathways (class in pypath.annot)@\spxentry{KeggPathways}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Kinases (class in pypath.annot)@\spxentry{Kinases}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Kirouac2010 (class in pypath.annot)@\spxentry{Kirouac2010}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{LigandReceptor (class in pypath.annot)@\spxentry{LigandReceptor}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Locate (class in pypath.annot)@\spxentry{Locate}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Matrisome (class in pypath.annot)@\spxentry{Matrisome}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Matrixdb (class in pypath.annot)@\spxentry{Matrixdb}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Membranome (class in pypath.annot)@\spxentry{Membranome}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{NetpathPathways (class in pypath.annot)@\spxentry{NetpathPathways}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Opm (class in pypath.annot)@\spxentry{Opm}\spxextra{class in pypath.annot}|hyperpage}{9}
+\indexentry{Phosphatome (class in pypath.annot)@\spxentry{Phosphatome}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Ramilowski2015 (class in pypath.annot)@\spxentry{Ramilowski2015}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Ramilowski2015Location (class in pypath.annot)@\spxentry{Ramilowski2015Location}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{SignalinkPathways (class in pypath.annot)@\spxentry{SignalinkPathways}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{SignorPathways (class in pypath.annot)@\spxentry{SignorPathways}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Surfaceome (class in pypath.annot)@\spxentry{Surfaceome}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Tfcensus (class in pypath.annot)@\spxentry{Tfcensus}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Topdb (class in pypath.annot)@\spxentry{Topdb}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Vesiclepedia (class in pypath.annot)@\spxentry{Vesiclepedia}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{Zhong2015 (class in pypath.annot)@\spxentry{Zhong2015}\spxextra{class in pypath.annot}|hyperpage}{10}
+\indexentry{complex\_sources\_default (in module pypath.annot)@\spxentry{complex\_sources\_default}\spxextra{in module pypath.annot}|hyperpage}{10}
+\indexentry{default\_fields (in module pypath.annot)@\spxentry{default\_fields}\spxextra{in module pypath.annot}|hyperpage}{10}
+\indexentry{get\_db() (in module pypath.annot)@\spxentry{get\_db()}\spxextra{in module pypath.annot}|hyperpage}{10}
+\indexentry{init\_db() (in module pypath.annot)@\spxentry{init\_db()}\spxextra{in module pypath.annot}|hyperpage}{10}
+\indexentry{protein\_sources\_default (in module pypath.annot)@\spxentry{protein\_sources\_default}\spxextra{in module pypath.annot}|hyperpage}{10}
+\indexentry{pypath.cellphonedb (module)@\spxentry{pypath.cellphonedb}\spxextra{module}|hyperpage}{10}
+\indexentry{CellPhoneDBComplex (class in pypath.cellphonedb)@\spxentry{CellPhoneDBComplex}\spxextra{class in pypath.cellphonedb}|hyperpage}{10}
+\indexentry{comments\_complex (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{comments\_complex}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{10}
+\indexentry{complex\_name (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{complex\_name}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{10}
+\indexentry{integrin (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{integrin}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{10}
+\indexentry{other (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{10}
+\indexentry{other\_desc (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{other\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{pdb\_id (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{pdb\_id}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{pdb\_structure (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{pdb\_structure}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{peripheral (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{peripheral}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{receptor (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{receptor}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{receptor\_desc (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{receptor\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{secreted (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{secreted}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{secreted\_desc (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{secreted\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{secreted\_highlight (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{secreted\_highlight}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{stoichiometry (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{stoichiometry}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{transmembrane (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{transmembrane}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{uniprot\_1 (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{uniprot\_1}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{uniprot\_2 (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{uniprot\_2}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{uniprot\_3 (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{uniprot\_3}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{uniprot\_4 (pypath.cellphonedb.CellPhoneDBComplex attribute)@\spxentry{uniprot\_4}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}|hyperpage}{11}
+\indexentry{CellPhoneDBGene (class in pypath.cellphonedb)@\spxentry{CellPhoneDBGene}\spxextra{class in pypath.cellphonedb}|hyperpage}{11}
+\indexentry{ensembl (pypath.cellphonedb.CellPhoneDBGene attribute)@\spxentry{ensembl}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}|hyperpage}{11}
+\indexentry{gene\_name (pypath.cellphonedb.CellPhoneDBGene attribute)@\spxentry{gene\_name}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}|hyperpage}{11}
+\indexentry{hgnc\_symbol (pypath.cellphonedb.CellPhoneDBGene attribute)@\spxentry{hgnc\_symbol}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}|hyperpage}{11}
+\indexentry{uniprot (pypath.cellphonedb.CellPhoneDBGene attribute)@\spxentry{uniprot}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}|hyperpage}{11}
+\indexentry{CellPhoneDBInteraction (class in pypath.cellphonedb)@\spxentry{CellPhoneDBInteraction}\spxextra{class in pypath.cellphonedb}|hyperpage}{11}
+\indexentry{annotation\_strategy (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{annotation\_strategy}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{id\_cp\_interaction (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{id\_cp\_interaction}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{partner\_a (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{partner\_a}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{partner\_b (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{partner\_b}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{protein\_name\_a (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{protein\_name\_a}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{protein\_name\_b (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{protein\_name\_b}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{source (pypath.cellphonedb.CellPhoneDBInteraction attribute)@\spxentry{source}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}|hyperpage}{12}
+\indexentry{CellPhoneDBProtein (class in pypath.cellphonedb)@\spxentry{CellPhoneDBProtein}\spxextra{class in pypath.cellphonedb}|hyperpage}{12}
+\indexentry{integrin (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{integrin}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{other (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{other\_desc (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{other\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{peripheral (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{peripheral}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{protein\_name (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{protein\_name}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{receptor (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{receptor}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{receptor\_desc (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{receptor\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{secreted (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{secreted}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{secreted\_desc (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{secreted\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{secreted\_highlight (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{secreted\_highlight}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{tags (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{tags}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{12}
+\indexentry{tags\_description (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{tags\_description}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{13}
+\indexentry{tags\_reason (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{tags\_reason}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{13}
+\indexentry{transmembrane (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{transmembrane}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{13}
+\indexentry{uniprot (pypath.cellphonedb.CellPhoneDBProtein attribute)@\spxentry{uniprot}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}|hyperpage}{13}
+\indexentry{pypath.complex (module)@\spxentry{pypath.complex}\spxextra{module}|hyperpage}{13}
+\indexentry{AbstractComplexResource (class in pypath.complex)@\spxentry{AbstractComplexResource}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{CellPhoneDB (class in pypath.complex)@\spxentry{CellPhoneDB}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Compleat (class in pypath.complex)@\spxentry{Compleat}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{ComplexAggregator (class in pypath.complex)@\spxentry{ComplexAggregator}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{reload() (pypath.complex.ComplexAggregator method)@\spxentry{reload()}\spxextra{pypath.complex.ComplexAggregator method}|hyperpage}{13}
+\indexentry{ComplexPortal (class in pypath.complex)@\spxentry{ComplexPortal}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Corum (class in pypath.complex)@\spxentry{Corum}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{GuideToPharmacology (class in pypath.complex)@\spxentry{GuideToPharmacology}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Havugimana (class in pypath.complex)@\spxentry{Havugimana}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Hpmr (class in pypath.complex)@\spxentry{Hpmr}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Humap (class in pypath.complex)@\spxentry{Humap}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Pdb (class in pypath.complex)@\spxentry{Pdb}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{Signor (class in pypath.complex)@\spxentry{Signor}\spxextra{class in pypath.complex}|hyperpage}{13}
+\indexentry{all\_complexes() (in module pypath.complex)@\spxentry{all\_complexes()}\spxextra{in module pypath.complex}|hyperpage}{13}
+\indexentry{get\_db() (in module pypath.complex)@\spxentry{get\_db()}\spxextra{in module pypath.complex}|hyperpage}{13}
+\indexentry{init\_db() (in module pypath.complex)@\spxentry{init\_db()}\spxextra{in module pypath.complex}|hyperpage}{13}
+\indexentry{pypath.go (module)@\spxentry{pypath.go}\spxextra{module}|hyperpage}{14}
+\indexentry{annotate() (in module pypath.go)@\spxentry{annotate()}\spxextra{in module pypath.go}|hyperpage}{14}
+\indexentry{get\_db() (in module pypath.go)@\spxentry{get\_db()}\spxextra{in module pypath.go}|hyperpage}{14}
+\indexentry{init\_db() (in module pypath.go)@\spxentry{init\_db()}\spxextra{in module pypath.go}|hyperpage}{14}
+\indexentry{load\_go() (in module pypath.go)@\spxentry{load\_go()}\spxextra{in module pypath.go}|hyperpage}{14}
+\indexentry{pypath.homology (module)@\spxentry{pypath.homology}\spxextra{module}|hyperpage}{14}
+\indexentry{pypath.intera (module)@\spxentry{pypath.intera}\spxextra{module}|hyperpage}{14}
+\indexentry{pypath.intercell (module)@\spxentry{pypath.intercell}\spxextra{module}|hyperpage}{14}
+\indexentry{Intercell (class in pypath.intercell)@\spxentry{Intercell}\spxextra{class in pypath.intercell}|hyperpage}{14}
+\indexentry{reload() (pypath.intercell.Intercell method)@\spxentry{reload()}\spxextra{pypath.intercell.Intercell method}|hyperpage}{14}
+\indexentry{IntercellAnnotation (class in pypath.intercell)@\spxentry{IntercellAnnotation}\spxextra{class in pypath.intercell}|hyperpage}{14}
+\indexentry{reload() (pypath.intercell.IntercellAnnotation method)@\spxentry{reload()}\spxextra{pypath.intercell.IntercellAnnotation method}|hyperpage}{14}
+\indexentry{IntercellRole (class in pypath.intercell)@\spxentry{IntercellRole}\spxextra{class in pypath.intercell}|hyperpage}{14}
+\indexentry{role (pypath.intercell.IntercellRole attribute)@\spxentry{role}\spxextra{pypath.intercell.IntercellRole attribute}|hyperpage}{14}
+\indexentry{source (pypath.intercell.IntercellRole attribute)@\spxentry{source}\spxextra{pypath.intercell.IntercellRole attribute}|hyperpage}{14}
+\indexentry{pypath.network (module)@\spxentry{pypath.network}\spxextra{module}|hyperpage}{15}
+\indexentry{Interaction (class in pypath.network)@\spxentry{Interaction}\spxextra{class in pypath.network}|hyperpage}{15}
+\indexentry{directed (pypath.network.Interaction attribute)@\spxentry{directed}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{effect (pypath.network.Interaction attribute)@\spxentry{effect}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{id\_a (pypath.network.Interaction attribute)@\spxentry{id\_a}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{id\_b (pypath.network.Interaction attribute)@\spxentry{id\_b}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{references (pypath.network.Interaction attribute)@\spxentry{references}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{sources (pypath.network.Interaction attribute)@\spxentry{sources}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{type (pypath.network.Interaction attribute)@\spxentry{type}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{type\_a (pypath.network.Interaction attribute)@\spxentry{type\_a}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{type\_b (pypath.network.Interaction attribute)@\spxentry{type\_b}\spxextra{pypath.network.Interaction attribute}|hyperpage}{15}
+\indexentry{pypath.pdb (module)@\spxentry{pypath.pdb}\spxextra{module}|hyperpage}{15}
+\indexentry{ResidueMapper (class in pypath.pdb)@\spxentry{ResidueMapper}\spxextra{class in pypath.pdb}|hyperpage}{15}
+\indexentry{clean() (pypath.pdb.ResidueMapper method)@\spxentry{clean()}\spxextra{pypath.pdb.ResidueMapper method}|hyperpage}{15}
+\indexentry{pypath.ptm (module)@\spxentry{pypath.ptm}\spxextra{module}|hyperpage}{15}
+\indexentry{pypath.pyreact (module)@\spxentry{pypath.pyreact}\spxextra{module}|hyperpage}{15}
+\indexentry{BioPaxReader (class in pypath.pyreact)@\spxentry{BioPaxReader}\spxextra{class in pypath.pyreact}|hyperpage}{15}
+\indexentry{biopax\_size() (pypath.pyreact.BioPaxReader method)@\spxentry{biopax\_size()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{cleanup\_hook() (pypath.pyreact.BioPaxReader method)@\spxentry{cleanup\_hook()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{close\_biopax() (pypath.pyreact.BioPaxReader method)@\spxentry{close\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{extract() (pypath.pyreact.BioPaxReader method)@\spxentry{extract()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{init\_etree() (pypath.pyreact.BioPaxReader method)@\spxentry{init\_etree()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{iterate() (pypath.pyreact.BioPaxReader method)@\spxentry{iterate()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{open\_biopax() (pypath.pyreact.BioPaxReader method)@\spxentry{open\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{process() (pypath.pyreact.BioPaxReader method)@\spxentry{process()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{set\_progress() (pypath.pyreact.BioPaxReader method)@\spxentry{set\_progress()}\spxextra{pypath.pyreact.BioPaxReader method}|hyperpage}{16}
+\indexentry{pypath.seq (module)@\spxentry{pypath.seq}\spxextra{module}|hyperpage}{16}
+\indexentry{get\_isoforms() (in module pypath.seq)@\spxentry{get\_isoforms()}\spxextra{in module pypath.seq}|hyperpage}{16}
+\indexentry{read\_fasta() (in module pypath.seq)@\spxentry{read\_fasta()}\spxextra{in module pypath.seq}|hyperpage}{16}
+\indexentry{swissprot\_seq() (in module pypath.seq)@\spxentry{swissprot\_seq()}\spxextra{in module pypath.seq}|hyperpage}{16}
+\indexentry{pypath.unichem (module)@\spxentry{pypath.unichem}\spxextra{module}|hyperpage}{17}

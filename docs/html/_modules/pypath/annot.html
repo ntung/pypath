@@ -184,6 +184,7 @@
 <span class="kn">import</span> <span class="nn">imp</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
@@ -207,6 +208,7 @@
 
 <span class="c1">#: Default protein annotation sources</span>
 <span class="n">protein_sources_default</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Dgidb&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Membranome&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Exocarta&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Vesiclepedia&#39;</span><span class="p">,</span>
@@ -235,6 +237,13 @@
     <span class="s1">&#39;KeggPathways&#39;</span><span class="p">,</span>
     <span class="s1">&#39;NetpathPathways&#39;</span><span class="p">,</span>
     <span class="s1">&#39;Cpad&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Disgenet&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Kinases&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Phosphatome&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Tfcensus&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Intogen&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Kinases&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CancerGeneCensus&#39;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1">#: Default protein complex annotation sources</span>
@@ -280,6 +289,9 @@
         <span class="s1">&#39;cancer&#39;</span><span class="p">,</span>
         <span class="s1">&#39;effect_on_cancer&#39;</span><span class="p">,</span>
     <span class="p">),</span>
+    <span class="s1">&#39;Disgenet&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;disease&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
 <span class="p">}</span>
 
 
@@ -313,15 +325,20 @@
 <span class="sd">        their role.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_definitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pickle_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">annotdb_pickle_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">class_definitions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_log_name&#39;</span><span class="p">):</span>
-            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;annot&#39;</span><span class="p">)</span>
+
+            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="n">annotdb_pickle_file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">(</span><span class="n">pickle_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_class_definitions</span><span class="p">(</span><span class="n">class_definitions</span> <span class="ow">or</span> <span class="p">{})</span>
@@ -329,16 +346,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">populate_classes</span><span class="p">()</span>
 
+
 <div class="viewcode-block" id="CustomAnnotation.reload"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reloads the object from the module level.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
         <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="CustomAnnotation.add_class_definitions"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.add_class_definitions">[docs]</a>    <span class="k">def</span> <span class="nf">add_class_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_definitions</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -350,12 +369,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_definitions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">class_definitions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">classdef</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">classdef</span><span class="p">)</span> <span class="k">for</span> <span class="n">classdef</span>
-                                      <span class="ow">in</span> <span class="n">class_definitions</span><span class="p">)</span>
+
+            <span class="n">class_definitions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">classdef</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">classdef</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">classdef</span> <span class="ow">in</span> <span class="n">class_definitions</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">class_definitions</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CustomAnnotation.populate_classes"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.populate_classes">[docs]</a>    <span class="k">def</span> <span class="nf">populate_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CustomAnnotation.populate_classes"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.populate_classes">[docs]</a>    <span class="k">def</span> <span class="nf">populate_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a classification of proteins according to their roles</span>
 <span class="sd">        in the intercellular communication. Loads from pickle</span>
@@ -367,13 +392,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
 
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">for</span> <span class="n">classdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+
             <span class="k">if</span> <span class="n">classdef</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="ow">or</span> <span class="n">update</span><span class="p">:</span>
+
                 <span class="bp">self</span><span class="o">.</span><span class="n">create_class</span><span class="p">(</span><span class="n">classdef</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="CustomAnnotation.load_from_pickle"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.load_from_pickle">[docs]</a>    <span class="k">def</span> <span class="nf">load_from_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -384,7 +412,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="CustomAnnotation.save_to_pickle"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.save_to_pickle">[docs]</a>    <span class="k">def</span> <span class="nf">save_to_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pickle_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -395,7 +425,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span></div>
+
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span>
+                <span class="n">file</span> <span class="o">=</span> <span class="n">fp</span><span class="p">,</span>
+            <span class="p">)</span></div>
 
 <span class="c1"># XXX: Double-check!</span>
 <div class="viewcode-block" id="CustomAnnotation.create_class"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.create_class">[docs]</a>    <span class="k">def</span> <span class="nf">create_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classdef</span><span class="p">):</span>
@@ -410,6 +444,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_annot</span><span class="p">(</span><span class="n">classdef</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="CustomAnnotation.process_annot"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.process_annot">[docs]</a>    <span class="k">def</span> <span class="nf">process_annot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classdef</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -427,14 +462,18 @@
             <span class="k">return</span> <span class="n">classdef</span><span class="o">.</span><span class="n">source</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">basestring</span><span class="p">):</span>
+
             <span class="k">if</span> <span class="n">classdef</span><span class="o">.</span><span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">:</span>
+
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">classdef</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
 
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">to_set</span><span class="p">()</span>
 
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">annots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">]</span>
-                    <span class="k">return</span> <span class="n">annots</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span><span class="o">**</span><span class="n">classdef</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span>
+                        <span class="o">**</span><span class="n">classdef</span><span class="o">.</span><span class="n">args</span>
+                    <span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">):</span>
 
@@ -446,6 +485,7 @@
 
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>
 
+
     <span class="k">def</span> <span class="nf">_execute_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotop</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes a set operation on anntation sets.</span>
@@ -454,24 +494,28 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">annots</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="n">annot_formats</span><span class="o">.</span><span class="n">AnnotOp</span><span class="p">)</span>
-                        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_annot</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="n">annot_formats</span><span class="o">.</span><span class="n">AnnotDef</span><span class="p">)</span>
-                        <span class="k">else</span> <span class="n">_annot</span>
-                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span>
-                        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">_annot</span><span class="p">))</span>
-                        <span class="k">for</span> <span class="n">_annot</span> <span class="ow">in</span> <span class="n">annotop</span><span class="o">.</span><span class="n">annots</span><span class="p">)</span>
+        <span class="n">annots</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="n">annot_formats</span><span class="o">.</span><span class="n">AnnotOp</span><span class="p">)</span> <span class="k">else</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_annot</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="n">annot_formats</span><span class="o">.</span><span class="n">AnnotDef</span><span class="p">)</span> <span class="k">else</span>
+                <span class="n">_annot</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_annot</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span> <span class="k">else</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">_annot</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">_annot</span> <span class="ow">in</span> <span class="n">annotop</span><span class="o">.</span><span class="n">annots</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">annotop</span><span class="o">.</span><span class="n">op</span><span class="p">(</span><span class="o">*</span><span class="n">annots</span><span class="p">)</span>
 
+
 <div class="viewcode-block" id="CustomAnnotation.get_class"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.get_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieves a class by its name and loads it if hasn&#39;t been loaded yet</span>
-<span class="sd">        but the name present in the class definitions.</span>
+<span class="sd">        Retrieves a class by its name and loads it if hasn&#39;t been loaded</span>
+<span class="sd">        yet but the name present in the class definitions.</span>
 
 <span class="sd">        :arg str name:</span>
-<span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="p">:</span>
@@ -484,9 +528,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="s1">&#39;No such annotation class: `</span><span class="si">%s</span><span class="s1">`&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span></div>
 
+
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+
 
     <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
 
@@ -495,38 +541,85 @@
             <span class="nb">any</span><span class="p">(</span><span class="n">other</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="CustomAnnotation.make_df"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.make_df">[docs]</a>    <span class="k">def</span> <span class="nf">make_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_annotations</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">map_gs</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span><span class="n">uniprot</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;genesymbol&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="p">[[</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uniprot</span><span class="p">,</span> <span class="n">map_gs</span><span class="p">,</span>
-                                        <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">map_name</span><span class="p">(</span><span class="n">uniprot</span><span class="p">,</span>
-                                                                   <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
-                                                                   <span class="s1">&#39;protein-name&#39;</span><span class="p">)),</span> <span class="p">]</span> <span class="o">+</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">all_annotations_str</span><span class="p">(</span><span class="n">uniprot</span><span class="p">)]</span> <span class="k">if</span> <span class="n">all_annotations</span> <span class="k">else</span> <span class="p">[])</span> <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span> <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">members</span><span class="p">],</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span> <span class="s1">&#39;genesymbol&#39;</span><span class="p">,</span> <span class="s1">&#39;full_name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">([</span><span class="s1">&#39;all_annotations&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">all_annotations</span> <span class="k">else</span> <span class="p">[]))</span></div>
+    <span class="k">def</span> <span class="nf">make_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">all_annotations</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">full_name</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 
-<div class="viewcode-block" id="CustomAnnotation.export"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span> <span class="s1">&#39;genesymbol&#39;</span><span class="p">]</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;category&#39;</span><span class="p">:</span>   <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;uniprot&#39;</span><span class="p">:</span>    <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;genesymbol&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">full_name</span><span class="p">:</span>
+
+            <span class="n">header</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;full_name&#39;</span><span class="p">)</span>
+            <span class="n">dtypes</span><span class="p">[</span><span class="s1">&#39;full_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;category&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="bp">cls</span><span class="p">,</span>
+                    <span class="n">uniprot</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                    <span class="p">(</span>
+                        <span class="n">mapping</span><span class="o">.</span><span class="n">map_name0</span><span class="p">(</span><span class="n">uniprot</span><span class="p">,</span> <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span> <span class="s1">&#39;genesymbol&#39;</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uniprot</span><span class="p">,</span> <span class="n">common</span><span class="o">.</span><span class="n">basestring</span><span class="p">)</span> <span class="k">else</span>
+                        <span class="n">uniprot</span><span class="o">.</span><span class="n">genesymbol_str</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">uniprot</span><span class="p">,</span> <span class="s1">&#39;genesymbol_str&#39;</span><span class="p">)</span> <span class="k">else</span>
+                        <span class="n">uniprot</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+                    <span class="p">),</span>
+                <span class="p">]</span> <span class="o">+</span>
+                <span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">mapping</span><span class="o">.</span><span class="n">map_name</span><span class="p">(</span>
+                                <span class="n">uniprot</span><span class="p">,</span>
+                                <span class="s1">&#39;uniprot&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;protein-name&#39;</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">),</span>
+                    <span class="p">]</span>
+                    <span class="k">if</span> <span class="n">full_name</span> <span class="k">else</span> <span class="p">[]</span>
+                <span class="p">)</span> <span class="o">+</span>
+                <span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">all_annotations_str</span><span class="p">(</span><span class="n">uniprot</span><span class="p">)]</span>
+                        <span class="k">if</span> <span class="n">all_annotations</span> <span class="k">else</span>
+                    <span class="p">[]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">uniprot</span> <span class="ow">in</span> <span class="n">members</span>
+            <span class="p">],</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">header</span> <span class="o">+</span> <span class="p">(</span>
+                <span class="p">[</span><span class="s1">&#39;all_annotations&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">all_annotations</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">make_df</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="CustomAnnotation.counts"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.counts">[docs]</a>    <span class="k">def</span> <span class="nf">counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a dict with number of elements in each class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">members</span><span class="p">))</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span>
-                    <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">members</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">members</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CustomAnnotation.classes_by_entity"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.classes_by_entity">[docs]</a>    <span class="k">def</span> <span class="nf">classes_by_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">cls</span> <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span> <span class="k">if</span> <span class="n">element</span>
-                   <span class="ow">in</span> <span class="n">elements</span><span class="p">)</span></div></div>
+    <span class="k">def</span> <span class="nf">classes_by_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="bp">cls</span>
+            <span class="k">for</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="AnnotationBase"><a class="viewcode-back" href="../../reference.html#pypath.annot.AnnotationBase">[docs]</a><span class="k">class</span> <span class="nc">AnnotationBase</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">AbstractResource</span><span class="p">):</span>
@@ -1110,6 +1203,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="n">records</span><span class="p">,</span>
             <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;uniprot&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;genesymbol&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;record_id&#39;</span><span class="p">:</span> <span class="s1">&#39;int32&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
         <span class="p">)</span>
 
 
@@ -1526,6 +1627,30 @@
         <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Disgenet"><a class="viewcode-back" href="../../reference.html#pypath.annot.Disgenet">[docs]</a><span class="k">class</span> <span class="nc">Disgenet</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;disease&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="mi">9606</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;DisGeNet&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;disgenet_annotations&#39;</span><span class="p">,</span>
+            <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Integrins"><a class="viewcode-back" href="../../reference.html#pypath.annot.Integrins">[docs]</a><span class="k">class</span> <span class="nc">Integrins</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
 
     <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
@@ -1552,6 +1677,48 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HPA&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;proteinatlas_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CancerGeneCensus"><a class="viewcode-back" href="../../reference.html#pypath.annot.CancerGeneCensus">[docs]</a><span class="k">class</span> <span class="nc">CancerGeneCensus</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;CancerGeneCensus&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;cancer_gene_census_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Intogen"><a class="viewcode-back" href="../../reference.html#pypath.annot.Intogen">[docs]</a><span class="k">class</span> <span class="nc">Intogen</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;role&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;IntOGen&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;intogen_annotations&#39;</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
@@ -1645,6 +1812,85 @@
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;HPMR&#39;</span><span class="p">,</span>
             <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;hpmr_annotations&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_process_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">annot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Kinases"><a class="viewcode-back" href="../../reference.html#pypath.annot.Kinases">[docs]</a><span class="k">class</span> <span class="nc">Kinases</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Kinases from `kinase.com`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Kinases&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_kinases&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tfcensus"><a class="viewcode-back" href="../../reference.html#pypath.annot.Tfcensus">[docs]</a><span class="k">class</span> <span class="nc">Tfcensus</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transcription factors from TF census (Vaquerizas et al 2009).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;TFcensus&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_tfcensus&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Dgidb"><a class="viewcode-back" href="../../reference.html#pypath.annot.Dgidb">[docs]</a><span class="k">class</span> <span class="nc">Dgidb</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Druggable proteins from DGIdb (Drug Gene Interaction Database).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;DGIdb&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;get_dgidb&#39;</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Phosphatome"><a class="viewcode-back" href="../../reference.html#pypath.annot.Phosphatome">[docs]</a><span class="k">class</span> <span class="nc">Phosphatome</span><span class="p">(</span><span class="n">AnnotationBase</span><span class="p">):</span>
+
+    <span class="n">_eq_fields</span> <span class="o">=</span> <span class="p">()</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The list of phosphatases from Chen et al, Science Signaling (2017)</span>
+<span class="sd">        Table S1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">AnnotationBase</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Phosphatome&#39;</span><span class="p">,</span>
+            <span class="n">input_method</span> <span class="o">=</span> <span class="s1">&#39;phosphatome_annotations&#39;</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
@@ -2286,8 +2532,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_module</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">complexes</span> <span class="o">=</span> <span class="n">complexes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">protein_sources</span> <span class="o">=</span> <span class="n">protein_sources</span> <span class="ow">or</span> <span class="n">protein_sources_default</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">complex_sources</span> <span class="o">=</span> <span class="n">complex_sources</span> <span class="ow">or</span> <span class="n">complex_sources_default</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protein_sources</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">protein_sources</span>
+                <span class="k">if</span> <span class="n">protein_sources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+            <span class="n">protein_sources_default</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">complex_sources</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">complex_sources</span>
+                <span class="k">if</span> <span class="n">complex_sources</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span>
+            <span class="n">complex_sources_default</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_fields</span> <span class="o">=</span> <span class="n">use_fields</span> <span class="ow">or</span> <span class="n">default_fields</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="n">ncbi_tax_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_annotators</span> <span class="o">=</span> <span class="n">keep_annotators</span>
@@ -2468,12 +2722,26 @@
 
             <span class="bp">cls</span> <span class="o">=</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="k">else</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span>
 
-            <span class="n">annot</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
-                <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">,</span>
-                <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">annot</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
+                <span class="n">annot</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+                    <span class="n">ncbi_tax_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncbi_tax_id</span><span class="p">,</span>
+                    <span class="n">reference_set</span> <span class="o">=</span> <span class="n">reference_set</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">annot</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">annot</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span>
+                    <span class="s1">&#39;Failed to load annotations from resource `</span><span class="si">%s</span><span class="s1">`.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                        <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
+                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">)</span> <span class="k">else</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">cls</span><span class="p">),</span>
+                        <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">make_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_set</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
