@@ -7,54 +7,58 @@
   \bigletter A
   \item \spxentry{AbstractComplexResource}\spxextra{class in pypath.complex}, \hyperpage{13}
   \item \spxentry{add\_class\_definitions()}\spxextra{pypath.annot.CustomAnnotation method}, 
-		\hyperpage{8}
+		\hyperpage{9}
   \item \spxentry{add\_complexes\_by\_inference()}\spxextra{pypath.annot.AnnotationBase method}, 
 		\hyperpage{7}
   \item \spxentry{Adhesome}\spxextra{class in pypath.annot}, \hyperpage{7}
-  \item \spxentry{all\_complexes()}\spxextra{in module pypath.complex}, \hyperpage{13}
-  \item \spxentry{all\_proteins()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
+  \item \spxentry{all\_complexes()}\spxextra{in module pypath.complex}, \hyperpage{14}
+  \item \spxentry{all\_proteins()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
   \item \spxentry{annotate()}\spxextra{in module pypath.go}, \hyperpage{14}
-  \item \spxentry{annotate\_complex()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
+  \item \spxentry{annotate\_complex()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
   \item \spxentry{annotation\_strategy}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
   \item \spxentry{AnnotationBase}\spxextra{class in pypath.annot}, \hyperpage{7}
+  \item \spxentry{AnnotDef}\spxextra{class in pypath.annot\_formats}, \hyperpage{7}
+  \item \spxentry{AnnotOp}\spxextra{class in pypath.annot\_formats}, \hyperpage{7}
+  \item \spxentry{annots}\spxextra{pypath.annot\_formats.AnnotOp attribute}, \hyperpage{7}
+  \item \spxentry{args}\spxextra{pypath.annot\_formats.AnnotDef attribute}, \hyperpage{7}
 
   \indexspace
   \bigletter B
   \item \spxentry{biopax\_size()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
-  \item \spxentry{BioPaxReader}\spxextra{class in pypath.pyreact}, \hyperpage{15}
+  \item \spxentry{BioPaxReader}\spxextra{class in pypath.pyreact}, \hyperpage{16}
 
   \indexspace
   \bigletter C
-  \item \spxentry{CancerGeneCensus}\spxextra{class in pypath.annot}, \hyperpage{7}
-  \item \spxentry{CellPhoneDB}\spxextra{class in pypath.annot}, \hyperpage{7}
+  \item \spxentry{CancerGeneCensus}\spxextra{class in pypath.annot}, \hyperpage{8}
+  \item \spxentry{CellPhoneDB}\spxextra{class in pypath.annot}, \hyperpage{8}
   \item \spxentry{CellPhoneDB}\spxextra{class in pypath.complex}, \hyperpage{13}
   \item \spxentry{CellPhoneDBComplex}\spxextra{class in pypath.annot}, \hyperpage{8}
-  \item \spxentry{CellPhoneDBComplex}\spxextra{class in pypath.cellphonedb}, \hyperpage{10}
-  \item \spxentry{CellPhoneDBGene}\spxextra{class in pypath.cellphonedb}, \hyperpage{11}
-  \item \spxentry{CellPhoneDBInteraction}\spxextra{class in pypath.cellphonedb}, \hyperpage{11}
+  \item \spxentry{CellPhoneDBComplex}\spxextra{class in pypath.cellphonedb}, \hyperpage{11}
+  \item \spxentry{CellPhoneDBGene}\spxextra{class in pypath.cellphonedb}, \hyperpage{12}
+  \item \spxentry{CellPhoneDBInteraction}\spxextra{class in pypath.cellphonedb}, \hyperpage{12}
   \item \spxentry{CellPhoneDBProtein}\spxextra{class in pypath.cellphonedb}, \hyperpage{12}
   \item \spxentry{CellSurfaceProteinAtlas}\spxextra{class in pypath.annot}, \hyperpage{8}
-  \item \spxentry{clean()}\spxextra{pypath.pdb.ResidueMapper method}, \hyperpage{15}
+  \item \spxentry{clean()}\spxextra{pypath.pdb.ResidueMapper method}, \hyperpage{16}
   \item \spxentry{cleanup\_hook()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
   \item \spxentry{close\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
   \item \spxentry{comments\_complex}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{10}
+		\hyperpage{11}
   \item \spxentry{Compleat}\spxextra{class in pypath.complex}, \hyperpage{13}
-  \item \spxentry{complex\_inference()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
+  \item \spxentry{complex\_inference()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
   \item \spxentry{complex\_name}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{10}
+		\hyperpage{11}
   \item \spxentry{complex\_sources\_default}\spxextra{in module pypath.annot}, \hyperpage{10}
-  \item \spxentry{ComplexAggregator}\spxextra{class in pypath.complex}, \hyperpage{13}
-  \item \spxentry{ComplexPortal}\spxextra{class in pypath.complex}, \hyperpage{13}
+  \item \spxentry{ComplexAggregator}\spxextra{class in pypath.complex}, \hyperpage{14}
+  \item \spxentry{ComplexPortal}\spxextra{class in pypath.complex}, \hyperpage{14}
   \item \spxentry{Comppi}\spxextra{class in pypath.annot}, \hyperpage{8}
   \item \spxentry{Corum}\spxextra{class in pypath.annot}, \hyperpage{8}
-  \item \spxentry{Corum}\spxextra{class in pypath.complex}, \hyperpage{13}
+  \item \spxentry{Corum}\spxextra{class in pypath.complex}, \hyperpage{14}
   \item \spxentry{CorumFuncat}\spxextra{class in pypath.annot}, \hyperpage{8}
   \item \spxentry{CorumGO}\spxextra{class in pypath.annot}, \hyperpage{8}
-  \item \spxentry{counts()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{8}
+  \item \spxentry{counts()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{9}
   \item \spxentry{Cpad}\spxextra{class in pypath.annot}, \hyperpage{8}
-  \item \spxentry{create\_class()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{8}
+  \item \spxentry{create\_class()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{9}
   \item \spxentry{CustomAnnotation}\spxextra{class in pypath.annot}, \hyperpage{8}
 
   \indexspace
@@ -67,35 +71,35 @@
   \indexspace
   \bigletter E
   \item \spxentry{effect}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
-  \item \spxentry{ensembl}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, \hyperpage{11}
+  \item \spxentry{ensembl}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, \hyperpage{12}
   \item \spxentry{Exocarta}\spxextra{class in pypath.annot}, \hyperpage{9}
   \item \spxentry{extract()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
 
   \indexspace
   \bigletter G
   \item \spxentry{gene\_name}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, 
-		\hyperpage{11}
-  \item \spxentry{get\_class()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{8}
+		\hyperpage{12}
+  \item \spxentry{get\_class()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{9}
   \item \spxentry{get\_db()}\spxextra{in module pypath.annot}, \hyperpage{10}
-  \item \spxentry{get\_db()}\spxextra{in module pypath.complex}, \hyperpage{13}
+  \item \spxentry{get\_db()}\spxextra{in module pypath.complex}, \hyperpage{14}
   \item \spxentry{get\_db()}\spxextra{in module pypath.go}, \hyperpage{14}
-  \item \spxentry{get\_isoforms()}\spxextra{in module pypath.seq}, \hyperpage{16}
-  \item \spxentry{get\_subset()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
+  \item \spxentry{get\_isoforms()}\spxextra{in module pypath.seq}, \hyperpage{17}
+  \item \spxentry{get\_subset()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
   \item \spxentry{GOIntercell}\spxextra{class in pypath.annot}, \hyperpage{9}
   \item \spxentry{GuideToPharmacology}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{GuideToPharmacology}\spxextra{class in pypath.complex}, \hyperpage{13}
+  \item \spxentry{GuideToPharmacology}\spxextra{class in pypath.complex}, \hyperpage{14}
 
   \indexspace
   \bigletter H
-  \item \spxentry{Havugimana}\spxextra{class in pypath.complex}, \hyperpage{13}
-  \item \spxentry{Hgnc}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{Havugimana}\spxextra{class in pypath.complex}, \hyperpage{14}
+  \item \spxentry{Hgnc}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{hgnc\_symbol}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, 
-		\hyperpage{11}
-  \item \spxentry{Hpmr}\spxextra{class in pypath.complex}, \hyperpage{13}
-  \item \spxentry{HpmrComplex}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{HumanPlasmaMembraneReceptome}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{HumanProteinAtlas}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{Humap}\spxextra{class in pypath.complex}, \hyperpage{13}
+		\hyperpage{12}
+  \item \spxentry{Hpmr}\spxextra{class in pypath.complex}, \hyperpage{14}
+  \item \spxentry{HpmrComplex}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{HumanPlasmaMembraneReceptome}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{HumanProteinAtlas}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{Humap}\spxextra{class in pypath.complex}, \hyperpage{14}
 
   \indexspace
   \bigletter I
@@ -104,56 +108,58 @@
   \item \spxentry{id\_cp\_interaction}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
   \item \spxentry{init\_db()}\spxextra{in module pypath.annot}, \hyperpage{10}
-  \item \spxentry{init\_db()}\spxextra{in module pypath.complex}, \hyperpage{13}
+  \item \spxentry{init\_db()}\spxextra{in module pypath.complex}, \hyperpage{14}
   \item \spxentry{init\_db()}\spxextra{in module pypath.go}, \hyperpage{14}
   \item \spxentry{init\_etree()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
   \item \spxentry{integrin}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{10}
+		\hyperpage{11}
   \item \spxentry{integrin}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
-  \item \spxentry{Integrins}\spxextra{class in pypath.annot}, \hyperpage{9}
+		\hyperpage{13}
+  \item \spxentry{Integrins}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{Interaction}\spxextra{class in pypath.network}, \hyperpage{15}
-  \item \spxentry{Intercell}\spxextra{class in pypath.intercell}, \hyperpage{14}
-  \item \spxentry{IntercellAnnotation}\spxextra{class in pypath.intercell}, \hyperpage{14}
-  \item \spxentry{IntercellRole}\spxextra{class in pypath.intercell}, \hyperpage{14}
-  \item \spxentry{Intogen}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{iterate()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
+  \item \spxentry{Intercell}\spxextra{class in pypath.intercell}, \hyperpage{15}
+  \item \spxentry{IntercellAnnotation}\spxextra{class in pypath.intercell}, \hyperpage{15}
+  \item \spxentry{IntercellRole}\spxextra{class in pypath.intercell}, \hyperpage{15}
+  \item \spxentry{Intogen}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{iterate()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{17}
 
   \indexspace
   \bigletter K
-  \item \spxentry{KeggPathways}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{Kinases}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{Kirouac2010}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{KeggPathways}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{Kinases}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{Kirouac2010}\spxextra{class in pypath.annot}, \hyperpage{10}
 
   \indexspace
   \bigletter L
-  \item \spxentry{LigandReceptor}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{LigandReceptor}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{load\_from\_pickle()}\spxextra{pypath.annot.CustomAnnotation method}, 
-		\hyperpage{8}
+		\hyperpage{9}
   \item \spxentry{load\_go()}\spxextra{in module pypath.go}, \hyperpage{14}
-  \item \spxentry{load\_proteins()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
-  \item \spxentry{Locate}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{load\_proteins()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
+  \item \spxentry{Locate}\spxextra{class in pypath.annot}, \hyperpage{10}
 
   \indexspace
   \bigletter M
-  \item \spxentry{Matrisome}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{Matrixdb}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{Membranome}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{Matrisome}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{Matrixdb}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{Membranome}\spxextra{class in pypath.annot}, \hyperpage{10}
 
   \indexspace
   \bigletter N
-  \item \spxentry{NetpathPathways}\spxextra{class in pypath.annot}, \hyperpage{9}
+  \item \spxentry{name}\spxextra{pypath.annot\_formats.AnnotDef attribute}, \hyperpage{7}
+  \item \spxentry{NetpathPathways}\spxextra{class in pypath.annot}, \hyperpage{10}
 
   \indexspace
   \bigletter O
-  \item \spxentry{open\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
-  \item \spxentry{Opm}\spxextra{class in pypath.annot}, \hyperpage{9}
-  \item \spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, \hyperpage{10}
-  \item \spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, \hyperpage{12}
+  \item \spxentry{op}\spxextra{pypath.annot\_formats.AnnotOp attribute}, \hyperpage{7}
+  \item \spxentry{open\_biopax()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{17}
+  \item \spxentry{Opm}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, \hyperpage{11}
+  \item \spxentry{other}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, \hyperpage{13}
   \item \spxentry{other\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{other\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
 
   \indexspace
   \bigletter P
@@ -161,7 +167,7 @@
 		\hyperpage{12}
   \item \spxentry{partner\_b}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
-  \item \spxentry{Pdb}\spxextra{class in pypath.complex}, \hyperpage{13}
+  \item \spxentry{Pdb}\spxextra{class in pypath.complex}, \hyperpage{14}
   \item \spxentry{pdb\_id}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{pdb\_structure}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
@@ -169,55 +175,56 @@
   \item \spxentry{peripheral}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{peripheral}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
   \item \spxentry{Phosphatome}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{populate\_classes()}\spxextra{pypath.annot.CustomAnnotation method}, 
 		\hyperpage{9}
-  \item \spxentry{process()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
+  \item \spxentry{process()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{17}
   \item \spxentry{process\_annot()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{9}
   \item \spxentry{protein\_name}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
   \item \spxentry{protein\_name\_a}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
   \item \spxentry{protein\_name\_b}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
-  \item \spxentry{protein\_sources\_default}\spxextra{in module pypath.annot}, \hyperpage{10}
+  \item \spxentry{protein\_sources\_default}\spxextra{in module pypath.annot}, \hyperpage{11}
   \item \spxentry{pypath.annot}\spxextra{module}, \hyperpage{7}
-  \item \spxentry{pypath.cellphonedb}\spxextra{module}, \hyperpage{10}
+  \item \spxentry{pypath.annot\_formats}\spxextra{module}, \hyperpage{7}
+  \item \spxentry{pypath.cellphonedb}\spxextra{module}, \hyperpage{11}
   \item \spxentry{pypath.complex}\spxextra{module}, \hyperpage{13}
   \item \spxentry{pypath.go}\spxextra{module}, \hyperpage{14}
-  \item \spxentry{pypath.homology}\spxextra{module}, \hyperpage{14}
-  \item \spxentry{pypath.intera}\spxextra{module}, \hyperpage{14}
-  \item \spxentry{pypath.intercell}\spxextra{module}, \hyperpage{14}
+  \item \spxentry{pypath.homology}\spxextra{module}, \hyperpage{15}
+  \item \spxentry{pypath.intera}\spxextra{module}, \hyperpage{15}
+  \item \spxentry{pypath.intercell}\spxextra{module}, \hyperpage{15}
   \item \spxentry{pypath.network}\spxextra{module}, \hyperpage{15}
-  \item \spxentry{pypath.pdb}\spxextra{module}, \hyperpage{15}
-  \item \spxentry{pypath.ptm}\spxextra{module}, \hyperpage{15}
-  \item \spxentry{pypath.pyreact}\spxextra{module}, \hyperpage{15}
-  \item \spxentry{pypath.seq}\spxextra{module}, \hyperpage{16}
+  \item \spxentry{pypath.pdb}\spxextra{module}, \hyperpage{16}
+  \item \spxentry{pypath.ptm}\spxextra{module}, \hyperpage{16}
+  \item \spxentry{pypath.pyreact}\spxextra{module}, \hyperpage{16}
+  \item \spxentry{pypath.seq}\spxextra{module}, \hyperpage{17}
   \item \spxentry{pypath.unichem}\spxextra{module}, \hyperpage{17}
 
   \indexspace
   \bigletter R
   \item \spxentry{Ramilowski2015}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{Ramilowski2015Location}\spxextra{class in pypath.annot}, \hyperpage{10}
-  \item \spxentry{read\_fasta()}\spxextra{in module pypath.seq}, \hyperpage{16}
+  \item \spxentry{read\_fasta()}\spxextra{in module pypath.seq}, \hyperpage{17}
   \item \spxentry{receptor}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{receptor}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
   \item \spxentry{receptor\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{receptor\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
-  \item \spxentry{record}\spxextra{pypath.annot.CellPhoneDB attribute}, \hyperpage{7}
+		\hyperpage{13}
+  \item \spxentry{record}\spxextra{pypath.annot.CellPhoneDB attribute}, \hyperpage{8}
   \item \spxentry{references}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
-  \item \spxentry{reload()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{7}
+  \item \spxentry{reload()}\spxextra{pypath.annot.AnnotationBase method}, \hyperpage{8}
   \item \spxentry{reload()}\spxextra{pypath.annot.CustomAnnotation method}, \hyperpage{9}
-  \item \spxentry{reload()}\spxextra{pypath.complex.ComplexAggregator method}, \hyperpage{13}
-  \item \spxentry{reload()}\spxextra{pypath.intercell.Intercell method}, \hyperpage{14}
-  \item \spxentry{reload()}\spxextra{pypath.intercell.IntercellAnnotation method}, \hyperpage{14}
-  \item \spxentry{ResidueMapper}\spxextra{class in pypath.pdb}, \hyperpage{15}
-  \item \spxentry{role}\spxextra{pypath.intercell.IntercellRole attribute}, \hyperpage{14}
+  \item \spxentry{reload()}\spxextra{pypath.complex.ComplexAggregator method}, \hyperpage{14}
+  \item \spxentry{reload()}\spxextra{pypath.intercell.Intercell method}, \hyperpage{15}
+  \item \spxentry{reload()}\spxextra{pypath.intercell.IntercellAnnotation method}, \hyperpage{15}
+  \item \spxentry{ResidueMapper}\spxextra{class in pypath.pdb}, \hyperpage{16}
+  \item \spxentry{role}\spxextra{pypath.intercell.IntercellRole attribute}, \hyperpage{15}
 
   \indexspace
   \bigletter S
@@ -225,31 +232,32 @@
   \item \spxentry{secreted}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{secreted}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
   \item \spxentry{secreted\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{secreted\_desc}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
+		\hyperpage{13}
   \item \spxentry{secreted\_highlight}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{secreted\_highlight}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
-		\hyperpage{12}
-  \item \spxentry{set\_progress()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{16}
+		\hyperpage{13}
+  \item \spxentry{set\_progress()}\spxextra{pypath.pyreact.BioPaxReader method}, \hyperpage{17}
   \item \spxentry{SignalinkPathways}\spxextra{class in pypath.annot}, \hyperpage{10}
-  \item \spxentry{Signor}\spxextra{class in pypath.complex}, \hyperpage{13}
+  \item \spxentry{Signor}\spxextra{class in pypath.complex}, \hyperpage{14}
   \item \spxentry{SignorPathways}\spxextra{class in pypath.annot}, \hyperpage{10}
+  \item \spxentry{source}\spxextra{pypath.annot\_formats.AnnotDef attribute}, \hyperpage{7}
   \item \spxentry{source}\spxextra{pypath.cellphonedb.CellPhoneDBInteraction attribute}, 
 		\hyperpage{12}
-  \item \spxentry{source}\spxextra{pypath.intercell.IntercellRole attribute}, \hyperpage{14}
+  \item \spxentry{source}\spxextra{pypath.intercell.IntercellRole attribute}, \hyperpage{15}
   \item \spxentry{sources}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
   \item \spxentry{stoichiometry}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
 		\hyperpage{11}
   \item \spxentry{Surfaceome}\spxextra{class in pypath.annot}, \hyperpage{10}
-  \item \spxentry{swissprot\_seq()}\spxextra{in module pypath.seq}, \hyperpage{16}
+  \item \spxentry{swissprot\_seq()}\spxextra{in module pypath.seq}, \hyperpage{17}
 
   \indexspace
   \bigletter T
-  \item \spxentry{tags}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, \hyperpage{12}
+  \item \spxentry{tags}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, \hyperpage{13}
   \item \spxentry{tags\_description}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
 		\hyperpage{13}
   \item \spxentry{tags\_reason}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
@@ -257,26 +265,26 @@
   \item \spxentry{Tfcensus}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{Topdb}\spxextra{class in pypath.annot}, \hyperpage{10}
   \item \spxentry{transmembrane}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{11}
+		\hyperpage{12}
   \item \spxentry{transmembrane}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
 		\hyperpage{13}
   \item \spxentry{type}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
   \item \spxentry{type\_a}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
-  \item \spxentry{type\_b}\spxextra{pypath.network.Interaction attribute}, \hyperpage{15}
+  \item \spxentry{type\_b}\spxextra{pypath.network.Interaction attribute}, \hyperpage{16}
 
   \indexspace
   \bigletter U
-  \item \spxentry{uniprot}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, \hyperpage{11}
+  \item \spxentry{uniprot}\spxextra{pypath.cellphonedb.CellPhoneDBGene attribute}, \hyperpage{12}
   \item \spxentry{uniprot}\spxextra{pypath.cellphonedb.CellPhoneDBProtein attribute}, 
 		\hyperpage{13}
   \item \spxentry{uniprot\_1}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{11}
+		\hyperpage{12}
   \item \spxentry{uniprot\_2}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{11}
+		\hyperpage{12}
   \item \spxentry{uniprot\_3}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{11}
+		\hyperpage{12}
   \item \spxentry{uniprot\_4}\spxextra{pypath.cellphonedb.CellPhoneDBComplex attribute}, 
-		\hyperpage{11}
+		\hyperpage{12}
 
   \indexspace
   \bigletter V

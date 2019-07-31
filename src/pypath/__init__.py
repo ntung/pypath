@@ -19,9 +19,9 @@
 #
 
 """
-``pypath`` is a module primarily for building molecular interaction networks
-but also with several submodules for accessing, preprocessing and serving
-data from various resources.
+``pypath`` is a module primarily for building molecular interaction
+networks but also with several submodules for accessing, preprocessing
+and serving data from various resources.
 """
 
 import sys
@@ -33,14 +33,13 @@ import pypath.session_mod as _session_mod
 
 
 class pypath(object):
-    
-    
+
     __version__ = _version.__version__
     __author__ = _version.__author__
-    
+
     _session_mod.new_session()
     session = _session_mod.get_session()
-    
+
     _disclaimer_text = (
         '\n\t=== d i s c l a i m e r ===\n\n'
         '\tAll data accessed through this module,\n'
@@ -56,32 +55,30 @@ class pypath(object):
         '\thttp://omnipathdb.org/info and \n'
         '\t`pypath.data_formats.urls`.\n\n'
     )
-    
+
     def __init__(self):
-        
+
         pass
-    
+
     @classmethod
     def _disclaimer(cls):
-        
+
         sys.stdout.write(cls._disclaimer_text)
         sys.stdout.flush()
-    
-    
+
     @classmethod
     def license(cls):
-        
+
         cls_disclaimer()
-    
-    
+
     def __getattribute__(self, attr):
-        
+
         try:
-            
+
             return importlib.import_module('pypath.%s' % attr)
-            
+
         except ImportError:
-            
+
             return object.__getattribute__(self, attr)
 
 
@@ -111,18 +108,18 @@ _session_mod.get_log().msg(
 
 
 #def __getattr__(attr):
-    
+
     #try:
-        
+
         #return importlib.import_module('pypath.%s' % attr)
-        
+
     #except ImportError:
-        
+
         #return __import__(__name__).__getattribute__(attr)
 
 
 #def __dir__():
-    
+
     #return object.__dir__(__import__(__name__)) + [
         #py[:-3]
         #for py in os.listdir(os.path.abspath(os.path.dirname(__file__)))

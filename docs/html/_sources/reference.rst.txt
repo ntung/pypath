@@ -2,6 +2,12 @@
 Module reference
 ****************
 
+annot_formats
+=============
+
+.. automodule:: pypath.annot_formats
+   :members:
+
 annot
 =====
 

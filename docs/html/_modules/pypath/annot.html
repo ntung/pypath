@@ -315,8 +315,7 @@
 <span class="sd">    :var str pickle_file:</span>
 <span class="sd">        The path to an annotation classes pickle file.</span>
 <span class="sd">    :var str annotdb_pickle_file:</span>
-<span class="sd">        Optional, ``None`` by default. Path to the annotation database</span>
-<span class="sd">        pickle file.</span>
+<span class="sd">        Path to the annotation database pickle file.</span>
 <span class="sd">    :var pypath.annot.AnnotationTable annotdb:</span>
 <span class="sd">        An instance of the annotation table class. Loads, contains and</span>
 <span class="sd">        manages the annotation data.</span>
@@ -325,20 +324,15 @@
 <span class="sd">        their role.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">class_definitions</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_definitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pickle_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">annotdb_pickle_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_log_name&#39;</span><span class="p">):</span>
-
-            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;annot&#39;</span><span class="p">)</span>
+            <span class="n">session_mod</span><span class="o">.</span><span class="n">Logger</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;annot&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="n">pickle_file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span> <span class="o">=</span> <span class="n">annotdb_pickle_file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span> <span class="o">=</span> <span class="n">get_db</span><span class="p">(</span><span class="n">pickle_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotdb_pickle_file</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_class_definitions</span><span class="p">(</span><span class="n">class_definitions</span> <span class="ow">or</span> <span class="p">{})</span>
@@ -353,7 +347,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">modname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">modname</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">modname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]])</span>
         <span class="n">imp</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="n">new</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span></div>
@@ -369,7 +363,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_definitions</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-
             <span class="n">class_definitions</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">classdef</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
@@ -380,7 +373,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">class_definitions</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="CustomAnnotation.populate_classes"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.populate_classes">[docs]</a>    <span class="k">def</span> <span class="nf">populate_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CustomAnnotation.populate_classes"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.populate_classes">[docs]</a>    <span class="k">def</span> <span class="nf">populate_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">update</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a classification of proteins according to their roles</span>
 <span class="sd">        in the intercellular communication. Loads from pickle</span>
@@ -392,14 +385,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">:</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">pickle_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_from_pickle</span><span class="p">(</span><span class="n">pickle_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pickle_file</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">for</span> <span class="n">classdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_definitions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
 
             <span class="k">if</span> <span class="n">classdef</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="ow">or</span> <span class="n">update</span><span class="p">:</span>
-
                 <span class="bp">self</span><span class="o">.</span><span class="n">create_class</span><span class="p">(</span><span class="n">classdef</span><span class="p">)</span></div>
 
 
@@ -412,7 +403,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">classes</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span></div>
 
 
@@ -425,11 +415,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pickle_file</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span>
-                <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span>
-                <span class="n">file</span> <span class="o">=</span> <span class="n">fp</span><span class="p">,</span>
-            <span class="p">)</span></div>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">classes</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">fp</span><span class="p">)</span></div>
 
 <span class="c1"># XXX: Double-check!</span>
 <div class="viewcode-block" id="CustomAnnotation.create_class"><a class="viewcode-back" href="../../reference.html#pypath.annot.CustomAnnotation.create_class">[docs]</a>    <span class="k">def</span> <span class="nf">create_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">classdef</span><span class="p">):</span>
@@ -466,21 +452,16 @@
             <span class="k">if</span> <span class="n">classdef</span><span class="o">.</span><span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">:</span>
 
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">classdef</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
-
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">to_set</span><span class="p">()</span>
 
                 <span class="k">else</span><span class="p">:</span>
-
                     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotdb</span><span class="o">.</span><span class="n">annots</span><span class="p">[</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">]</span><span class="o">.</span><span class="n">get_subset</span><span class="p">(</span>
-                        <span class="o">**</span><span class="n">classdef</span><span class="o">.</span><span class="n">args</span>
-                    <span class="p">)</span>
+                        <span class="o">**</span><span class="n">classdef</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">):</span>
-
             <span class="k">return</span> <span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="o">**</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">args</span> <span class="ow">or</span> <span class="p">{}))</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="n">annot_formats</span><span class="o">.</span><span class="n">AnnotOp</span><span class="p">):</span>
-
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_operation</span><span class="p">(</span><span class="n">classdef</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">set</span><span class="p">()</span></div>

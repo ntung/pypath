@@ -277,6 +277,78 @@ as soon as possible.
 \chapter{Module reference}
 \label{\detokenize{reference:module-reference}}\label{\detokenize{reference::doc}}
 
+\section{annot\_formats}
+\label{\detokenize{reference:module-pypath.annot_formats}}\label{\detokenize{reference:annot-formats}}\index{pypath.annot\_formats (module)@\spxentry{pypath.annot\_formats}\spxextra{module}}\index{AnnotDef (class in pypath.annot\_formats)@\spxentry{AnnotDef}\spxextra{class in pypath.annot\_formats}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotDef}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot\_formats.}}\sphinxbfcode{\sphinxupquote{AnnotDef}}}{\emph{name}, \emph{source}, \emph{args}}{}
+Annotations are defined by a \sphinxcode{\sphinxupquote{name}}, a \sphinxcode{\sphinxupquote{source}} and an \sphinxcode{\sphinxupquote{args}}
+parameter. If the former is a string it will be first looked up among
+the annotation resources in \sphinxcode{\sphinxupquote{pypath.annot.db}}. Otherwise among the
+keys of the classes in the \sphinxcode{\sphinxupquote{CustomAnnotation}} object or in the
+dictionary of the class\_definitions. If \sphinxcode{\sphinxupquote{source}} is a \sphinxtitleref{set}, it
+will be used as a category without further processing. If it is
+callable it will be called and should return a \sphinxtitleref{set}. If
+\sphinxcode{\sphinxupquote{bool(args)}} is \sphinxtitleref{False}, in case of annotations in
+\sphinxcode{\sphinxupquote{pypath.annot.db}} the \sphinxcode{\sphinxupquote{to\_set}} method will be called. Otherwise
+\sphinxcode{\sphinxupquote{args}} will be passed to the \sphinxcode{\sphinxupquote{get\_subset}} method. If \sphinxcode{\sphinxupquote{source}}
+is callable, \sphinxcode{\sphinxupquote{args}} will be passed if available.
+\index{args (pypath.annot\_formats.AnnotDef attribute)@\spxentry{args}\spxextra{pypath.annot\_formats.AnnotDef attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotDef.args}}\pysigline{\sphinxbfcode{\sphinxupquote{args}}}
+Alias for field number 2
+
+\end{fulllineitems}
+
+\index{name (pypath.annot\_formats.AnnotDef attribute)@\spxentry{name}\spxextra{pypath.annot\_formats.AnnotDef attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotDef.name}}\pysigline{\sphinxbfcode{\sphinxupquote{name}}}
+Alias for field number 0
+
+\end{fulllineitems}
+
+\index{source (pypath.annot\_formats.AnnotDef attribute)@\spxentry{source}\spxextra{pypath.annot\_formats.AnnotDef attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotDef.source}}\pysigline{\sphinxbfcode{\sphinxupquote{source}}}
+Alias for field number 1
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+\index{AnnotOp (class in pypath.annot\_formats)@\spxentry{AnnotOp}\spxextra{class in pypath.annot\_formats}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotOp}}\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{pypath.annot\_formats.}}\sphinxbfcode{\sphinxupquote{AnnotOp}}}{\emph{annots}, \emph{op}}{}
+Annotation operations consist of list of annotation definitions or
+names as they can be looked up in the \sphinxcode{\sphinxupquote{class\_definitions}} of the
+\sphinxcode{\sphinxupquote{CustomAnnotation}} object and an operator to be called on the sets
+(union, intersection or difference).
+\index{annots (pypath.annot\_formats.AnnotOp attribute)@\spxentry{annots}\spxextra{pypath.annot\_formats.AnnotOp attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotOp.annots}}\pysigline{\sphinxbfcode{\sphinxupquote{annots}}}
+Alias for field number 0
+
+\end{fulllineitems}
+
+\index{op (pypath.annot\_formats.AnnotOp attribute)@\spxentry{op}\spxextra{pypath.annot\_formats.AnnotOp attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{reference:pypath.annot_formats.AnnotOp.op}}\pysigline{\sphinxbfcode{\sphinxupquote{op}}}
+Alias for field number 1
+
+\end{fulllineitems}
+
+
+\end{fulllineitems}
+
+
+
 \section{annot}
 \label{\detokenize{reference:module-pypath.annot}}\label{\detokenize{reference:annot}}\index{pypath.annot (module)@\spxentry{pypath.annot}\spxextra{module}}
 Annotation module. Contains classes and methods to load different
@@ -456,8 +528,7 @@ pickle file.
 \sphinxstyleliteralstrong{\sphinxupquote{pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The path to an annotation classes pickle file.
 
 \item {} 
-\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Optional, \sphinxcode{\sphinxupquote{None}} by default. Path to the annotation database
-pickle file.
+\sphinxstyleliteralstrong{\sphinxupquote{annotdb\_pickle\_file}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Path to the annotation database pickle file.
 
 \item {} 
 \sphinxstyleliteralstrong{\sphinxupquote{annotdb}} (\sphinxstyleliteralemphasis{\sphinxupquote{pypath.annot.AnnotationTable}}) \textendash{} An instance of the annotation table class. Loads, contains and
@@ -2075,6 +2146,7 @@ example.
 \let\bigletter\sphinxstyleindexlettergroup
 \bigletter{p}
 \item\relax\sphinxstyleindexentry{pypath.annot}\sphinxstyleindexpageref{reference:\detokenize{module-pypath.annot}}
+\item\relax\sphinxstyleindexentry{pypath.annot\_formats}\sphinxstyleindexpageref{reference:\detokenize{module-pypath.annot_formats}}
 \item\relax\sphinxstyleindexentry{pypath.cellphonedb}\sphinxstyleindexpageref{reference:\detokenize{module-pypath.cellphonedb}}
 \item\relax\sphinxstyleindexentry{pypath.complex}\sphinxstyleindexpageref{reference:\detokenize{module-pypath.complex}}
 \item\relax\sphinxstyleindexentry{pypath.go}\sphinxstyleindexpageref{reference:\detokenize{module-pypath.go}}

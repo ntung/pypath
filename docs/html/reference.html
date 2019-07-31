@@ -88,6 +88,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Module reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-pypath.annot_formats">annot_formats</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pypath.annot">annot</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#bel">bel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pypath.cellphonedb">cellphonedb</a></li>
@@ -172,6 +173,64 @@
             
   <div class="section" id="module-reference">
 <h1>Module reference<a class="headerlink" href="#module-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pypath.annot_formats">
+<span id="annot-formats"></span><h2>annot_formats<a class="headerlink" href="#module-pypath.annot_formats" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pypath.annot_formats.AnnotDef">
+<em class="property">class </em><code class="descclassname">pypath.annot_formats.</code><code class="descname">AnnotDef</code><span class="sig-paren">(</span><em>name</em>, <em>source</em>, <em>args</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.annot_formats.AnnotDef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotations are defined by a <code class="docutils literal notranslate"><span class="pre">name</span></code>, a <code class="docutils literal notranslate"><span class="pre">source</span></code> and an <code class="docutils literal notranslate"><span class="pre">args</span></code>
+parameter. If the former is a string it will be first looked up among
+the annotation resources in <code class="docutils literal notranslate"><span class="pre">pypath.annot.db</span></code>. Otherwise among the
+keys of the classes in the <code class="docutils literal notranslate"><span class="pre">CustomAnnotation</span></code> object or in the
+dictionary of the class_definitions. If <code class="docutils literal notranslate"><span class="pre">source</span></code> is a <cite>set</cite>, it
+will be used as a category without further processing. If it is
+callable it will be called and should return a <cite>set</cite>. If
+<code class="docutils literal notranslate"><span class="pre">bool(args)</span></code> is <cite>False</cite>, in case of annotations in
+<code class="docutils literal notranslate"><span class="pre">pypath.annot.db</span></code> the <code class="docutils literal notranslate"><span class="pre">to_set</span></code> method will be called. Otherwise
+<code class="docutils literal notranslate"><span class="pre">args</span></code> will be passed to the <code class="docutils literal notranslate"><span class="pre">get_subset</span></code> method. If <code class="docutils literal notranslate"><span class="pre">source</span></code>
+is callable, <code class="docutils literal notranslate"><span class="pre">args</span></code> will be passed if available.</p>
+<dl class="attribute">
+<dt id="pypath.annot_formats.AnnotDef.args">
+<code class="descname">args</code><a class="headerlink" href="#pypath.annot_formats.AnnotDef.args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pypath.annot_formats.AnnotDef.name">
+<code class="descname">name</code><a class="headerlink" href="#pypath.annot_formats.AnnotDef.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pypath.annot_formats.AnnotDef.source">
+<code class="descname">source</code><a class="headerlink" href="#pypath.annot_formats.AnnotDef.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pypath.annot_formats.AnnotOp">
+<em class="property">class </em><code class="descclassname">pypath.annot_formats.</code><code class="descname">AnnotOp</code><span class="sig-paren">(</span><em>annots</em>, <em>op</em><span class="sig-paren">)</span><a class="headerlink" href="#pypath.annot_formats.AnnotOp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotation operations consist of list of annotation definitions or
+names as they can be looked up in the <code class="docutils literal notranslate"><span class="pre">class_definitions</span></code> of the
+<code class="docutils literal notranslate"><span class="pre">CustomAnnotation</span></code> object and an operator to be called on the sets
+(union, intersection or difference).</p>
+<dl class="attribute">
+<dt id="pypath.annot_formats.AnnotOp.annots">
+<code class="descname">annots</code><a class="headerlink" href="#pypath.annot_formats.AnnotOp.annots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pypath.annot_formats.AnnotOp.op">
+<code class="descname">op</code><a class="headerlink" href="#pypath.annot_formats.AnnotOp.op" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-pypath.annot">
 <span id="annot"></span><h2>annot<a class="headerlink" href="#module-pypath.annot" title="Permalink to this headline">¶</a></h2>
 <p>Annotation module. Contains classes and methods to load different
@@ -314,8 +373,7 @@ pickle file.</p></li>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>pickle_file</strong> (<em>str</em>) – The path to an annotation classes pickle file.</p></li>
-<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Optional, <code class="docutils literal notranslate"><span class="pre">None</span></code> by default. Path to the annotation database
-pickle file.</p></li>
+<li><p><strong>annotdb_pickle_file</strong> (<em>str</em>) – Path to the annotation database pickle file.</p></li>
 <li><p><strong>annotdb</strong> (<em>pypath.annot.AnnotationTable</em>) – An instance of the annotation table class. Loads, contains and
 manages the annotation data.</p></li>
 <li><p><strong>classes</strong> (<em>dict</em>) – Contains the entities by their class definition according to
