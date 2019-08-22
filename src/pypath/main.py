@@ -97,8 +97,8 @@ import pypath.cache as cache_mod
 import pypath.data_formats as data_formats
 import pypath.mapping as mapping
 import pypath.descriptions as descriptions
-import pypath.chembl as chembl
-import pypath.mysql as mysql
+#import pypath.chembl as chembl
+#import pypath.mysql as mysql
 import pypath.dataio as dataio
 import pypath.network as network
 import pypath.uniprot_input as uniprot_input
@@ -118,7 +118,7 @@ import pypath.export as export
 import pypath.ig_drawing as ig_drawing
 import pypath.common as common
 import pypath._version as _version
-from pypath.gr_plot import *
+#from pypath.gr_plot import *
 from pypath.progress import *
 import pypath.settings as settings
 
@@ -1641,12 +1641,12 @@ class PyPath(session_mod.Logger):
         )
 
         if save:
-            
+
             self._log('Saving igraph object to file `%s`...' % pfile)
             self.save_network(pfile = pfile)
             self._log('Network saved successfully to file `%s`.' % pfile)
-    
-    
+
+
     def save_network(self, pfile=None):
         """Saves the network object.
 
@@ -2640,8 +2640,8 @@ class PyPath(session_mod.Logger):
             self.data[param.name] = edge_list_mapped
 
         self.raw_data = edge_list_mapped
-    
-    
+
+
     def signaling_proteins_list(self):
         """
         Compiles a list of signaling proteins (as opposed to other
@@ -2746,24 +2746,24 @@ class PyPath(session_mod.Logger):
             else set([])
 
         return len(set(self.graph.vs['name']) & lst) / float(len(lst))
-    
-    
+
+
     def entities_by_resources(self):
         """
         Returns a dict of sets with resources as keys and sets of entity IDs
         as values.
         """
-        
+
         results = collections.defaultdict(set)
-        
+
         for v in self.graph.vs:
-            
+
             for resource in v['sources']:
-                
+
                 result[resource].add(v['name'])
-        
+
         return result
-    
+
 
     def fisher_enrichment(self, lst, attr, ref='proteome'):
         """
@@ -2849,7 +2849,7 @@ class PyPath(session_mod.Logger):
         mapTbl = ''.join([original_name_type, "_", default_name_type])
 
         if type(_input) in common.charTypes and os.path.isfile(_input):
-            
+
             _input = curl.Curl(_input, large = True).result
 
             #codecs.open(_input, encoding='utf-8', mode='r')
@@ -2898,7 +2898,7 @@ class PyPath(session_mod.Logger):
                     }
 
                 except:
-                    
+
                     print(line)
                     self._log(
                         'Wrong name column indexes (%u and %u), '
@@ -4113,7 +4113,7 @@ class PyPath(session_mod.Logger):
             d.delete_vertices(list(set(toDel)))
 
         if not graph:
-            
+
             self.dgraph = d
             self._directed = self.dgraph
             self._get_directed()
@@ -5432,7 +5432,7 @@ class PyPath(session_mod.Logger):
         # XXX: What's the purpose of this? I mean attribute _directed is not
         #      accessed in this function (?)
         self._already_has_directed()
-        
+
         if graph is None and self.dgraph is not None:
             self.genesymbol_labels(graph=self.dgraph, remap_all=remap_all)
 
@@ -5460,11 +5460,11 @@ class PyPath(session_mod.Logger):
             if l is None:
 
                 label = None
-                
+
                 if isinstance(v['name'], intera.Complex):
-                    
+
                     label = v['name'].genesymbol_str
-                
+
                 elif (
                     v['type'] in label_name_types and
                     v['type'] in default_name_types
@@ -5732,8 +5732,8 @@ class PyPath(session_mod.Logger):
 
                     if s in e['refs_by_source']:
                         e['refs_by_cat'][cat].update(e['refs_by_source'][s])
-    
-    
+
+
     def basic_stats_intergroup(self, groupA, groupB, header=None): # TODO
         """
 
@@ -7020,7 +7020,7 @@ class PyPath(session_mod.Logger):
             f.write('\n\t<!-- edges -->\n\n')
 
             for e in g.es:
-                
+
                 f.write(
                     '<edge id="%s_%s" source="%s" target="%s" directed="%s">\n'
                     % (g.vs[e.source]['name'], g.vs[e.target]['name'],
@@ -7038,7 +7038,7 @@ class PyPath(session_mod.Logger):
                         ))
                     )
                 )
-                
+
                 f.write(
                     '\t<data key="DirectionAB">%s</data>\n' % (
                         ';'.join(sorted(
@@ -9600,15 +9600,15 @@ class PyPath(session_mod.Logger):
             database no new database will be created. This means the
             parameters specified in other arguments might have no effect.
         """
-        
+
         if database:
-            
+
             ptma = database
-            
+
         else:
-            
+
             method = 'init_db' if force_load else 'get_db'
-            
+
             _ = getattr(pypath.ptm, 'method')(
                 input_methods = input_methods,
                 ncbi_tax_id = self.ncbi_tax_id,
@@ -9618,9 +9618,9 @@ class PyPath(session_mod.Logger):
                 nonhuman_direct_lookup = nonhuman_direct_lookup,
                 inputargs = inputargs
             )
-            
+
             ptma = pypath.ptm.get_db()
-            
+
         ptma.assign_to_network(self)
 
         if self.ncbi_tax_id == 9606 and (
@@ -12761,11 +12761,11 @@ class PyPath(session_mod.Logger):
 
         # XXX: According to the alias above omnipath = data_formats.omnipath already
         # YYY: Ok, but here the user has a chance to override it, is it bad?
-        
+
         exclude = exclude or []
-        
+
         if omnipath is None:
-            
+
             if old_omnipath_resources:
                 omnipath = modcopy.deepcopy(data_formats.omnipath)
                 omnipath['biogrid'] = data_formats.interaction['biogrid']
@@ -12780,10 +12780,10 @@ class PyPath(session_mod.Logger):
 
         if kinase_substrate_extra:
             self.load_resources(data_formats.ptm_misc)
-        
+
         if ligand_receptor_extra:
             self.load_resources(data_formats.ligand_receptor)
-        
+
         if pathway_extra:
             self.load_resources(data_formats.pathway_noref)
 
@@ -12910,16 +12910,16 @@ class PyPath(session_mod.Logger):
         for interactions already supported by literature
         evidences from other sources.
         """
-        
+
         if use_string_effects:
             self.string_effects(graph = graph)
-        
+
         self.kegg_directions(graph=graph)
-        
+
         if use_laudanna_data:
             self.laudanna_effects(graph=graph)
             self.laudanna_directions(graph=graph)
-        
+
         self.wang_effects(graph=graph)
         self.acsn_effects(graph=graph)
         self.phosphosite_directions(graph=graph)
@@ -14432,15 +14432,15 @@ class PyPath(session_mod.Logger):
             tuple(_sort((names[e.source], names[e.target])))
             for e in graph.es
         ]
-        
+
     def __iter__(self):
-        
+
         return self.iter_interactions()
-    
+
     def iter_interactions(self, signs = True, all_undirected = True):
         """
         Iterates over edges and yields interaction records.
-        
+
         :param bool signs:
             Ignoring signs if ``False``. This way each directed interaction
             will yield a single record even if it's ambiguously labeled
@@ -14453,9 +14453,9 @@ class PyPath(session_mod.Logger):
             be provided and the undirected sources and references will be
             added to the directed records.
         """
-        
+
         def get_references(sources, edge):
-            
+
             return set(
                 ref.pmid
                 for this_refs in
@@ -14466,34 +14466,34 @@ class PyPath(session_mod.Logger):
                 )
                 for ref in this_refs
             )
-        
-        
+
+
         for edge in self.graph.es:
-            
+
             directions = edge['dirs']
-            
+
             for direction in (directions.straight, directions.reverse):
-                
+
                 if not directions.dirs[direction]:
                     # this direction does not exist
                     continue
-                
+
                 dir_sources = directions.get_dir(direction, sources = True)
-                
+
                 id_a = direction[0]
                 id_b = direction[1]
                 type_a = self.uniprot(id_a)['type']
                 type_b = self.uniprot(id_b)['type']
-                
+
                 for effect, sign_sources in zip(
                     (1, -1),
                     directions.get_sign(direction, sources = True)
                 ):
-                    
+
                     if sign_sources:
-                        
+
                         references = get_references(sign_sources, edge)
-                        
+
                         yield network.Interaction(
                             id_a = id_a,
                             id_b = id_b,
@@ -14505,16 +14505,16 @@ class PyPath(session_mod.Logger):
                             sources = sign_sources,
                             references = references,
                         )
-                
+
                 sources_with_sign = set.union(
                     *directions.get_sign(direction, sources = True)
                 )
                 sources_without_sign = dir_sources - sources_with_sign
-                
+
                 if sources_without_sign:
-                    
+
                     references = get_references(sources_without_sign, edge)
-                    
+
                     yield network.Interaction(
                         id_a = id_a,
                         id_b = id_b,
@@ -14526,19 +14526,19 @@ class PyPath(session_mod.Logger):
                         sources = sources_without_sign,
                         references = references,
                     )
-            
+
             undirected_sources = (
                 directions.get_dir('undirected', sources = True)
             )
-            
+
             if undirected_sources:
-                
+
                 id_a = self.graph.vs[edge.source]['name']
                 id_b = self.graph.vs[edge.target]['name']
                 type_a = self.graph.vs[edge.source]['type']
                 type_b = self.graph.vs[edge.target]['type']
                 references = get_references(undirected_sources, edge)
-                
+
                 yield network.Interaction(
                     id_a = id_a,
                     id_b = id_b,
@@ -14550,7 +14550,7 @@ class PyPath(session_mod.Logger):
                     sources = undirected_sources,
                     references = references,
                 )
-    
+
     # shortcuts for the most often used igraph attributes:
 
     @property

@@ -38,7 +38,7 @@ from collections import OrderedDict
 # from this module:
 import pypath.dataio as dataio
 import pypath.data_formats as data_formats
-import pypath.enrich as enrich
+#import pypath.enrich as enrich
 import pypath.mapping as mapping
 import pypath.progress as progress
 import pypath.common as common
@@ -181,83 +181,83 @@ class GSEA(object):
                 self.groups[coll] = group
 
 
-class GSEABinaryEnrichmentSet(enrich.EnrichmentSet):
-    def __init__(self,
-                 basic_set,
-                 gsea=None,
-                 geneset_ids=None,
-                 alpha=0.05,
-                 correction_method='hommel',
-                 user=None,
-                 mapper=None):
-        if type(gsea) is not GSEA and geneset_ids is None:
-            console('Please give either a `pypath.gsea.GSEA` object'
-                    'or a list of geneset names.')
-        if geneset_ids is None:
-            geneset_ids = gsea.sets.keys()
-        self.user = user
-        self.mapper = mapper
-        if type(gsea) is not GSEA:
-            gsea = GSEA(user=self.user, mapper=self.mapper)
-            for geneset_id in geneset_ids:
-                gsea.load_set(geneset_id)
-        self.geneset_ids = geneset_ids
-        self.gsea = gsea
-        self.alpha = alpha
-        self.correction_method = correction_method
-        self.basic_set = set(basic_set)
-        self.counts_pop = self.count(self.basic_set)
-        self.pop_size = len(self.basic_set)
-        self.set_size = None
-        self.counts_set = None
-        self.top_geneset_ids = self.top_ids
-        self.top_genesets = self.top_names
-
-    def count(self, this_set):
-        return dict((i, len(this_set & s))
-                    for i, s in iteritems(self.gsea.sets))
-
-    def new_set(self, set_names):
-        if type(set_names) is not set:
-            set_names = set(set_names)
-        self.set_size = len(set_names)
-        self.counts_set = self.count(set_names)
-        self.calculate()
-
-    def calculate(self):
-        data = dict([(gset_id, (cnt, self.counts_pop[gset_id], self.set_size,
-                                self.gsea.info[gset_id]))
-                     for gset_id, cnt in iteritems(self.counts_set)])
-        enrich.EnrichmentSet.__init__(
-            self,
-            data,
-            self.pop_size,
-            alpha=self.alpha,
-            correction_method=self.correction_method)
-
-    def toplist(self,
-                length=None,
-                alpha=None,
-                significant=True,
-                min_set_size=0,
-                groups=None,
-                filtr=lambda x: True,
-                **kwargs):
-        args = get_args(locals(), ['filtr', 'groups'])
-        if groups is None:
-            groups = self.gsea.groups.keys()  # all by default
-        sets = set(
-            common.flatList(s for g, s in iteritems(self.gsea.groups)
-                            if g in groups))
-        return super(GSEABinaryEnrichmentSet, self).toplist(
-            filtr=lambda x: x[0] in sets and filtr(x), **args)
-
-    def __str__(self):
-        if self.counts_set is None:
-            resp = '\n\t:: No calculations performed yet. Please define '\
-                'a set of genes with `new_set()`.\n\n'
-        else:
-            resp = '\n :: Top significantly enriched genesets (max. 10):\n\n\t'\
-                + '\n\t'.join([t[0].upper() + t[1:] for t in
-                               self.top_genesets(length=10, significant=True)]) + '\n'
-        return resp
+#class GSEABinaryEnrichmentSet(enrich.EnrichmentSet):
+#    def __init__(self,
+#                 basic_set,
+#                 gsea=None,
+#                 geneset_ids=None,
+#                 alpha=0.05,
+#                 correction_method='hommel',
+#                 user=None,
+#                 mapper=None):
+#        if type(gsea) is not GSEA and geneset_ids is None:
+#            console('Please give either a `pypath.gsea.GSEA` object'
+#                    'or a list of geneset names.')
+#        if geneset_ids is None:
+#            geneset_ids = gsea.sets.keys()
+#        self.user = user
+#        self.mapper = mapper
+#        if type(gsea) is not GSEA:
+#            gsea = GSEA(user=self.user, mapper=self.mapper)
+#            for geneset_id in geneset_ids:
+#                gsea.load_set(geneset_id)
+#        self.geneset_ids = geneset_ids
+#        self.gsea = gsea
+#        self.alpha = alpha
+#        self.correction_method = correction_method
+#        self.basic_set = set(basic_set)
+#        self.counts_pop = self.count(self.basic_set)
+#        self.pop_size = len(self.basic_set)
+#        self.set_size = None
+#        self.counts_set = None
+#        self.top_geneset_ids = self.top_ids
+#        self.top_genesets = self.top_names
+#
+#    def count(self, this_set):
+#        return dict((i, len(this_set & s))
+#                    for i, s in iteritems(self.gsea.sets))
+#
+#    def new_set(self, set_names):
+#        if type(set_names) is not set:
+#            set_names = set(set_names)
+#        self.set_size = len(set_names)
+#        self.counts_set = self.count(set_names)
+#        self.calculate()
+#
+#    def calculate(self):
+#        data = dict([(gset_id, (cnt, self.counts_pop[gset_id], self.set_size,
+#                                self.gsea.info[gset_id]))
+#                     for gset_id, cnt in iteritems(self.counts_set)])
+#        enrich.EnrichmentSet.__init__(
+#            self,
+#            data,
+#            self.pop_size,
+#            alpha=self.alpha,
+#            correction_method=self.correction_method)
+#
+#    def toplist(self,
+#                length=None,
+#                alpha=None,
+#                significant=True,
+#                min_set_size=0,
+#                groups=None,
+#                filtr=lambda x: True,
+#                **kwargs):
+#        args = get_args(locals(), ['filtr', 'groups'])
+#        if groups is None:
+#            groups = self.gsea.groups.keys()  # all by default
+#        sets = set(
+#            common.flatList(s for g, s in iteritems(self.gsea.groups)
+#                            if g in groups))
+#        return super(GSEABinaryEnrichmentSet, self).toplist(
+#            filtr=lambda x: x[0] in sets and filtr(x), **args)
+#
+#    def __str__(self):
+#        if self.counts_set is None:
+#            resp = '\n\t:: No calculations performed yet. Please define '\
+#                'a set of genes with `new_set()`.\n\n'
+#        else:
+#            resp = '\n :: Top significantly enriched genesets (max. 10):\n\n\t'\
+#                + '\n\t'.join([t[0].upper() + t[1:] for t in
+#                               self.top_genesets(length=10, significant=True)]) + '\n'
+#        return resp
