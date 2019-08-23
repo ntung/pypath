@@ -24,6 +24,7 @@ from future.utils import iteritems
 import os
 import imp
 import collections
+import copy
 
 import pandas as pd
 
@@ -167,7 +168,7 @@ class CellPhoneDB(omnipath.OmniPath):
             annotation_pickle = annotation_pickle,
             intercell_pickle = intercell_pickle,
             complex_pickle = complex_pickle,
-            load_network = not self.network,
+            load_network = False, # we load the network here below
             load_complexes = not self.complex,
             load_annotations = not self.intercell and not self.annot,
             load_intercell = not self.intercell,
@@ -224,7 +225,9 @@ class CellPhoneDB(omnipath.OmniPath):
             
             if not self.use_omnipath and 'lst' not in self.network_param:
                 
-                self.network_param['lst'] = data_formats.pathway_all
+                resources = copy.deepcopy(data_formats.pathway_all)
+                resources.update(copy.deepcopy(data_formats.ligand_receptor))
+                self.network_param['lst'] = resources
             
             self.network = main_mod.PyPath()
             self.network.init_network(**self.network_param)
@@ -279,7 +282,7 @@ class CellPhoneDB(omnipath.OmniPath):
         iuphar = {'Guide2Pharma', 'Guide2Pharma_CP'}
         
         self._entities = set()
-        self.cpdb_interaction = set()
+        self.cpdb_interaction = {}
         
         int_id = 0
         for iaction in self.network.records.itertuples():
@@ -312,19 +315,53 @@ class CellPhoneDB(omnipath.OmniPath):
                 id_a, name_a = get_id_name(iaction.id_a)
                 id_b, name_b = get_id_name(iaction.id_b)
                 
-                self.cpdb_interaction.add(
+                key = (id_a, id_b)
+                
+                int_id_carry_over = (
+                    int(self.cpdb_interaction[key].id_cp_interaction[5:])
+                        if key in self.cpdb_interaction else
+                    None
+                )
+                
+                resources_carry_over, refs_carry_over = (
+                    (
+                        set(
+                            self.cpdb_interaction[
+                                key
+                            ].annotation_strategy.split(',')
+                        ),
+                        set(
+                            pmid[7:]
+                            for pmid in
+                            self.cpdb_interaction[key].source.split(',')
+                        )
+                    )
+                    if key in self.cpdb_interaction else
+                    (set(), set())
+                )
+                
+                self.cpdb_interaction[key] = (
                     CellPhoneDBInteraction(
-                        id_cp_interaction = 'CPI-%06u' % int_id,
+                        id_cp_interaction = 'CPI-%06u' % (
+                            int_id_carry_over or int_id
+                        ),
                         partner_a = id_a,
                         partner_b = id_b,
                         protein_name_a = name_a,
                         protein_name_b = name_b,
                         annotation_strategy = (
-                            'OmniPath,%s' % ','.join(sorted(iaction.sources))
+                            ','.join(sorted(
+                                resources_carry_over |
+                                iaction.sources |
+                                {'OmniPath'}
+                            ))
                         ),
                         source = ','.join(
                             'PMID: %s' % pmid
-                            for pmid in sorted(iaction.references)
+                            for pmid in sorted(
+                                refs_carry_over |
+                                iaction.references
+                            )
                         ),
                     )
                 )
@@ -332,7 +369,14 @@ class CellPhoneDB(omnipath.OmniPath):
                 self._entities.add(iaction.id_a)
                 self._entities.add(iaction.id_b)
                 
-                int_id += 1
+                if int_id_carry_over is None:
+                    
+                    int_id += 1
+        
+        self.cpdb_interaction = sorted(
+            self.cpdb_interaction.values(),
+            key = lambda i: i[0]
+        )
     
     
     def build_protein(self):
@@ -469,6 +513,8 @@ class CellPhoneDB(omnipath.OmniPath):
     def create_dataframes(self):
         
         for name in ('interaction', 'protein', 'complex', 'gene'):
+            
+            self._log('Creating CellPhoneDB data frame `%s`.' % name)
             
             data = list(getattr(self, 'cpdb_%s' % name))
             columns = globals()['CellPhoneDB%s' % name.capitalize()]._fields
