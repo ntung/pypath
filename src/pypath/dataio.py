@@ -2262,7 +2262,7 @@ def comppi_locations(organism = 9606, score_threshold = .7):
     return result
 
 
-def ramilowski_locations():
+def ramilowski_locations(long_notes = False):
 
     reloc = re.compile(
         r'([^\(]+[^\s^\(])'
@@ -2347,11 +2347,11 @@ def ramilowski_locations():
 
                 result[l[3]].add(
                     RamilowskiLocation(
-                        location = location.lower(),
+                        location = location.lower().replace('=', '').strip(),
                         source = source,
                         tmh = int(tmh) if tmh.isdigit() else None,
                         note = note,
-                        long_note = long_note,
+                        long_note = long_note if long_notes else None,
                     )
                 )
 
@@ -8822,7 +8822,8 @@ def signalink_interactions():
 def signalink_pathway_annotations():
 
     SignalinkPathway = collections.namedtuple(
-        'SignalinkPathway', ['pathway'],
+        'SignalinkPathway',
+        ['pathway', 'core'],
     )
 
 
@@ -8833,15 +8834,21 @@ def signalink_pathway_annotations():
     for i in interactions:
 
         for pathway in i[8].split(';'):
-
+            
+            core = 'non-core' not in pathway
+            pathway = pathway.split('(')[0].strip()
+            
             result[i[0]].add(
-                SignalinkPathway(pathway = pathway)
+                SignalinkPathway(pathway = pathway, core = core)
             )
 
         for pathway in i[9].split(';'):
-
+            
+            core = 'non-core' not in pathway
+            pathway = pathway.split('(')[0].strip()
+            
             result[i[1]].add(
-                SignalinkPathway(pathway = pathway)
+                SignalinkPathway(pathway = pathway, core = core)
             )
 
     return result
@@ -9430,6 +9437,7 @@ def intogen_annotations():
         [
             'type',
             'role',
+            'curated',
             'oncodrive_role_prob',
         ],
     )
@@ -9463,12 +9471,25 @@ def intogen_annotations():
         )
 
         for uniprot in uniprots:
-
+            
+            role_prob, curated = (
+                (
+                    1.0,
+                    True,
+                )
+                if rec['OncodriveROLE_prob'] == 'Manually curated' else
+                (
+                    float(rec['OncodriveROLE_prob']),
+                    False,
+                )
+            )
+            
             result[uniprot].add(
                 IntogenAnnotation(
                     type = rec['Driver_type'],
                     role = rec['Role'],
-                    oncodrive_role_prob = rec['OncodriveROLE_prob'],
+                    curated = curated,
+                    oncodrive_role_prob = role_prob,
                 )
             )
 
@@ -10788,6 +10809,7 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
     ProteinatlasAnnotation = collections.namedtuple(
         'ProtainatlasAnnotation',
         [
+            'organ',
             'tissue',
             'level',
             'status',
@@ -10822,11 +10844,21 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
     if normal:
 
         for tissue, gex in iteritems(data['normal']):
+            
+            organ = tissue
+            
+            if ':' in tissue:
+                
+                organ, tissue = tissue.split(':')
+            
+            organ = organ.strip()
+            tissue = tissue.strip()
 
             for uniprot, ex in iteritems(gex):
 
                 result[uniprot].add(
                     ProteinatlasAnnotation(
+                        organ = organ,
                         tissue = tissue,
                         level = ex[0],
                         status = ex[1],
@@ -10852,6 +10884,7 @@ def proteinatlas_annotations(normal = True, pathology = True, cancer = True):
 
                 result[uniprot].add(
                     ProteinatlasAnnotation(
+                        organ = condition,
                         tissue = condition,
                         level = max(
                             (i for i in iteritems(ex) if i[0] in LEVELS),
@@ -11735,7 +11768,7 @@ def get_compartments_localizations(
         pass
 
 
-def get_locate_localizations(
+def locate_localizations(
         organism = 9606,
         literature = True,
         external = True,
@@ -11881,7 +11914,7 @@ def get_locate_localizations(
 
                                                 result[uniprot].add(record(
                                                     source = sources,
-                                                    location = _loc,
+                                                    location = _loc.strip(),
                                                     cls = this_class,
                                                     score = None,
                                                 ))

@@ -23,6 +23,7 @@ from future.utils import iteritems
 
 import sys
 import os
+import re
 import copy
 import collections
 
@@ -143,7 +144,7 @@ class BaseServer(twisted.web.resource.Resource, session_mod.Logger):
     
     def render_POST(self, request):
         
-        if request.getHeader(b'content-type').startsWith(b'application/json'):
+        if request.getHeader(b'content-type').startswith(b'application/json'):
             
             args_raw = json.loads(request.content.getvalue())
             request.args = dict(
@@ -397,6 +398,18 @@ class TableServer(BaseServer):
             'fields': None,
             'genesymbols': {'1', '0', 'no', 'yes'},
         },
+        'annotations_summary': {
+            'header': None,
+            'format': {
+                'json',
+                'tab',
+                'text',
+                'tsv',
+                'table',
+            },
+            'databases': None,
+            'fields': None,
+        },
         'intercell': {
             'header': None,
             'format': {
@@ -414,6 +427,24 @@ class TableServer(BaseServer):
             },
             'categories': None,
             'proteins': None,
+            'fields': None,
+        },
+        'intercell_summary': {
+            'header': None,
+            'format': {
+                'json',
+                'tab',
+                'text',
+                'tsv',
+                'table',
+            },
+            'levels': {
+                'main',
+                'sub',
+                'small_main',
+                'above_main',
+            },
+            'categories': None,
             'fields': None,
         },
         'complexes': {
@@ -637,15 +668,44 @@ class TableServer(BaseServer):
     
     def _preprocess_annotations(self):
         
+        renum = re.compile(r'[-\d\.]+')
+        
         self._log('Preprocessing annotations.')
-        pass
+        
+        self.data['annotations_summary'] = self.data['annotations'].groupby(
+            ['source', 'label'],
+            as_index = False,
+        ).agg({
+            'value':
+                lambda x: (
+                    '#'.join(sorted(set(str(ii) for ii in x)))
+                    if not all(
+                        isinstance(i, (int, float)) or (
+                            isinstance(i, str) and
+                            i and (
+                                i is None or
+                                renum.match(i)
+                            )
+                        )
+                        for i in x
+                    ) else
+                    '<numeric>'
+                )
+        })
+
     
     
     def _preprocess_intercell(self):
         
         self._log('Preprocessing intercell data.')
         tbl = self.data['intercell']
+        tbl.mainclass = tbl.mainclass.cat.add_categories('')
+        tbl.mainclass[tbl.mainclass.isna()] = ''
         tbl.drop('full_name', axis = 1, inplace = True, errors = 'ignore')
+        self.data['intercell_summary'] = tbl.groupby(
+            ['category', 'mainclass', 'class_type'],
+            as_index = False,
+        ).agg({})
     
     
     def _check_args(self, req):
@@ -1234,6 +1294,31 @@ class TableServer(BaseServer):
         return self._serve_dataframe(tbl, req)
     
     
+    def annotations_summary(self, req):
+        
+        bad_req = self._check_args(req)
+        
+        if bad_req:
+            
+            return bad_req
+        
+        # starting from the entire dataset
+        tbl = self.data['annotations_summary']
+        
+        hdr = tbl.columns
+        
+        # filtering for databases
+        if b'databases' in req.args:
+            
+            databases = self._args_set(req, 'databases')
+            
+            tbl = tbl[tbl.source.isin(databases)]
+        
+        tbl = tbl.loc[:,hdr]
+        
+        return self._serve_dataframe(tbl, req)
+    
+    
     def intercell(self, req):
         
         bad_req = self._check_args(req)
@@ -1272,6 +1357,38 @@ class TableServer(BaseServer):
                     tbl.genesymbol.isin(proteins),
                 )
             ]
+        
+        tbl = tbl.loc[:,hdr]
+        
+        return self._serve_dataframe(tbl, req)
+    
+    
+    def intercell_summary(self, req):
+        
+        bad_req = self._check_args(req)
+        
+        if bad_req:
+            
+            return bad_req
+        
+        # starting from the entire dataset
+        tbl = self.data['intercell_summary']
+        
+        hdr = tbl.columns
+        
+        # filtering for category level
+        if b'levels' in req.args:
+            
+            levels = self._args_set(req, 'levels')
+            
+            tbl = tbl[tbl.class_type.isin(levels)]
+        
+        # filtering for categories
+        if b'categories' in req.args:
+            
+            categories = self._args_set(req, 'categories')
+            
+            tbl = tbl[tbl.mainclass.isin(categories)]
         
         tbl = tbl.loc[:,hdr]
         
@@ -1644,7 +1761,13 @@ class PypathServer(BaseServer):
 
 class Rest(object):
     
-    def __init__(self, port, serverclass = PypathServer, **kwargs):
+    def __init__(
+            self,
+            port,
+            serverclass = PypathServer,
+            start = True,
+            **kwargs
+        ):
         """
         Runs a webserver serving a `PyPath` instance listening
         to a custom port.
@@ -1660,6 +1783,14 @@ class Rest(object):
         """
         
         self.port = port
-        self.site = twisted.web.server.Site(serverclass(**kwargs))
+        self.server = serverclass(**kwargs)
+        
+        if start:
+            
+            self.start()
+    
+    def start(self):
+        
+        self.site = twisted.web.server.Site(self.server)
         twisted.internet.reactor.listenTCP(self.port, self.site)
         twisted.internet.reactor.run()

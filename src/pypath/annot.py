@@ -1562,8 +1562,8 @@ class Ramilowski2015Location(AnnotationBase):
             input_method = 'ramilowski_locations',
             **kwargs
         )
-        
-        
+    
+    
     def _process_method(self):
         
         self.annot = self.data
@@ -1756,7 +1756,7 @@ class SignorPathways(AnnotationBase):
 
 class SignalinkPathways(AnnotationBase):
     
-    _eq_fields = ('pathway',)
+    _eq_fields = ('pathway', 'core')
     
     
     def __init__(self, ncbi_tax_id = 9606, **kwargs):
@@ -1860,7 +1860,7 @@ class Locate(AnnotationBase):
         AnnotationBase.__init__(
             self,
             name = 'Locate',
-            input_method = 'get_locate_localizations',
+            input_method = 'locate_localizations',
             ncbi_tax_id = ncbi_tax_id,
             input_args = input_args,
             **kwargs
