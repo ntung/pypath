@@ -1,0 +1,24 @@
+@startuml
+Actor PyPathUser
+PyPathUser -> PyPath: new PyPath()
+PyPath -> DataController: load_data_from_resources()
+DataController -> ResourceConnector: create_data_from_db()/from_file()
+ResourceConnector -> FileReader: read_resource()
+FileReader -> PhysicalDiskIO: get_data
+PhysicalDiskIO -> FileReader: return binary/text data
+FileReader -> ResourceConnector: return binary/text data
+ResourceConnector -> IDTranslator: translate_id1_to_id2()
+IDTranslator -> ResourceConnector: return translated data
+ResourceConnector -> DataController: pass translated data
+DataController -> Data: init()
+Data -> DataController: return Data obj
+DataController -> PyPath: return itself
+PyPath -> DataController: append_resources_to_data()
+DataController -> DataConflictResolver: resolve_conflicts_by_config()
+DataConflictResolver -> DataController: update_data()
+DataController -> Data: update_edges()/update_nodes()
+DataController -> PyPath: return itself
+PyPath -> DataExporter: export_data_to_csv(<DataController>)
+DataExporter -> PhysicalDiskIO: write_csv()
+
+@enduml

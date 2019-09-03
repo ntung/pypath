@@ -1,0 +1,131 @@
+@startuml
+class PyPath {
+  def init_all_resources()
+
+  def load_metaresource_by_name(<Resource.METARESNAMES> name): DataController
+  def load_metaresource(<Resource> metaresource): DataController
+  def load_omnipath(): DataController
+  def load_data_from_resources(<List Resource>): DataController
+  def load_data_from_selfmade_files(<string> json_URL, <string> json_dscr_URL): DataController
+
+  def append_resources_to_data(<List Resource>)
+
+  def get_resources_by_type(<Resource.TYPES>, exclude=<Resource>)
+  def get_resources_by_names(<Resource.NAMES> name): <obj> Resource or None
+  def get_resources_types(): <Resource.TYPES>): <Resource.TYPES>
+  def get_all_resources():<Resource.NAMES>
+
+  def get_metaresources_by_name(<Resource.METARESNAMES> name)
+}
+
+class Data {
+  <Pandas> df
+  <List Resources> resources
+  def get_all_edges()
+  def get_all_nodes()
+}
+
+class DataController {
+  def create_data_from_resource(<Resource>): Data
+  def create_data_from_file(<Resource>): Data
+  def create_data_from_db(<Resource>): Data
+}
+
+class Node {
+  id
+  name
+}
+
+class Edge {
+  Node node_out
+  Node node_in
+  id
+  <List Annotation> annotations
+}
+
+class Resource {
+  json_URI
+}
+
+class ResourceConnector {
+  json_description_URI
+  def read_resource_from_file()
+  def read_resource_from_db()
+}
+
+class SpecificResourceConnector {
+  def get_proteins()
+  def ...()
+}
+
+class IDTranslator {
+  def translate_id1_to_id2()
+}
+
+class Annotation {
+
+}
+
+class MetaResourceBuilder {
+
+}
+
+class OmniPath {
+
+}
+
+class Logger {
+
+}
+
+class Progress{
+
+}
+
+class Config {
+
+}
+
+class FileReader {
+  parse_json()
+}
+
+class DataExporter {
+  def export_data_to_pickle()
+  def export_data_to_dot()
+  def export_data_to_csv()
+}
+
+class DataConflictResolver {
+  resolve_conflicts_by_config()
+}
+
+class Visualizer {
+  def export_data_to_png()
+}
+
+class ResourceTranslator {
+  def translate_to_resource()
+}
+
+DataController - ResourceTranslator
+DataController - DataConflictResolver
+Edge - Annotation
+Node - Annotation
+PyPath - DataController: operates
+DataController - Data: creates
+DataController - ResourceConnector
+SpecificResourceConnector <|-- ResourceConnector
+PyPath - DataExporter: calls
+SpecificResourceConnector - FileReader
+SpecificResourceConnector - IDTranslator
+PyPath - Visualizer
+Data - Edge: has
+Edge - Node: has
+PyPath - MetaResourceBuilder
+OmniPath - MetaResourceBuilder: calls
+PyPath - Resource: initiates all
+OmniPath - DataController: controlled by
+
+
+@enduml
