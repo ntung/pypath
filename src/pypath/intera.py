@@ -50,6 +50,9 @@ if 'unicode' not in __builtins__:
     unicode = str
 
 
+COMPLEX_SEP = '_'
+
+
 class Residue(object):
 
     def __init__(self,
@@ -676,7 +679,21 @@ class DomainMotif(object):
             return True
         else:
             return False
-
+    
+    def key(self):
+        """
+        Returns a unique key which is a tuple of the proteins, the residue
+        and the modification type.
+        """
+        
+        return (
+            self.domain.protein,
+            self.ptm.protein,
+            self.ptm.residue.name,
+            self.ptm.residue.number,
+            self.ptm.typ,
+        )
+    
     def get_proteins(self):
         return [self.domain.protein, self.ptm.protein]
 
@@ -878,7 +895,9 @@ class Complex(object):
     
     def __str__(self):
         
-        return 'COMPLEX:%s' % '-'.join(sorted(self.components.keys()))
+        return 'COMPLEX:%s' % (
+            COMPLEX_SEP.join(sorted(self.components.keys()))
+        )
     
     
     def __repr__(self):
@@ -1090,7 +1109,7 @@ class Complex(object):
     @property
     def genesymbol_str(self):
         
-        return '-'.join(self.genesymbols)
+        return COMPLEX_SEP.join(self.genesymbols)
 
 
 class Interface(object):

@@ -42,6 +42,7 @@ import pandas as pd
 import pypath.dataio as dataio
 import pypath.common as common
 import pypath.mapping as mapping
+import pypath.reflists as reflists
 import pypath.resource as resource
 import pypath.go as go
 import pypath.intercell_annot as intercell_annot
@@ -49,6 +50,7 @@ import pypath.session_mod as session_mod
 import pypath.annot_formats as annot_formats
 import pypath.complex as complex
 import pypath.intera as intera
+import pypath.entity as entity
 
 #TODO this should be part of json files
 protein_sources_default = {
@@ -82,11 +84,10 @@ protein_sources_default = {
     'NetpathPathways',
     'Cpad',
     'Disgenet',
-    'Kinases',
+    'Kinasedotcom',
     'Phosphatome',
     'Tfcensus',
     'Intogen',
-    'Kinases',
     'CancerGeneCensus',
     'Cancersea',
 }
@@ -163,6 +164,7 @@ class CustomAnnotation(session_mod.Logger):
 
         self.classes = {}
         self.populate_classes()
+        self.network = None
 
 
     def reload(self):
@@ -211,12 +213,18 @@ class CustomAnnotation(session_mod.Logger):
     
     def load_from_pickle(self, pickle_file):
         
+        self._log('Loading from pickle `%s`.' % pickle_file)
+        
         with open(pickle_file, 'rb') as fp:
             
             self.classes = pickle.load(fp)
+        
+        self._log('Loaded from pickle `%s`.' % pickle_file)
     
     
     def save_to_pickle(self, pickle_file):
+        
+        self._log('Saving to pickle `%s`.' % pickle_file)
         
         with open(pickle_file, 'wb') as fp:
             
@@ -224,12 +232,13 @@ class CustomAnnotation(session_mod.Logger):
                 obj = self.classes,
                 file = fp,
             )
+        
+        self._log('Saved to pickle `%s`.' % pickle_file)
     
 
     def create_class(self, classdef):
         """
-        Creates a category of entities with specific role in intercellular
-        communication.
+        Creates a category of entities by processing an custom definition.
         """
 
         self.classes[classdef.name] = self.process_annot(classdef)
@@ -321,32 +330,42 @@ class CustomAnnotation(session_mod.Logger):
 
 
     def make_df(self, all_annotations = False, full_name = False):
+        """
+        Creates a ``pandas.DataFrame`` where each record assigns a
+        molecular entity to an annotation category. The data frame will
+        be assigned to the ``df`` attribute.
+        """
         
-        header = ['category', 'uniprot', 'genesymbol']
+        self._log('Creating data frame from custom annotation.')
+        
+        header = ['category', 'uniprot', 'genesymbol', 'entity_type']
         dtypes = {
-            'category':   'category',
-            'uniprot':    'category',
-            'genesymbol': 'category',
+            'category':    'category',
+            'uniprot':     'category',
+            'genesymbol':  'category',
+            'entity_type': 'category',
         }
         
         if full_name:
             
-            header.append('full_name')
+            header.insert(-1, 'full_name')
             dtypes['full_name'] = 'category'
         
         self.df = pd.DataFrame(
             [
+                # annotation category, entity id
                 [
                     cls,
                     uniprot.__str__(),
                     (
                         mapping.map_name0(uniprot, 'uniprot', 'genesymbol')
                             if isinstance(uniprot, common.basestring) else
-                        uniprot.genesymbol_str
+                        'COMPLEX:%s' % uniprot.genesymbol_str
                             if hasattr(uniprot, 'genesymbol_str') else
                         uniprot.__str__()
                     ),
                 ] +
+                # full name
                 (
                     [
                         '; '.join(
@@ -359,6 +378,15 @@ class CustomAnnotation(session_mod.Logger):
                     ]
                     if full_name else []
                 ) +
+                # entity type
+                [
+                    'complex'
+                        if hasattr(uniprot, 'genesymbol_str') else
+                    'mirna'
+                        if uniprot.startswith('MIMAT') else
+                    'protein'
+                ] +
+                # all annotations
                 (
                     [self.annotdb.all_annotations_str(uniprot)]
                         if all_annotations else
@@ -371,8 +399,511 @@ class CustomAnnotation(session_mod.Logger):
                 ['all_annotations'] if all_annotations else []
             ),
         ).astype(dtypes)
-
-
+        
+        self._log(
+            'Custom annotation data frame has been created. '
+            'Memory usage: %s.' % common.df_memory_usage(self.df)
+        )
+    
+    
+    def counts_by_class(
+            self,
+            class_types = 'main',
+            entity_types = 'protein',
+            labels = True,
+        ):
+        
+        class_types = common.to_set(class_types)
+        
+        df = self.df[self.df.class_type.isin(class_types)]
+        
+        if entity_types:
+            
+            entity_types = common.to_set(entity_types)
+            df = df[df.entity_type.isin(entity_types)]
+        
+        counts = df.groupby('category')['uniprot'].nunique()
+        
+        if labels:
+            
+            counts.index = counts.index.map(self.class_labels)
+        
+        return counts[counts > 0]
+    
+    
+    def network_df(
+            self,
+            network = None,
+            resources = None,
+            classes = None,
+            source_classes = None,
+            target_classes = None,
+            only_directed = False,
+            only_effect = None,
+            only_proteins = False,
+            only_class_levels = None,
+        ):
+        """
+        Combines the annotation data frame and a network data frame.
+        Creates a ``pandas.DataFrame`` where each record is an interaction
+        between a pair of molecular enitities labeled by their annotations.
+        
+        network : pypath.network.Network,pandas.DataFrame
+            A ``pypath.network.Network`` object or a data frame with network
+            data.
+        resources : set,None
+            Use only these network resouces.
+        classes : set,None
+            Use only these annotation classes.
+        only_directed : bool
+            Use only the directed interactions.
+        only_effect : int,None
+            Use only the interactions with this effect. Either -1 or 1.
+        only_proteins : bool
+            Use only the interactions where each of the partners is a protein
+            (i.e. not complex, miRNA, small molecule or other kind of entity).
+        """
+        
+        self._log('Combining custom annotation with network data frame.')
+        
+        network_df = (
+            self._network_df(network)
+                if network is not None else
+            self.network
+        )
+        
+        if network_df is None:
+            
+            self._log('No network provided, no default network set.')
+            
+            return
+        
+        annot_df = self.df
+        
+        if only_class_levels:
+            
+            only_class_levels = common.to_set(only_class_levels)
+            annot_df = annot_df[annot_df.class_type.isin(only_class_levels)]
+        
+        if (
+            not only_directed and
+            not only_effect and
+            not classes and (
+                source_classes or
+                target_classes
+            )
+        ):
+            
+            classes = set.union(
+                common.to_set(source_classes),
+                common.to_set(target_classes),
+            )
+        
+        if classes:
+            
+            annot_df = self._filter_by_classes(annot_df, classes)
+        
+        if resources:
+            
+            filter_op = (
+                network_df.sources.eq
+                    if isinstance(resources, common.basestring) else
+                network_df.sources.isin
+            )
+            
+            network_df = network_df[filter_op(resources)]
+        
+        if only_directed:
+            
+            network_df = network_df[network_df.directed]
+        
+        if only_effect:
+            
+            network_df = network_df[network_df.effect == only_effect]
+        
+        if only_proteins:
+            
+            network_df = network_df[
+                (network_df.type_a == 'protein') &
+                (network_df.type_b == 'protein')
+            ]
+        
+        annot_network_df = pd.merge(
+            network_df,
+            self._filter_by_classes(annot_df, source_classes),
+            suffixes = ['', '_a'],
+            how = 'inner',
+            left_on = 'id_a',
+            right_on = 'uniprot',
+        )
+        
+        # if we deal with undirected interactions but source & target classes
+        if (
+            not only_directed and
+            not only_effect and (
+                source_classes or
+                target_classes
+            )
+        ):
+            
+            annot_network_df = pd.concat(
+                (
+                    
+                    annot_network_df,
+                    
+                    pd.merge(
+                        network_df[
+                            np.logical_not(network_df.directed)
+                        ][
+                            network_df.columns[
+                                np.r_[1, 0, 3, 2, 4:len(network_df.columns)]
+                            ]
+                        ][
+                            ['id_a', 'id_b', 'type_a', 'type_b'] +
+                            list(network_df.columns)[4:]
+                        ],
+                        self._filter_by_classes(annot_df, source_classes),
+                        suffixes = ['', '_a'],
+                        how = 'inner',
+                        left_on = 'id_a',
+                        right_on = 'uniprot',
+                    ),
+                    
+                ),
+                
+                sort = False,
+                ignore_index = True,
+            )
+        
+        annot_network_df.id_a = annot_network_df.id_a.astype('category')
+        
+        annot_network_df = pd.merge(
+            annot_network_df,
+            self._filter_by_classes(annot_df, target_classes),
+            suffixes = ['_a', '_b'],
+            how = 'inner',
+            left_on = 'id_b',
+            right_on = 'uniprot',
+        )
+        
+        annot_network_df.id_b = annot_network_df.id_b.astype('category')
+        
+        #annot_network_df.set_index(
+            #'id_a',
+            #drop = False,
+            #inplace = True,
+        #)
+        
+        self._log(
+            'Combined custom annotation data frame with network data frame. '
+            'Memory usage: %s.' % common.df_memory_usage(annot_network_df)
+        )
+        
+        return annot_network_df
+    
+    #
+    # Below only thin wrappers to make the interface more intuitive
+    # without knowing the argument names
+    #
+    
+    #
+    # Building a network of connections between classes
+    #
+    
+    def inter_class_network(
+            self,
+            source_classes = None,
+            target_classes = None,
+            network = None,
+            **kwargs,
+        ):
+        
+        return self.network_df(
+            network = network,
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        )
+    
+    
+    def inter_class_network_directed(
+            self,
+            source_classes = None,
+            target_classes = None,
+            network = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({'only_directed': True})
+        
+        return self.network_df(
+            network = network,
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        )
+    
+    
+    def inter_class_network_stimulatory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            network = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({
+            'only_directed': True,
+            'only_effect': 1,
+        })
+        
+        return self.network_df(
+            network = network,
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        )
+    
+    
+    def inter_class_network_inhibitory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            network = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({
+            'only_directed': True,
+            'only_effect': -1,
+        })
+        
+        return self.network_df(
+            network = network,
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        )
+    
+    #
+    # Counting connections between classes (total)
+    #
+    
+    def count_inter_class_connections(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        return self.inter_class_network(
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        ).groupby(['id_a', 'id_b']).ngroups
+    
+    
+    def count_inter_class_connections_directed(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        return self.inter_class_network_directed(
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        ).groupby(['id_a', 'id_b']).ngroups
+    
+    
+    def count_inter_class_connections_stimulatory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        return self.inter_class_network_stimulatory(
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        ).groupby(['id_a', 'id_b']).ngroups
+    
+    
+    def count_inter_class_connections_inhibitory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        return self.inter_class_network_inhibitory(
+            source_classes = source_classes,
+            target_classes = target_classes,
+            **kwargs,
+        ).groupby(['id_a', 'id_b']).ngroups
+    
+    
+    #
+    # Class to class connection counts
+    #
+    
+    # TODO: maybe add wrappers for directed and others as above
+    def class_to_class_connections(
+            self,
+            **kwargs
+        ):
+        
+        c2c_c = (
+            self.inter_class_network(
+                **kwargs,
+            ).groupby(
+                ['category_a', 'category_b']
+            ).apply(
+                lambda grp: len(set(zip(grp.id_a, grp.id_b)))
+            )
+        )
+        
+        c2c_c = c2c_c.reset_index().rename(columns = {0: 'connections'})
+        
+        return c2c_c
+    
+    #
+    # Inter-class degrees
+    #
+    
+    def degree_inter_class_network(
+            self,
+            source_classes = None,
+            target_classes = None,
+            degrees_of = 'target',
+            **kwargs,
+        ):
+        """
+        degrees_of : str
+            Either *source* or *target*. Count the degrees for the source
+            or the target class.
+        """
+        
+        id_cols = ('id_a', 'id_b')
+        groupby, unique = (
+            id_cols
+                if degrees_of == 'source' else
+            reversed(id_cols)
+        )
+        
+        degrees = (
+            self.inter_class_network(
+                source_classes = source_classes,
+                target_classes = target_classes,
+                **kwargs,
+            ).groupby(groupby)[unique].nunique()
+        )
+        
+        return degrees[degrees != 0]
+    
+    
+    def degree_inter_class_network_directed(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({'only_directed': True})
+        
+        return (
+            self.degree_inter_class_network(
+                source_classes = source_classes,
+                target_classes = target_classes,
+                **kwargs,
+            )
+        )
+    
+    
+    def degree_inter_class_network_stimulatory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({
+            'only_directed': True,
+            'only_effect': 1,
+        })
+        
+        return (
+            self.degree_inter_class_network(
+                source_classes = source_classes,
+                target_classes = target_classes,
+                **kwargs,
+            )
+        )
+    
+    
+    def degree_inter_class_network_inhibitory(
+            self,
+            source_classes = None,
+            target_classes = None,
+            **kwargs,
+        ):
+        
+        kwargs.update({
+            'only_directed': True,
+            'only_effect': -1,
+        })
+        
+        return (
+            self.degree_inter_class_network(
+                source_classes = source_classes,
+                target_classes = target_classes,
+                **kwargs,
+            )
+        )
+    
+    
+    #
+    # End of wrappers
+    #
+    
+    
+    def register_network(self, network):
+        """
+        Sets ``network`` as the default network dataset for the instance.
+        All methods afterwards will use this network.
+        """
+        
+        self.network = self._network_df(network)
+    
+    
+    @staticmethod
+    def _network_df(network):
+        
+        return (
+            network.records
+                if hasattr(network, 'records') else
+            network
+        )
+    
+    
+    @staticmethod
+    def _filter_by_classes(annot_df, classes = None):
+        
+        if not classes:
+            
+            return annot_df
+        
+        filter_op = (
+            annot_df.category.eq
+                if isinstance(classes, common.basestring) else
+            annot_df.category.isin
+        )
+        
+        return annot_df[filter_op(classes)]
+    
+    
     def export(self, fname, **kwargs):
 
         self.make_df()
@@ -398,6 +929,105 @@ class CustomAnnotation(session_mod.Logger):
             for cls, elements in iteritems(self.classes)
             if element in elements
         )
+    
+    
+    def entities_by_resource(self, entity_types = None):
+        
+        entity_types = common.to_set(entity_types)
+        by_resource = collections.defaultdict(set)
+        
+        for key, resource in iteritems(self.resource_labels):
+            
+            by_resource[resource].update(
+                self.classes[key]
+                    if not entity_types else
+                {
+                    entity
+                    for entity in self.classes[key]
+                    if AnnotationBase.get_entity_type(entity) in entity_types
+                }
+            )
+        
+        return dict(by_resource)
+    
+    
+    def counts_by_resource(self, entity_types = None):
+        
+        return dict(
+            (
+                resource,
+                len(entities)
+            )
+            for resource, entities in iteritems(
+                self.entities_by_resource(entity_types = entity_types)
+            )
+        )
+    
+    
+    def update_summaries(self):
+        
+        self.summaries = {}
+        
+        for cat, level in iteritems(self.class_types):
+            
+            if level == 'sub':
+                
+                continue
+            
+            label = self.class_labels[cat]
+            
+            self.summaries[label] = {
+                'label': label,
+                'level': level,
+                'resources': sorted(
+                    self.resource_labels[res]
+                    for res in self.children[cat]
+                    if res in self.resource_labels
+                ),
+                'n_proteins': sum(
+                    1 for entity in self.classes[cat]
+                    if not isinstance(entity, intera.Complex)
+                ),
+                'n_complexes': sum(
+                    1 for entity in self.classes[cat]
+                    if isinstance(entity, intera.Complex)
+                ),
+            }
+    
+    
+    def summaries_tab(self, outfile = None):
+        
+        columns = (
+            ('label', 'Category'),
+            ('level', 'Category level'),
+            ('n_proteins', 'Proteins'),
+            ('n_complexes', 'Complexes'),
+            ('resources', 'Resources'),
+        )
+        
+        tab = []
+        tab.append([f[1] for f in columns])
+        
+        tab.extend([
+            [
+                (
+                    ', '.join(self.summaries[src][f[0]])
+                        if isinstance(self.summaries[src][f[0]], list) else
+                    str(self.summaries[src][f[0]])
+                )
+                for f in columns
+            ]
+            for src in sorted(self.summaries.keys())
+        ])
+        
+        if outfile:
+            
+            with open(outfile, 'w') as fp:
+                
+                fp.write('\n'.join('\t'.join(row) for row in tab))
+        
+        return tab
+
 
 
 class AnnotationBase(resource.AbstractResource):
@@ -795,6 +1425,26 @@ class AnnotationBase(resource.AbstractResource):
         return set(self.annot.keys())
     
     
+    @staticmethod
+    def _entity_types(entity_types):
+        
+        return (
+            {entity_types}
+                if isinstance(entity_types, common.basestring) else
+            entity_types
+        )
+    
+    
+    def all_entities(self, entity_types = None):
+        
+        entity_types = self._entity_types(entity_types)
+        
+        return sorted((
+            k for k in self.annot.keys()
+            if self._match_entity_type(k, entity_types)
+        ))
+    
+    
     def all_proteins(self):
         """
         All UniProt IDs annotated in this resource.
@@ -802,7 +1452,7 @@ class AnnotationBase(resource.AbstractResource):
         
         return sorted((
             k for k in self.annot.keys()
-            if isinstance(k, common.basestring)
+            if self.is_protein(k)
         ))
     
     
@@ -811,8 +1461,102 @@ class AnnotationBase(resource.AbstractResource):
         return sorted((
             k
             for k in self.annot.keys()
-            if isinstance(k, intera.Complex)
+            if self.is_complex(k)
         ))
+    
+    
+    def all_mirnas(self):
+        
+        return sorted((
+            k for k in self.annot.keys()
+            if self.is_mirna(k)
+        ))
+    
+    
+    @staticmethod
+    def is_protein(key):
+        
+        return entity.Entity._is_protein(key)
+    
+    
+    @staticmethod
+    def is_mirna(key):
+        
+        return entity.Entity._is_mirna(key)
+    
+    
+    @staticmethod
+    def is_complex(key):
+        
+        return entity.Entity._is_complex(key)
+    
+    
+    @classmethod
+    def get_entity_type(cls, key):
+        
+        return entity.Entity._get_entity_type(key)
+    
+    
+    @classmethod
+    def _match_entity_type(cls, key, entity_types):
+        
+        return not entity_types or cls.get_entity_type(key) in entity_types
+    
+    
+    def numof_records(self, entity_types = None):
+        
+        entity_types = self._entity_types(entity_types)
+        
+        return sum(
+            max(len(a), 1)
+            for k, a in iteritems(self.annot)
+            if self._match_entity_type(k, entity_types)
+        )
+    
+    
+    def numof_protein_records(self):
+        
+        return self.numof_records(entity_types = {'protein'})
+    
+    
+    def numof_mirna_records(self):
+        
+        return self.numof_records(entity_types = {'mirna'})
+    
+    
+    def numof_complex_records(self):
+        
+        return self.numof_records(entity_types = {'complex'})
+    
+    
+    def numof_entities(self):
+        
+        return len(self.annot)
+    
+    
+    def _numof_entities(self, entity_types = None):
+        
+        entity_types = self._entity_types(entity_types)
+        
+        return len([
+            k for k in self.annot.keys()
+            if self._match_entity_type(k, entity_types)
+        ])
+    
+    
+    def numof_proteins(self):
+        
+        return self._numof_entities(entity_types = {'protein'})
+    
+    
+    def numof_mirnas(self):
+        
+        return self._numof_entities(entity_types = {'mirna'})
+    
+    
+    def numof_complexes(self):
+        
+        return self._numof_entities(entity_types = {'complex'})
     
     
     def to_array(self, reference_set = None, use_fields = None):
@@ -913,6 +1657,7 @@ class AnnotationBase(resource.AbstractResource):
         columns = [
             'uniprot',
             'genesymbol',
+            'entity_type',
             'source',
             'label',
             'value',
@@ -947,6 +1692,7 @@ class AnnotationBase(resource.AbstractResource):
                 records.append([
                     element.__str__(),
                     genesymbol_str,
+                    self.get_entity_type(element),
                     self.name,
                     'in %s' % self.name,
                     'yes',
@@ -970,6 +1716,7 @@ class AnnotationBase(resource.AbstractResource):
                     records.append([
                         element.__str__(),
                         genesymbol_str,
+                        self.get_entity_type(element),
                         self.name,
                         label,
                         str(value),
@@ -985,6 +1732,7 @@ class AnnotationBase(resource.AbstractResource):
             {
                 'uniprot': 'category',
                 'genesymbol': 'category',
+                'entity_type': 'category',
                 'source': 'category',
                 'label': 'category',
                 'record_id': 'int32',
@@ -1003,7 +1751,7 @@ class AnnotationBase(resource.AbstractResource):
 
         other = other if isinstance(other, set) else set(other)
 
-        return len(self & other) / len(other)
+        return len(self & other) / len(other) if other else .0
 
 
     def subset_intersection(self, universe, **kwargs):
@@ -1075,7 +1823,63 @@ class AnnotationBase(resource.AbstractResource):
 
     def __len__(self):
 
-        return len(self.annot)
+        return self.numof_entities()
+    
+    
+    def numof_references(self):
+        
+        return len(set(self.all_refs()))
+    
+    
+    def curation_effort(self):
+        
+        return len(self.all_refs())
+    
+    
+    def all_refs(self):
+        
+        if 'pmid' in self.get_names():
+            
+            return [
+                a.pmid
+                for aa in self.annot.values()
+                for a in aa
+                if a.pmid
+            ]
+        
+        return []
+    
+    
+    @property
+    def summary(self):
+        
+        return {
+            'n_total': self.numof_entities(),
+            'n_records_total': self.numof_records(),
+            'n_proteins': self.numof_proteins(),
+            'pct_proteins': self.proportion(self.proteins) * 100,
+            'n_complexes': self.numof_complexes(),
+            'pct_complexes': self.proportion(
+                complex.get_db().complexes.keys()
+            ) * 100,
+            'n_mirnas': self.numof_mirnas(),
+            'pct_mirnas': (
+                self.proportion(reflists.get_reflist('mirbase')) * 100
+            ),
+            'n_protein_records': self.numof_protein_records(),
+            'n_complex_records': self.numof_complex_records(),
+            'n_mirna_records': self.numof_mirna_records(),
+            'references': self.numof_references(),
+            'curation_effort': self.curation_effort(),
+            'records_per_entity': (
+                self.numof_protein_records() / self.numof_proteins()
+                    if self.numof_proteins() else
+                self.numof_records() / self.numof_entities()
+            ),
+            'complex_annotations_inferred': bool(self.numof_proteins()),
+            'fields': ', '.join(self.get_names()),
+            'name': self.name,
+        }
 
 
 class Membranome(AnnotationBase):
@@ -1205,25 +2009,15 @@ class Matrisome(AnnotationBase):
             self,
             name = 'Matrisome',
             ncbi_tax_id = ncbi_tax_id,
-            input_method = 'get_matrisome',
+            input_method = 'matrisome_annotations',
             **kwargs,
         )
 
 
     def _process_method(self):
-
-        _annot = collections.defaultdict(set)
-
-        record = collections.namedtuple(
-            'MatrisomeAnnotation',
-            ['mainclass', 'subclass', 'subsubclass'],
-        )
-
-        for uniprot, a in iteritems(self.data):
-
-            _annot[uniprot].add(record(*a))
-
-        self.annot = dict(_annot)
+        
+        self.annot = self.data
+        delattr(self, 'data')
 
 
 class Surfaceome(AnnotationBase):
@@ -1621,9 +2415,9 @@ class HumanPlasmaMembraneReceptome(AnnotationBase):
         del self.data
 
 
-class Kinases(AnnotationBase):
+class Kinasedotcom(AnnotationBase):
     
-    _eq_fields = ()
+    _eq_fields = ('group', 'family')
     
     
     def __init__(self, **kwargs):
@@ -1633,10 +2427,18 @@ class Kinases(AnnotationBase):
 
         AnnotationBase.__init__(
             self,
-            name = 'Kinases',
-            input_method = 'get_kinases',
+            name = 'kinase.com',
+            input_method = 'kinasedotcom_annotations',
             **kwargs
         )
+    
+    
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
 
 
 class Tfcensus(AnnotationBase):
@@ -1659,7 +2461,7 @@ class Tfcensus(AnnotationBase):
 
 class Dgidb(AnnotationBase):
     
-    _eq_fields = ()
+    _eq_fields = ('category',)
     
     
     def __init__(self, **kwargs):
@@ -1670,9 +2472,17 @@ class Dgidb(AnnotationBase):
         AnnotationBase.__init__(
             self,
             name = 'DGIdb',
-            input_method = 'get_dgidb',
+            input_method = 'dgidb_annotations',
             **kwargs
         )
+    
+    
+    def _process_method(self):
+
+        #  already the appropriate format, no processing needed
+        self.annot = self.data
+
+        delattr(self, 'data')
 
 
 class Phosphatome(AnnotationBase):
@@ -2386,6 +3196,8 @@ class AnnotationTable(session_mod.Logger):
     
     def load_from_pickle(self, pickle_file):
         
+        self._log('Loading from pickle `%s`.' % pickle_file)
+        
         with open(pickle_file, 'rb') as fp:
             
             self.proteins, self.complexes, self.reference_set, annots = (
@@ -2426,10 +3238,11 @@ class AnnotationTable(session_mod.Logger):
                 cls = globals()[cls_name]
                 
                 self.annots[name] = cls(dump = data)
+        
+        self._log('Loaded from pickle `%s`.' % pickle_file)
     
     
     def save_to_pickle(self, pickle_file):
-        
         
         def get_record_class(annot):
             
@@ -2439,6 +3252,8 @@ class AnnotationTable(session_mod.Logger):
                     
                     return elem.__class__
         
+        
+        self._log('Saving to pickle `%s`.' % pickle_file)
         
         with open(pickle_file, 'wb') as fp:
             
@@ -2485,6 +3300,8 @@ class AnnotationTable(session_mod.Logger):
                 ),
                 file = fp,
             )
+        
+        self._log('Saved to pickle `%s`.' % pickle_file)
     
     
     def set_reference_set(self):
@@ -2707,6 +3524,8 @@ class AnnotationTable(session_mod.Logger):
 
     def to_dataframe(self, reference_set = None):
         
+        self._log('Creating data frame from AnnotationTable.')
+        
         self.ensure_array(
             reference_set = reference_set,
             rebuild = reference_set is not None,
@@ -2720,10 +3539,18 @@ class AnnotationTable(session_mod.Logger):
             columns = colnames,
         )
         
+        self._log(
+            'Created annotation data frame, memory usage: %s.' % (
+                common.df_memory_usage(self.df)
+            )
+        )
+        
         return df
 
 
     def make_narrow_df(self):
+        
+        self._log('Creating narrow data frame from AnnotationTable.')
 
         for annot in self.annots.values():
 
@@ -2731,6 +3558,12 @@ class AnnotationTable(session_mod.Logger):
 
         self.narrow_df = pd.concat(
             annot.df for annot in self.annots.values()
+        )
+        
+        self._log(
+            'Created annotation data frame, memory usage: %s.' % (
+                common.df_memory_usage(self.narrow_df)
+            )
         )
 
 
@@ -2772,6 +3605,59 @@ class AnnotationTable(session_mod.Logger):
             str(a) for a in
             self.all_annotations(protein = protein)
         )
+    
+    
+    def update_summaries(self):
+        
+        self.summaries = dict(
+            (
+                name,
+                a.summary
+            )
+            for name, a in iteritems(self.annots)
+        )
+    
+    
+    def summary_tab(self, outfile = None):
+        
+        columns = (
+            ('name', 'Resource'),
+            ('n_total', 'Entities'),
+            ('n_records_total', 'Records'),
+            ('records_per_entity', 'Records per entity'),
+            ('n_proteins', 'Proteins'),
+            ('pct_proteins', 'Proteins [%]'),
+            ('n_protein_records', 'Protein records'),
+            ('n_complexes', 'Complexes'),
+            ('pct_complexes', 'Complexes [%]'),
+            ('n_complex_records', 'Complex records'),
+            ('complex_annotations_inferred', 'Inferred complex annotations'),
+            ('n_mirnas', 'miRNA'),
+            ('pct_mirnas', 'miRNA [%]'),
+            ('n_mirna_records', 'miRNA records'),
+            ('references', 'References'),
+            ('curation_effort', 'Curation effort'),
+            ('fields', 'Fields'),
+        )
+        
+        tab = []
+        tab.append([f[1] for f in columns])
+        
+        tab.extend([
+            [
+                str(self.summaries[src][f[0]])
+                for f in columns
+            ]
+            for src in sorted(self.summaries.keys())
+        ])
+        
+        if outfile:
+            
+            with open(outfile, 'w') as fp:
+                
+                fp.write('\n'.join('\t'.join(row) for row in tab))
+        
+        return tab
 
 
 def init_db(

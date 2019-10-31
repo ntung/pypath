@@ -1895,6 +1895,10 @@ _default_css = u'''
                     background-color: #EFF4E9;
                     font-family: monospace;
                 }
+                .yellowbox {
+                    border-color: #FDD73F;
+                    background-color: #FFF8DD;
+                }
                 .small {
                     font-size: small;
                 }
@@ -2004,7 +2008,7 @@ _footer = u'''
             <a href="http://saezlab.org/person/olga-ivanova/">
                 Olga Ivanova,</a>
             <a href="http://saezlab.org/">Saez Lab</a> 2016-2019. 
-            Feedback: omnipath@googlegroups.com </p>
+            Feedback: omnipathdb@gmail.com </p>
         <p>
             <a href="https://validator.w3.org/check/referer">
                 <img 
