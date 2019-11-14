@@ -128,6 +128,9 @@ if 'unicode' not in __builtins__:
 CURSOR_UP_ONE = '\x1b[1A'
 ERASE_LINE = '\x1b[2K'
 
+# UniProt ID with isoform e.g. O14754-1
+reupi = re.compile(r'([\w]{6,10})(?:-([0-9]{1,2}))?')
+
 #
 # thanks for http://stackoverflow.com/a/3239248/854988
 #
@@ -3206,21 +3209,59 @@ def pepcyber_uniprot(num):
     return result
 
 
-def get_pdzbase():
+def pdzbase_interactions():
     """
     Downloads data from PDZbase. Parses data from the HTML tables.
     """
-
-    url = urls.urls['pdzbase']['url']
+    
+    PDZbaseInteraction = collections.namedtuple(
+        'PDZbaseInteraction',
+        [
+            'uniprot_pdz',
+            'isoform_pdz',
+            'uniprot_ligand',
+            'isoform_ligand',
+            'genesymbol_pdz',
+            'genesymbol_ligand',
+            'pdz_domain',
+            'organism',
+            'pubmed',
+        ],
+    )
+    
+    
+    url = urls.urls['pdzbase']['url_rescued']
     c = curl.Curl(url, silent = False)
     data = c.result
     soup = bs4.BeautifulSoup(data, 'html.parser')
-    rows = soup.find_all('table')[3].find('table').find('table').find_all('tr')
+    rows = (
+        soup.find_all('table')[3].find('table').find('table').find_all('tr')
+    )
     result = []
+    
+    del rows[0]
+    
     for r in rows:
-        thisRow = [c.text.strip() for c in r.find_all('td')]
-        result.append(thisRow)
-    del result[0]
+        
+        r = [c.text.strip() for c in r.find_all('td')]
+        
+        uniprot_pdz, isoform_pdz = reupi.match(r[1]).groups()
+        uniprot_ligand, isoform_ligand = reupi.match(r[4]).groups()
+        
+        result.append(
+            PDZbaseInteraction(
+                uniprot_pdz = uniprot_pdz,
+                isoform_pdz = int(isoform_pdz) if isoform_pdz else 1,
+                uniprot_ligand = uniprot_ligand,
+                isoform_ligand = int(isoform_ligand) if isoform_ligand else 1,
+                genesymbol_pdz = r[0],
+                genesymbol_ligand = r[3],
+                pdz_domain = int(r[2]),
+                organism = common.ensure_ncbi_tax_id(r[5]),
+                pubmed = int(r[6]),
+            )
+        )
+    
     return result
 
 
@@ -3463,6 +3504,7 @@ def get_elm_classes():
 
 
 def get_elm_instances():
+    
     url = urls.urls['elm_inst']['url']
     c = curl.Curl(url, silent = False)
     data = c.result
@@ -3470,23 +3512,84 @@ def get_elm_instances():
     data = data[6:]
 
 
-def get_elm_interactions():
+def elm_interactions():
     """
     Downlods manually curated interactions from ELM.
     This is the gold standard set of ELM.
     """
+    
+    
+    def number_or_none(value, typ = int):
+        
+        return typ(value) if value != 'None' else None
+    
+    
+    retax = re.compile(r'"([0-9]+)"\([-:/,\.\[\]\(\)\w\s]+\)')
+    
+    ELMInteraction = collections.namedtuple(
+        'ELMInteraction',
+        [
+            'motif_elm',
+            'domain_pfam',
+            'uniprot_motif',
+            'uniprot_domain',
+            'isoform_motif',
+            'isoform_domain',
+            'start_motif',
+            'end_motif',
+            'start_domain',
+            'end_domain',
+            'affinity_min',
+            'affinity_max',
+            'pubmeds',
+            'taxon_motif',
+            'taxon_domain',
+        ],
+    )
+    
     result = []
     url = urls.urls['elm_int']['url']
     c = curl.Curl(url, silent = False)
     data = c.result
     data = data.split('\n')
     del data[0]
+    
     for l in data:
-        result.append([x.strip() for x in l.split('\t')])
+        
+        if not l:
+            
+            continue
+        
+        l = tuple(x.strip() for x in l.split('\t'))
+        
+        uniprot_mofif, isoform_motif = reupi.match(l[2]).groups()
+        uniprot_domain, isoform_domain = reupi.match(l[3]).groups()
+        
+        result.append(
+            ELMInteraction(
+                motif_elm = l[0],
+                domain_pfam = l[1],
+                uniprot_motif = uniprot_mofif,
+                uniprot_domain = uniprot_domain,
+                isoform_motif = int(isoform_motif) if isoform_motif else 1,
+                isoform_domain = int(isoform_domain) if isoform_domain else 1,
+                start_motif = int(l[4]),
+                end_motif = int(l[5]),
+                start_domain = number_or_none(l[6]),
+                end_domain = number_or_none(l[7]),
+                affinity_min = number_or_none(l[8], float),
+                affinity_max = number_or_none(l[9], float),
+                pubmeds = tuple(map(int, l[10].split(','))) if l[10] else (),
+                taxon_motif = int(retax.match(l[11]).groups()[0]),
+                taxon_domain = int(retax.match(l[12]).groups()[0]),
+            )
+        )
+    
     return result
 
 
 def pfam_uniprot(uniprots, infile = None):
+    
     result = {}
     url = urls.urls['pfam_up']['url']
     infile = infile if infile is not None \
@@ -6560,7 +6663,7 @@ def only_pmids(idList, strict = True):
     """
     if type(idList) in common.simpleTypes:
         idList = [idList]
-    pmids = set([i for i in idList if i.isdigit()])
+    pmids = {i for i in idList if isinstance(i, int) or i.isdigit()}
     pmcids = [i for i in idList if i.startswith('PMC')]
     dois = [i for i in idList if '/' in i]
     manuscids = [i for i in idList if i.startswith('NIHMS')]
@@ -10610,7 +10713,13 @@ def intact_interactions(
 
         else:
 
-            return _try_isoform(field.split(':')[1].replace('"', ''))
+            uniprot, isoform = _try_isoform(
+                field.split(':')[1].replace('"', '')
+            )
+            
+            uniprot = uniprot.split('-')[0]
+            
+            return uniprot, isoform
 
 
     def get_taxon(field):
@@ -12711,3 +12820,122 @@ def cancersea_annotations():
                 )
     
     return dict(annotations)
+
+
+def get_protmapper():
+    """
+    Returns the raw records as read by ``csv.DictReader``.
+    From Bachman et al. 2019 "Assembling a phosphoproteomic knowledge base
+    using ProtMapper to normalize phosphosite information from databases and
+    text mining",
+    https://www.biorxiv.org/content/10.1101/822668v3.supplementary-material
+    """
+    
+    url = urls.urls['protmapper']['url']
+    files = urls.urls['protmapper']['files']
+    c = curl.Curl(url, large = True, silent = False, files_needed = files)
+    
+    evidences = collections.defaultdict(list)
+    
+    for rec in csv.DictReader(c.files_multipart['evidences.csv']):
+        
+        evidences[rec['ID']].append(rec)
+    
+    records = list(csv.DictReader(c.files_multipart['export.csv']))
+    
+    return records, evidences
+
+
+def protmapper_ptms(
+        only_evidences = None,
+        only_literature = False,
+        interactions = False,
+    ):
+    """
+    only_evidences : str,set,NoneType
+        Keep only the interactions with these evidence type, e.g. `VALID`.
+        See the 'descriptions' column in the 'evidences.csv' supplementary
+        table.
+    """
+    
+    databases = {
+        'signor': 'Signor',
+        'psp': 'PhosphoSite',
+        'sparser': 'Sparser',
+        'reach': 'REACH',
+        'pid': 'NCI-PID',
+        'reactome': 'Reactome',
+        'rlimsp': 'RLIMS-P',
+        'bel': 'BEL-Large-Corpus',
+    }
+    
+    result = []
+    only_evidences = common.to_set(only_evidences)
+    
+    records, evidences = get_protmapper()
+    
+    for rec in records:
+        
+        if rec['CTRL_NS'] != 'UP':
+            
+            continue
+        
+        if only_evidences:
+            
+            ev_types = {
+                ev['DESCRIPTION']
+                for ev in evidences[rec['ID']]
+            }
+            
+            if not only_evidences & ev_types:
+                
+                continue
+        
+        references = {
+            ev['PMID']
+            for ev in evidences[rec['ID']]
+            if ev['PMID']
+        }
+        
+        if only_literature and not references:
+            
+            continue
+        
+        typ = (
+            'phosphorylation'
+                if rec['CTRL_IS_KINASE'] == 'True' else
+            'unknown'
+        )
+        sources = {
+            '%s_ProtMapper' % (
+                databases[source] if source in databases else source
+            )
+            for source in rec['SOURCES'].strip('"').split(',')
+        }
+        
+        if interactions:
+            
+            result.append([
+                rec['CTRL_ID'],
+                rec['TARGET_UP_ID'],
+                sources,
+                references,
+            ])
+            
+        else:
+            
+            result.append({
+                'kinase': rec['CTRL_ID'],
+                'resaa': rec['TARGET_RES'],
+                'resnum': int(rec['TARGET_POS']),
+                'references': references,
+                'substrate': rec['TARGET_UP_ID'],
+                'databases': sources,
+            })
+    
+    return result
+
+
+def protmapper_interactions(**kwargs):
+    
+    return protmapper_ptms(interactions = True, **kwargs)

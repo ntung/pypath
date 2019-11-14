@@ -449,26 +449,27 @@ pathway = {
         extra_node_attrs_a = {},
         extra_node_attrs_b = {}),
     'pdz': input_formats.ReadSettings(
-        name = "PDZBase",
+        name = 'PDZBase',
         separator = None,
-        id_col_a = 1,
-        id_col_b = 4,
-        id_type_a = "uniprot",
-        id_type_b = "uniprot",
-        entity_type_a = "protein",
-        entity_type_b = "protein",
+        id_col_a = 0,
+        id_col_b = 2,
+        id_type_a = 'uniprot',
+        id_type_b = 'uniprot',
+        entity_type_a = 'protein',
+        entity_type_b = 'protein',
         is_directed = 1,
         sign = False,
-        ncbi_tax_id = {'col': 5,
-                   'dict': {
-                       'human': 9606
-                   }},
-        input = 'get_pdzbase',
-        references = 6,
+        ncbi_tax_id = {
+            'col': 7,
+            'include': {9606},
+        },
+        input = 'pdzbase_interactions',
+        references = 8,
         header = False,
         extra_edge_attrs = {},
         extra_node_attrs_a = {},
-        extra_node_attrs_b = {}),
+        extra_node_attrs_b = {}
+    ),
     'signor': input_formats.ReadSettings(
         name = "Signor",
         separator = None,
@@ -819,25 +820,16 @@ ptm = {
         is_directed = 0,
         sign = False,
         ncbi_tax_id = {
-            'A': {
-                'col': 11,
-                'dict': {
-                    '"9606"(Homo sapiens)': 9606
-                }
-            },
-            'B': {
-                'col': 12,
-                'dict': {
-                    '"9606"(Homo sapiens)': 9606
-                }
-            }
+            'A': {'col': 13, 'include': {9606}},
+            'B': {'col': 14, 'include': {9606}},
         },
-        input = 'get_elm_interactions',
-        references = (10, ','),
+        input = 'elm_interactions',
+        references = 12,
         header = False,
         extra_edge_attrs = {},
         extra_node_attrs_a = {},
-        extra_node_attrs_b = {}),
+        extra_node_attrs_b = {}
+    ),
     'domino': input_formats.ReadSettings(
         name = "DOMINO",
         separator = None,
@@ -887,7 +879,8 @@ ptm = {
         extra_edge_attrs = {},
         extra_node_attrs_a = {},
         extra_node_attrs_b = {},
-        must_have_references = True),
+        must_have_references = True
+    ),
     'hprd_p': input_formats.ReadSettings(
         name = "HPRD-phos",
         separator = None,
@@ -905,7 +898,29 @@ ptm = {
         header = False,
         extra_edge_attrs = {'hprd_mechanism': 8},
         extra_node_attrs_a = {},
-        extra_node_attrs_b = {})
+        extra_node_attrs_b = {}
+    ),
+    'protmapper': input_formats.ReadSettings(
+        name = "ProtMapper",
+        separator = None,
+        id_col_a = 0,
+        id_col_b = 1,
+        id_type_a = 'uniprot',
+        id_type_b = 'uniprot',
+        entity_type_a = 'protein',
+        entity_type_b = 'protein',
+        is_directed = 1,
+        sign = False,
+        ncbi_tax_id = 9606,
+        input = 'protmapper_interactions',
+        references = 3,
+        resource = 2,
+        header = False,
+        extra_edge_attrs = {},
+        extra_node_attrs_a = {},
+        extra_node_attrs_b = {},
+        must_have_references = True,
+    ),
 }
 
 # synonym
@@ -1005,8 +1020,13 @@ ptm_misc = {
         extra_edge_attrs = {'li2012_mechanism': 3,
                         'li2012_route': 2},
         extra_node_attrs_a = {},
-        extra_node_attrs_b = {})
+        extra_node_attrs_b = {}
+    ),
+    
 }
+
+ptm_misc['protmapper'] = copy.deepcopy(ptm['protmapper'])
+ptm_misc['protmapper'].must_have_references = False
 
 # synonym
 ptm_noref = ptm_misc
@@ -1032,11 +1052,12 @@ interaction_misc = {
         is_directed = False,
         sign = False,
         input = 'intact_interactions',
-        references = (2, ";"),
+        references = 4,
         ncbi_tax_id = 9606,
-        extra_edge_attrs = {"intact_methods": (3, ';')},
+        extra_edge_attrs = {"intact_methods": 5},
         extra_node_attrs_a = {},
-        extra_node_attrs_b = {}),
+        extra_node_attrs_b = {},
+    ),
     'hippie': input_formats.ReadSettings(
         name = "HIPPIE",
         separator = None,
@@ -1578,8 +1599,8 @@ pa.init_network(pypath.data_formats.transcription)
 
 """
 transcription = {
-    'tfregulons': input_formats.ReadSettings(
-        name = "TFRegulons",
+    'dorothea': input_formats.ReadSettings(
+        name = "DoRothEA",
         separator = None,
         id_col_a = 0,
         id_col_b = 1,
@@ -2228,6 +2249,7 @@ categories = {
     'Reactome': 'r',
     'ACSN': 'r',
     'WikiPathways': 'r',
+    'TRIP': 'p',
     'PANTHER': 'r',
     'ABS': 't',
     'MIMP': 'm',
@@ -2266,7 +2288,6 @@ categories = {
     'TFactS': 't',
     'TFe': 't',
     'TRED': 't',
-    'TRIP': 't',
     'TRRD': 't',
     'TRRUST': 't',
     # miRNA-mRNA

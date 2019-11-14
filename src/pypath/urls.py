@@ -158,7 +158,8 @@ urls = {
     },
     'pdzbase': {
         'label': 'Manually curated interactions of PDZ domain proteins',
-        'url': 'http://abc.med.cornell.edu/pdzbase/allinteractions'
+        'url_rescued': 'http://rescued.omnipathdb.org/PDZBase.html',
+        'url': 'http://abc.med.cornell.edu/pdzbase/allinteractions',
     },
     'pdz_details': {
         'label': 'Details of interactions in PDZbase',
@@ -393,7 +394,7 @@ urls = {
     'uniprot_sec': {
         'label': 'Secondary UniProt ACs',
         'url': 'ftp://ftp.uniprot.org/pub/databases/uniprot/'
-        'knowledgebase/docs/sec_ac.txt'
+        'knowledgebase/complete/docs/sec_ac.txt'
     },
     'uniprot_idmap_ftp': {
         'label': 'Human ID mapping from UniProt',
@@ -806,8 +807,10 @@ urls = {
     },
     'wikipw': {
         'label': 'WikiPathways human biopax',
-        'biopax_l3': 'http://wikipathways.org//wpi/cache/wikipathways_'
-        'Homo_sapiens_Curation-AnalysisCollection__owl.zip'
+        'biopax_l3_old': 'http://wikipathways.org//wpi/cache/wikipathways_'
+            'Homo_sapiens_Curation-AnalysisCollection__owl.zip',
+        'biopax_l3': 'http://data.wikipathways.org/20191010/gpml/'
+            'wikipathways-20191010-gpml-Homo_sapiens.zip',
     },
     'pwcommons': {
         'label': 'PathwayCommons binary SIF files',
@@ -1064,6 +1067,16 @@ urls = {
     },
     'alzpathway': {
         'url': 'http://rescued.omnipathdb.org/alzpw-ppi.csv',
+    },
+    'protmapper': {
+        'label': 'Integration of kinase-substrate data across many '\
+            'resources and text mining',
+        'url': 'https://www.biorxiv.org/content/biorxiv/early/2019/11/06/'\
+            '822668.1/DC1/embed/media-1.zip?download=true',
+        'files': [
+            'export.csv',
+            'evidences.csv',
+        ],
     },
 }
 

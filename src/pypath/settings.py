@@ -28,7 +28,22 @@ import os
 import copy
 import collections
 
-import pypath.common as common
+ROOT = os.path.abspath(os.path.dirname(__file__))
+
+
+class _const:
+
+    class ConstError(TypeError):
+
+        pass
+
+    def __setattr__(self, name, value):
+
+        if name in self.__dict__:
+
+            raise(self.ConstError, "Can't rebind const(%s)" % name)
+
+        self.__dict__[name] = value
 
 
 _defaults = {
@@ -39,8 +54,8 @@ _defaults = {
     'path_root': '/',
     # The basedir for every files and directories in the followings.
     'basedir': os.getcwd(),
-    # If None will be the same as ``basedir``.
-    'progessbars': True,
+    
+    'progressbars': False,
     # verbosity for messages printed to console
     'console_verbosity': -1,
     # verbosity for messages written to log
@@ -50,6 +65,7 @@ _defaults = {
     # check for expired mapping tables and delete them
     # (period in seconds)
     'mapper_cleanup_interval': 60,
+    # If None will be the same as ``basedir``.
     'data_basedir': None,
     'acsn_names': 'acsn_names.gmt',
     'alzpw_ppi': 'alzpw-ppi.csv',
@@ -140,7 +156,7 @@ def reset_all():
         val = getattr(defaults, k)
         
         if k in in_datadir:
-            val = os.path.join(common.ROOT, 'data', val)
+            val = os.path.join(ROOT, 'data', val)
         
         setattr(settings, k, val)
     
@@ -185,7 +201,7 @@ def reset(param):
     setup(param, get_default(param))
 
 
-defaults = common._const()
+defaults = _const()
 
 for k, v in iteritems(_defaults):
     

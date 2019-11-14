@@ -23,7 +23,7 @@ from future.utils import iteritems
 from past.builtins import xrange, range
 
 import sys
-import imp
+import importlib as imp
 import itertools
 import collections
 import pickle
@@ -40,6 +40,20 @@ import pypath.progress as progress
 import pypath.session_mod as session_mod
 
 
+builtin_inputs = [
+    'PhosphoSite',
+    'phosphoELM',
+    'Signor',
+    'dbPTM',
+    'HPRD',
+    'Li2012',
+    'PhosphoNetworks',
+    'MIMP',
+    'DEPOD',
+    'ProtMapper'
+]
+
+
 class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
 
     methods = {
@@ -52,12 +66,24 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
         'hprd': 'get_hprd_ptms',
         'li2012': 'li2012_phospho',
         'depod': 'get_depod',
+        'protmapper': 'protmapper_ptms',
     }
 
-    organisms_supported = set(['signor', 'phosphosite',
-                               'phosphoelm', 'dbptm', 'depod'])
+    organisms_supported = set([
+        'signor',
+        'phosphosite',
+        'phosphoelm',
+        'dbptm',
+        'depod',
+    ])
 
-    enzyme_id_uniprot = set(['phosphosite', 'phosphoelm', 'signor', 'depod'])
+    enzyme_id_uniprot = set([
+        'phosphosite',
+        'phosphoelm',
+        'signor',
+        'depod',
+        'protmapper',
+    ])
 
     substrate_id_types = {
         'mimp': [('genesymbol', 'substrate'), ('refseq', 'substrate_refseq')],
@@ -69,7 +95,16 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
         'signor': ['uniprot'],
         'hprd': [('refseqp', 'substrate_refseqp')],
         'depod': ['uniprot'],
+        'protmapper': ['uniprot'],
     }
+    
+    resource_names = dict(
+        (
+            name.lower(),
+            name
+        )
+        for name in builtin_inputs
+    )
 
 
     def __init__(
@@ -183,7 +218,14 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
                 dataio,
                 self.methods[self.input_method.lower()]
             )
-            self.name = self.name or self.input_method
+            self.name = (
+                self.name or
+                (
+                    self.resource_names[self.input_method.lower()]
+                    if self.input_method.lower() in self.resource_names else
+                    self.input_method
+                )
+            )
         else:
             self.inputm = f
             self.name = self.name or 'Unknown'
@@ -315,7 +357,7 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
 
                 for isof in se.isoforms():
 
-                    if p['instance'] is not None:
+                    if 'instance' in p and p['instance'] is not None:
 
                         if se.match(
                             p['instance'],
@@ -393,12 +435,12 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
                     s[0],
                     isoform=s[1])
 
-                if p['instance'] is None:
+                if 'instance' not in p or p['instance'] is None:
 
                     reg = se.get_region(
                         p['resnum'],
-                        p['start'],
-                        p['end'],
+                        p['start'] if 'start' in p else None,
+                        p['end'] if 'end' in p else None,
                         isoform=s[1])
 
                     if reg is not None:
@@ -433,18 +475,25 @@ class PtmProcessor(homology.Proteomes,homology.SequenceContainer):
                     domain=dom,
                     ptm=ptm,
                     sources=[self.name],
-                    refs=p['references'])
+                    refs=p['references'],
+                )
+                
 
                 if self.input_is('mimp'):
-                    dommot.mimp_sources = ';'.split(p[
-                        'databases'])
+                    dommot.mimp_sources = ';'.split(p['databases'])
+                    dommot.add_sources(dommot.mimp_sources)
                     dommot.npmid = p['npmid']
+                
+                if self.input_is('protmapper'):
+                    dommot.protmapper_sources = p['databases']
+                    dommot.add_sources(p['databases'])
 
                 elif self.input_is('phosphonetworks'):
                     dommot.pnetw_score = p['score']
 
                 elif self.input_is('dbptm'):
-                    dommot.dbptm_sources = [p['source']]
+                    dommot.dbptm_sources = ['%s_dbPTM' % p['source']]
+                    dommot.add_sources(dommot.dbptm_sources)
 
                 yield dommot
 
@@ -566,7 +615,8 @@ class PtmHomologyProcessor(
 
 
 class PtmAggregator(session_mod.Logger):
-
+    
+    
     def __init__(self,
             input_methods = None,
             ncbi_tax_id = 9606,
@@ -605,20 +655,22 @@ class PtmAggregator(session_mod.Logger):
         
         if self.pickle_file:
             
-            self.load_from_pickle()
+            self.load_from_pickle(pickle_file = self.pickle_file)
             
         else:
             
             self.build()
     
     
-    def load_from_pickle(self):
+    def load_from_pickle(self, pickle_file = None):
         
         self._log('Loading from file `%s`.' % pickle_file)
         
         with open(self.pickle_file, 'rb') as fp:
             
             self.enz_sub, self.references = pickle.load(fp)
+        
+        self.update_ptm_lookup_dict()
     
     
     def save_to_pickle(self, pickle_file):
@@ -637,11 +689,6 @@ class PtmAggregator(session_mod.Logger):
     
     
     def build(self):
-        
-        self.builtin_inputs = ['PhosphoSite', 'phosphoELM',
-                               'Signor', 'dbPTM', 'HPRD',
-                               'Li2012', 'PhosphoNetworks',
-                               'MIMP', 'DEPOD']
         
         self.inputargs = self.inputargs or {}
         self.map_by_homology_from = set(self.map_by_homology_from or [9606])
@@ -671,7 +718,7 @@ class PtmAggregator(session_mod.Logger):
 
         if self.input_methods is None:
             
-            self.input_methods = self.builtin_inputs
+            self.input_methods = builtin_inputs
 
 
     def build_list(self):
@@ -734,9 +781,9 @@ class PtmAggregator(session_mod.Logger):
                     substrate_id_type = self.substrate_id_type,
                     **inputargs,
                 )
-
+                
                 extend_lists(proc.__iter__())
-
+            
             if self.map_by_homology_from:
                 
                 self._log(
@@ -748,7 +795,7 @@ class PtmAggregator(session_mod.Logger):
                         self.ncbi_tax_id,
                     )
                 )
-
+                
                 proc = PtmHomologyProcessor(
                     input_method = input_method,
                     ncbi_tax_id = self.ncbi_tax_id,
@@ -760,8 +807,26 @@ class PtmAggregator(session_mod.Logger):
                     ptm_homology_strict = self.ptm_homology_strict,
                     **inputargs
                 )
-
+                
                 extend_lists(proc.__iter__())
+        
+        self.references = dict(self.references)
+        self.update_ptm_lookup_dict()
+    
+    
+    def update_ptm_lookup_dict(self):
+        
+        self.ptm_to_enzyme = collections.defaultdict(set)
+        self.ptms = {}
+        
+        for (enz, sub), ptms in iteritems(self.enz_sub):
+            
+            for ptm in ptms:
+                
+                self.ptm_to_enzyme[ptm.ptm].add(enz)
+                self.ptms[ptm.ptm] = ptm.ptm
+        
+        self.ptm_to_enzyme = dict(self.ptm_to_enzyme)
 
 
     def unique(self):
@@ -1010,7 +1075,7 @@ class PtmAggregator(session_mod.Logger):
             }
     
     
-    def summaries_tab(self, outfile = None):
+    def summaries_tab(self, outfile = None, return_table = False):
         
         columns = (
             ('name', 'Resource'),
@@ -1045,7 +1110,9 @@ class PtmAggregator(session_mod.Logger):
                 
                 fp.write('\n'.join('\t'.join(row) for row in tab))
         
-        return tab
+        if return_table:
+            
+            return tab
 
 
 
